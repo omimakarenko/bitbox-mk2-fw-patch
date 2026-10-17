@@ -1,0 +1,9 @@
+# Python's bytecode cache
+__pycache__/
+*.pyc
+
+# Firmware images: 1010music's, never ours to distribute, stock or patched
+*.BIN
+*.bin
+*.zip
+patched/
