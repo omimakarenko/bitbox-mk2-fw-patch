@@ -47,9 +47,18 @@ micro patcher's own sources with MK2 constants, and the result is frozen in
 FROZEN_MK2 below so building needs no toolchain. `--reassemble` (needs clang)
 rebuilds them and refuses if the frozen bytes have drifted.
 
-Not yet: Character, OSD, Keep CCs, Program Change, Clk Loss, Preset BPM,
-Flip UI. Two of the micro's RAM areas fall inside the MK2's stack and must
-move first.
+STAGE 3 adds the rest of the 2.3.9-mod set: Settings rows (Clk Loss, Preset
+BPM, OSD, Keep CCs on page 3; ProgChange's NEW ONLY), the Character chain
+(CC 14-29, channel 1), the pop-up and CPU bar, and Keep CCs. Their hooks are
+patch_micro.py's own functions, re-run with every micro address in their
+source swapped through CODE_MAP / RAM_MAP (anything unmapped refuses), and the
+Character C object relocated pair by pair (CHR_RELOC). All patch RAM moves up
+by RAM_DELTA, as one block, to clear the MK2's larger stack.
+
+Not here: Flip UI (the MK2 flips its screen and touch natively), CC 89, and
+2.3.10-mod's additions (Clip modes, compressor types, themes, saving).
+
+tools/emu_check_mk2.py runs the hooks in an emulator; run it before flashing.
 
 Usage: patch_mk2.py <BITBOXMK2.bin> <out.bin> [-v] [--reassemble]
 """
@@ -62,7 +71,7 @@ import patch_micro as pm                # noqa: E402  the hook generators
 BASE = 0x08040000
 STOCK_SHA = "35ab7995ad0eca8484f3b28bc76389f10b2037dbb21a4a394e950d9329073e86"
 STOCK_SIZE = 674896
-VERSION = "2.3.4-cc4"                   # 9 characters: see pm.VER_DISPLAY_MAX
+VERSION = "2.3.4-cc5"                   # 9 characters: see pm.VER_DISPLAY_MAX
 
 # CCs left out of this build. 2026-10-27, cc1 on hardware: CC 89 (Loop
 # Crossfade) on a Sample pad gave sudden full-scale distorted output at any
@@ -132,10 +141,8 @@ STAGE2 = {
     "COMP_ONOFF_OFF": 0x28c58,        # micro 0x28cc0
     "COMP_DSP_FN":   0x080ba43c,      # micro 0x080b9b04, identical
     "COMP_DSP_CALL": 0x080983a8,      # micro 0x08097056
-    # Auto makeup's flag. The micro keeps it at 0x2406a620, right after Keep
-    # CCs -- which on the MK2 is INSIDE the main stack (top 0x2406ad98). It
-    # moves into the free words between the store blocks and the Character's.
-    "AUTO_RAM": 0x2406c0b0,
+    # (Auto makeup's flag, and every other patch-RAM address, moves with the
+    # whole patch-RAM block: see RAM_DELTA below.)
     # The EQ class: identical code, 0x19c further up (0x198 from the handler).
     "EQ_HANDLER": 0x080bb3b8,
     "EQ_VTABLE": 0x080df27c,
@@ -210,6 +217,257 @@ tstock:
 # MIDI thread forever and the watchdog rebooted the module. clang_asm() now
 # refuses any object that carries a relocation.
 
+# --- patch RAM: one block, moved as a whole ------------------------------------
+# The micro keeps all of its RAM between its main stack (top 0x240692a8) and
+# its uncached pool (floor 0x2406f4e0): 0x24069400 up. The MK2's stack ends
+# higher, at 0x2406ad98, so 0x24069400-0x2406ad98 is stack here: Keep CCs, the
+# OSD's UI-side area and (2.3.10) the Jungle and compressor areas would sit in
+# it. Every patch-RAM address therefore moves up by RAM_DELTA, together, so
+# their layout -- and every offset the hooks and the C object compute between
+# them -- is unchanged. 0x24069400 + 0x1a00 = 0x2406ae00 clears the stack; the
+# micro's highest byte (2.3.10, 0x2406f080) lands at 0x24070a80, under the MK2
+# pool floor 0x24070dc0. check_ram() proves both for every range in use.
+RAM_DELTA = 0x1a00
+MICRO_RAM_WIN = (0x24069400, 0x2406f4e0)      # micro: just above its stack .. its pool
+
+
+def ram_shift(v):
+    lo, hi = MICRO_RAM_WIN
+    return v + RAM_DELTA if lo <= v < hi else v
+
+
+# --- STAGE 3: Settings rows, Clk Loss, Preset BPM, Program Change, CPU bar,
+# --- Character, the OSD and Keep CCs (the 2.3.9-mod set) ---------------------
+# Stock RAM objects, micro -> MK2, each proved by literal-pool pairs (the count)
+# or as an offset from one that is.
+RAM_MAP = {
+    0x24022978: 0x24023cb8,   # MANAGER, the engine (164 pairs)
+    0x2402c978: 0x2402dcb8,   # SCAN_LO = MANAGER + 0xa000
+    0x2402cd78: 0x2402e0b8,   # SCAN_HI = MANAGER + 0xa400
+    0x24013cb0: 0x24015170,   # SESSION_MGR (118 pairs)
+    0x24015f28: 0x240173e8,   # SONG_STORE = SESSION_MGR + 0x2278 (offset unchanged, 24 pairs)
+    0x2401bc80: 0x2401d040,   # GLOBAL_STORE = SESSION_MGR + 0x7fd0 -> +0x7ed0 (22 pairs)
+    0x2401bcb4: 0x2401d074,   # SESSION_DIRTY = SESSION_MGR + 0x8004 -> +0x7f04 (45 pairs)
+    0x24022578: 0x240238b8,   # PC_MANAGER (64 pairs)
+    0x240228a4: 0x24023be4,   # PC_LIST = PC_MANAGER + 0x32c (17 pairs)
+    0x24022908: 0x24023c48,   # PC_PENDING = PC_MANAGER + 0x390
+    0x2402290c: 0x24023c4c,   # PC_CURRENT = PC_MANAGER + 0x394 (offset unchanged, 23)
+    0x24002e7c: 0x24004280,   # DISPLAY_OBJ (32 pairs)
+}
+RAM_ALLOWED = {0x24000000, 0x2407c000, 0x24080000}   # bounds checks, not objects
+
+# Every micro flash address stage 3 reads, guards, calls or branches to. "eq":
+# the aligned instructions match; "~": same instruction, MK2 frame offsets;
+# "lit": the literal-pool word paired with it; "manual": data, found by hand
+# (the font, the OFF/ON strings, the LFO labels, the EQ vtable, the font
+# descriptor's initialiser, the Character site's context).
+CODE_MAP = {
+    0x08042488: 0x08042384,   # lit
+    0x08042900: 0x0804368c,   # eq
+    0x080439de: 0x0804476a,   # eq
+    0x080442c4: 0x08044fe0,   # eq
+    0x08044328: 0x08045044,   # eq
+    0x08044eb8: 0x08045bd4,   # eq
+    0x0804565c: 0x08046378,   # eq
+    0x0805bbb4: 0x0805b950,   # eq
+    0x08069e4e: 0x0806a24e,   # eq
+    0x08069e7c: 0x0806a27c,   # eq
+    0x08069ed4: 0x0806a2d4,   # eq
+    0x0806a8c2: 0x0806acba,   # eq
+    0x0806abbc: 0x0806afb2,   # eq
+    0x0806b054: 0x0806b448,   # eq
+    0x0806d6e0: 0x0806dae4,   # lit
+    0x0806dc14: 0x0806e018,   # lit
+    0x0807aa9c: 0x0807ca10,   # eq
+    0x0807af2c: 0x0807cde8,   # eq
+    0x0807c258: 0x0807e114,   # eq
+    0x0807c26e: 0x0807e12a,   # eq
+    0x0807c298: 0x0807e154,   # eq
+    0x0807c4e0: 0x0807e2f4,   # eq
+    0x0807c538: 0x0807e3d0,   # lit
+    0x0807c5be: 0x0807e456,   # eq
+    0x0807c7e8: 0x0807e680,   # eq
+    0x0807d51c: 0x0807f91e,   # eq
+    0x0807f768: 0x08082088,   # eq
+    0x0807f874: 0x08082194,   # eq
+    0x0807f892: 0x080821b2,   # eq
+    0x0807f98c: 0x080822ac,   # eq
+    0x0807f994: 0x080822b4,   # eq
+    0x0807fa74: 0x08082394,   # lit
+    0x080894d0: 0x08089388,   # eq
+    0x080894d4: 0x0808938c,   # eq
+    0x080894fa: 0x080893b2,   # eq
+    0x080894fe: 0x080893b6,   # eq
+    0x0808951e: 0x080893d6,   # eq
+    0x08089e08: 0x08089cc0,   # eq
+    0x08089ef4: 0x08089dac,   # eq
+    0x08089efe: 0x08089db6,   # eq
+    0x0808aa0c: 0x0808a8c4,   # eq
+    0x0808b4e8: 0x0808b2c4,   # eq
+    0x0808bd52: 0x0808ba46,   # eq
+    0x0808c460: 0x0808c0e4,   # eq
+    0x080937f4: 0x08094de4,   # eq
+    0x080939cc: 0x08094fbc,   # eq
+    0x080939d0: 0x08094fc0,   # eq
+    0x08093d30: 0x080952c4,   # eq
+    0x08093e72: 0x08095388,   # eq
+    0x08093e82: 0x08095398,   # eq
+    0x08093e94: 0x080953aa,   # eq
+    0x08093ee6: 0x080953fc,   # eq
+    0x08093eea: 0x08095400,   # ~
+    0x08093eee: 0x08095404,   # ~
+    0x08093f10: 0x08095426,   # eq
+    0x08093f14: 0x0809542a,   # eq
+    0x08093fea: 0x08095506,   # ~
+    0x080950c0: 0x0809656c,   # eq
+    0x0809654e: 0x080979e8,   # eq
+    0x08096cf8: 0x08098170,   # manual
+    0x08096d04: 0x0809817a,   # eq
+    0x08096d26: 0x0809819c,   # eq
+    0x0809702c: 0x080983fc,   # lit
+    0x08097056: 0x08098388,   # eq
+    0x0809705a: 0x0809838c,   # eq
+    0x08097b8c: 0x08098f18,   # eq
+    0x08097bdc: 0x08098f68,   # eq
+    0x080a04c0: 0x080a1868,   # eq
+    0x080a3328: 0x080a46d0,   # eq
+    0x080a396c: 0x080a4d14,   # eq
+    0x080a6258: 0x080a7438,   # eq
+    0x080a625c: 0x080a743c,   # eq
+    0x080a6372: 0x080a7552,   # eq
+    0x080a6376: 0x080a7556,   # eq
+    0x080a6522: 0x080a7702,   # eq
+    0x080a6526: 0x080a7706,   # eq
+    0x080a65e6: 0x080a77c6,   # eq
+    0x080a65ea: 0x080a77ca,   # eq
+    0x080a6674: 0x080a7854,   # eq
+    0x080a6678: 0x080a7858,   # eq
+    0x080a6712: 0x080a78f2,   # eq
+    0x080a6716: 0x080a78f6,   # eq
+    0x080a67a0: 0x080a7980,   # eq
+    0x080a67a4: 0x080a7984,   # eq
+    0x080a67d6: 0x080a79b6,   # eq
+    0x080a67da: 0x080a79ba,   # eq
+    0x080a67e6: 0x080a79c6,   # eq
+    0x080a7ca8: 0x080a8e88,   # eq
+    0x080a83a4: 0x080a9584,   # eq
+    0x080a83e2: 0x080a95c2,   # eq
+    0x080ac35e: 0x080ad53e,   # eq
+    0x080ac766: 0x080ad946,   # eq
+    0x080b2316: 0x080b336e,   # eq
+    0x080b27c2: 0x080b381a,   # eq
+    0x080b42ac: 0x080b53d4,   # eq
+    0x080b55ac: 0x080b66d4,   # eq
+    0x080b57f6: 0x080b691e,   # eq
+    0x080b58fc: 0x080b6a24,   # eq
+    0x080b742a: 0x080b8552,   # eq
+    0x080b7cd6: 0x080b8dfe,   # eq
+    0x080b9b04: 0x080ba43c,   # eq
+    0x080ba794: 0x080ba930,   # eq
+    0x080ba8d8: 0x080baa74,   # eq
+    0x080bab98: 0x080bad34,   # eq
+    0x080bae18: 0x080bafb4,   # eq
+    0x080baf5c: 0x080bb0f8,   # eq
+    0x080bb220: 0x080bb3b8,   # eq
+    0x080bf664: 0x080c0784,   # manual
+    0x080c0030: 0x080c1104,   # manual
+    0x080c0034: 0x080c1108,   # manual
+    0x080c478c: 0x080c58dc,   # manual
+    0x080e259c: 0x080df27c,   # manual
+    0x080e25a8: 0x080df288,   # manual
+    0x080e3e64: 0x080e4c24,   # manual
+}
+# The micro's third SESSION_MGR literal (0x080921e8) has no aligned twin; the
+# other two do, and 78 literals in the MK2 hold the MK2's value.
+SESSION_MGR_GUARDS_MK2 = (0x0806dae4, 0x0806e018)
+# Guards whose bytes legitimately differ on the MK2, each read and checked by
+# hand: the dispatcher frame (0x40.. not 0x78..), the engine in r5 not r4,
+# branch and literal offsets that moved. micro address -> MK2 bytes.
+GUARD_BYTES_MK2 = {
+    0x08093e82: "4af6106315f80390",   # movw r3,#0xae10; ldrb sb,[r5,r3]: the ready byte
+    0x08093f10: "38681493",           # ldr r0,[r7]; str r3,[sp,#0x50]
+    0x08093ee6: "07232046cdf844908df84030",   # type 7 at sp+0x40, +4 = 0
+    0x080950c0: "034603484ff48062184413f005b8",   # the thunk, key 0x400
+    0x080a83e2: "04221044fbf7a5bb",   # key 0x400 is queue +4
+    0x0807c26e: "a94817f0caf8",       # LoadBank asks it, with the literal
+    0x08093d30: "03f050be",           # through this tail call
+    0x0807f892: "08a9284612f001ff",   # the UI dispatcher reads it with r5
+    0x080939cc: "03f0acbf",           # through this tail call
+    0x08093eea: "cdf844908df84030",   # type 7 for a CC at +0x40 ...
+    0x08093fea: "8df84030cdf84490",   # ... type 5 for a note-on, same tail
+    0x08042488: "b83c0224",           # the audio task's engine literal: MANAGER
+}
+# The Character's site: `movs r1,#0xb; mov r0,sl; bl; mov r1,r0; mov r0,r4`
+# (micro: #0xe and vmov r0,s17 -- the reverb return's buffer index and where
+# the engine is kept differ; nblock only reads r0 at the call).
+CHR_SITE_CONTEXT_MK2 = (0x08098170, "504611f091f901462046")
+
+# The Character C object builds these addresses with movw/movt pairs:
+# (section, movw offset, movt offset, micro value). Each is checked before it
+# is rewritten; nothing else in the object addresses flash or stock RAM.
+# Found by a disassembly that resynchronises past undecodable words AND a
+# brute-force halfword scan, which agree on all 27. cc5's first build had 24:
+# a plain linear sweep stopped a third of the way into chr_osd_tick, and the
+# OSD wrote to two unmoved micro addresses -- inside the MK2's stack. Caught
+# in emulation (UC_HOOK_MEM_WRITE), never flashed.
+CHR_RELOC = (
+    (".text.chr_osd_tick", 0x000c, 0x0014, 0x240694a8),
+    (".text.chr_osd_tick", 0x0184, 0x018c, 0x2406c358),
+    (".text.chr_osd_tick", 0x01c0, 0x01c8, 0x2406c308),
+    (".text.chr_osd_tick", 0x05b2, 0x05c0, 0x2406c358),
+    (".text.chr_osd_tick", 0x063a, 0x0644, 0x240694a8),
+    (".text.chr_osd_tick", 0x0664, 0x0668, 0x080bf564),   # font - 0x100
+    (".text.chr_osd_tick", 0x0a0c, 0x0a10, 0x240694a8),
+    (".text.chr_osd_tick", 0x0b46, 0x0b4c, 0x080c478c),   # LFO labels
+    (".text.chr_osd_tick", 0x0b90, 0x0b98, 0x2406c358),
+    (".text.chr_osd_tick", 0x0b94, 0x0b9c, 0x240694a8),
+    (".text.chr_osd_tick", 0x1012, 0x101a, 0x2406a620),
+    (".text.chr_osd_tick", 0x11fa, 0x1200, 0x2406c358),
+    (".text.chr_osd_tick", 0x1dea, 0x1df2, 0x2406c358),
+    (".text.chr_osd_tick", 0x1e00, 0x1e04, 0x240694a8),
+    (".text.osd_sync", 0x000a, 0x001a, 0x24069860),
+    (".text.chr_cc", 0x001a, 0x002e, 0x2406c308),
+    (".text.chr_cc", 0x00ba, 0x00be, 0x2406c20c),
+    (".text.chr_cc", 0x0122, 0x012a, 0x2406c204),
+    (".text.chr_cc", 0x0172, 0x017c, 0x2406c20c),
+    (".text.chr_cc", 0x0178, 0x0182, 0x2406c204),
+    (".text.chr_cc", 0x0340, 0x0344, 0x2406c20c),
+    (".text.store_ok", 0x0006, 0x000e, 0x2406c200),
+    (".text.store_seed", 0x0000, 0x0006, 0x2406c204),
+    (".text.chr_block", 0x0044, 0x004c, 0x2406c204),
+    (".text.chr_block", 0x04d4, 0x04da, 0x2406c204),
+    (".text.chr_block", 0x07d8, 0x07e0, 0x2406c204),
+    (".text.slot_reset", 0x0002, 0x0008, 0x2406c254),
+)
+CHR_FLASH = {0x080bf564: 0x080c0684, 0x080c478c: 0x080c58dc}
+
+# Settings: the MK2 has three pages of eight rows (micro: two). Page 3 holds
+# four stock rows and four free slots -- exactly the four rows the patch adds.
+SETTINGS_VA = 0x080c7ebc                  # loaded at 0x080799b0 (micro 0x08077948)
+SETTINGS_STOCK = ((97, 120, 156, 150), (127, 379, 194), (89, 90, 181, 195))
+
+# The stage-3 functions of patch_micro.py that are run here, with every micro
+# address in their source replaced through CODE_MAP / RAM_MAP / ram_shift.
+STAGE3_FUNCS = (
+    "build_program_change_hook", "apply_program_change",
+    "build_clock_hold_hook", "apply_clock_hold",
+    "build_cpu_meter_hook", "apply_cpu_meter",
+    "build_preset_bpm_hook", "apply_preset_bpm",
+    "build_character_hook", "apply_character",
+    "_osd_pad_rec", "_osd_post", "_keep_skip", "build_osd_hook", "apply_osd",
+    "build_keep_hook", "apply_keep_ccs",
+)
+# Module constants they read that carry micro code addresses.
+STAGE3_GLOBALS = (
+    "PC_CALLS", "PC_MIRROR_VA", "CLK_CALLS", "CLK_SITES", "CLK_SET_STORE",
+    "CLK_SET_REBUILD", "CLK_REG_LIMIT_VA", "CLK_STORE_CAP_VA", "K_CALLS",
+    "L_CALLS", "L_ENTRIES", "CHR_SITE", "CHR_SITE_FN", "CHR_EQ_HEAD_VA",
+    "OSD_CALLS", "OSD_FONT_VA", "OSD_FONT_LIT_VA", "OSD_LFO_LABELS",
+    "OSD_PAD_SITES", "OSD_SLICER_GUARD", "OSD_GRANULAR_GUARD", "OSD_SETPARAM",
+    "KEEP_CALLS", "KEEP_GUARDS", "KEEP_FINAL_SITES", "FINALIZE_FN",
+    "KEEP_SETPARAM",
+)
+
 # Generated by `patch_mk2.py ... --reassemble` with clang 18; see mk2_assemble.
 # BEGIN FROZEN_MK2
 FROZEN_MK2 = {
@@ -224,24 +482,24 @@ FROZEN_MK2 = {
     'mk2_hookDr': (
         "03b4ddf850c0bcf1000f40f0a280ddf854c0bcf1280f04d0acf12903052b2cd997e04df6b840c2f202404ef2b801c2f2"
         "02410268a2f11053b3f5a02f0cd24ff6a073d358b3f1c00f06d14ff6a473d35848f6a04c634503d004308842e9d378e0"
-        "ddf858c0bcf5005fb4bf0023012348f65841c0f2020153546be04cf20002c2f2064211684cf2de0cc1f2100c61450ed0"
+        "ddf858c0bcf5005fb4bf0023012348f65841c0f2020153546be04df60022c2f2064211684cf2de0cc1f2100c61450ed0"
         "c2f800c050a002f1040102f1180c90ed000a81ed000a043004316145f7d3052b52d0042b0bd146480168dff818c16145"
         "05d141686fea0c0c614500d141e0ddf858c01cf07f0f08bf4ceadc1c00ee10cab8ee400a03eb430040a101eb8001d1ed"
         "000a91ed011a886820ee200a30ee010a002801d0bceec00a02eb830080ed010a012b0bd82e480168dff8b8c0614505d1"
         "41686fea0c0c614500d125e0d2f800c053688cea030c93688cea030cd3688cea030c13698cea030c53698cea030cc2f8"
         "18c003bc00000000ddf858c01c48bcf5005f05db1b4901606fea0101416003e0002101604160ece792ed010ad2ed020a"
         "b7ee001ac1ee200a70eec10a20ee200ab4ee400af1ee10fa15d60ca0d0ed000ab4ee600af1ee10fac8bfb0ee600af1ee"
-        "600ab4ee600af1ee10fab8bfb0ee600a82ed050ab2e700205061afe700001042b0c006244155544f000040c100000040"
+        "600ab4ee600af1ee10fab8bfb0ee600a82ed050ab2e700205061afe70000104220c006244155544f000040c100000040"
         "a005000040380000000000008002203b000020c2000000006002983a0000803f000000005542953e0000c04101000000"
         "e7a239400000f043010000004002903b000010c200000000"
         , {'_sD': 0, 'dauto': 344, 'dauto_off': 368, 'dfound': 96, 'dk36': 460, 'dmakeup': 376, 'dmk_zero': 454, 'dnext': 340, 'dnextc': 88, 'donoff': 34, 'dout': 338, 'dparam': 122, 'dscale': 492, 'dscan': 50, 'dseed': 158, 'dseeded': 174, 'dstock': 472, 'dstore': 264, 'dsum': 300, 'dval': 206}),
     'mk2_hookE': (
-        "4cf20002c2f2064213684cf2de0cc1f2100c634519d0c2f800c040f20003ccf24013536040f20003c4f20003936040f2"
+        "4df60022c2f2064213684cf2de0cc1f2100c634519d0c2f800c040f20003ccf24013536040f20003c4f20003936040f2"
         "a053d36043f64003136140f2000353614ff63e53c9f25013936153688cea030c93688cea030cd3688cea030c13698cea"
         "030c53698cea030c936963450ed15368c0f828349368c0f82c34d368c0f848341369c0f84c345369c0f8303400000000"
         , {'_sE': 0, 'enext': 140, 'eout': 140, 'everify': 74}),
     'mk2_hookF': (
-        "03b4ddf850c0bcf1000f40f09580ddf854c0acf13203092b00f28e804cf24002c2f2064211684ef20e00c1f210008142"
+        "03b4ddf850c0bcf1000f40f09580ddf854c0acf13203092b00f28e804df64022c2f2064211684ef20e00c1f210008142"
         "26d0106040f20001516041f6c071916041f6c071d16041f6c071116140f20001516140f20001916140f20001d16140f2"
         "0001116240f20001516240f2010191620021116351634ff6cf71c1f21001d1621699002b05d10a2001fb00f1890b5160"
         "2fe0072b06d1b1f5005fb4bf00210121116226e0092b06d1b1f5005fb4bf0021012151621de0042b06d1b1f5005fb4bf"
@@ -250,7 +508,7 @@ FROZEN_MK2 = {
         "80ea0300136a80ea0300536a80ea0300936a80ea0300d06203bc0000000000bf38080c10383838383838"
         , {'_sF': 0, 'fbump': 242, 'fnext': 314, 'fnotba': 200, 'fnotbb': 218, 'fnotbc': 236, 'fnotbyp': 164, 'fnotmode': 146, 'fnotslope': 182, 'fout': 312, 'fplain': 236, 'fseeded': 128, 'fslots': 320}),
     'mk2_hookG': (
-        "2de9f0412ded068b04460d464cf24006c2f2064633684ef20e00c1f21000834227d03246106040f20001516041f6c071"
+        "2de9f0412ded068b04460d464df64026c2f2064633684ef20e00c1f21000834227d03246106040f20001516041f6c071"
         "916041f6c071d16041f6c071116140f20001516140f20001916140f20001d16140f20001116240f20001516240f20101"
         "91620021116351634ff6cf71c1f21001d1623068736880ea0300b36880ea0300f36880ea0300336980ea0300736980ea"
         "0300b36980ea0300f36980ea0300336a80ea0300736a80ea0300b36a80ea0300f36a984240f00480b06a306300f0fcf8"
@@ -316,6 +574,81 @@ FROZEN_MK2 = {
         "00009b4300005c4400000c4500002042418764422934a342b11ae942bf78264396c56d4314cea9436888f24380342d44"
         "a16377445aacb044c057fc44fb353445a1b28045bed1b7455646034600803b46"
         , {'_sG': 0, 'gapply': 696, 'gbpnar': 2928, 'gbpwid': 2924, 'gccinv': 2908, 'gclr': 700, 'gctl0f': 952, 'gctl0j': 960, 'gctl10f': 2424, 'gctl10j': 2432, 'gctl11f': 2544, 'gctl11j': 2552, 'gctl1f': 1362, 'gctl1j': 1370, 'gctl2f': 1560, 'gctl2j': 1568, 'gctl3f': 1632, 'gctl3j': 1640, 'gctl4f': 1794, 'gctl4j': 1802, 'gctl5f': 2128, 'gctl5j': 2136, 'gctl6f': 2190, 'gctl6j': 2198, 'gctl7f': 2300, 'gctl7j': 2308, 'gctl8f': 2330, 'gctl8j': 2338, 'gctl9f': 2394, 'gctl9j': 2402, 'gdjspr': 2916, 'gdtab': 2768, 'gfmtdn': 2944, 'gfmtf': 2976, 'gfmtg': 2964, 'gfmtis': 2940, 'gfmtq': 2952, 'gfmtup': 2948, 'gfsend': 676, 'gfsflat': 690, 'gfshift': 614, 'gfsup': 668, 'gft1': 280, 'gft2': 298, 'gftab': 256, 'ggain': 460, 'ggboo': 2896, 'ggboost': 514, 'ggcut': 2892, 'ggend': 522, 'ggflat': 528, 'ghalf': 354, 'ghdone': 402, 'ghsinv': 2904, 'ghspan': 2920, 'gidxs': 2912, 'gmbpsl': 1990, 'gmdj': 802, 'gmdjc': 864, 'gmdjf': 882, 'gmdjhp': 880, 'gmdjs1': 1010, 'gmdjs2': 1014, 'gmfill': 2716, 'gmfmc': 2600, 'gmfmt': 2524, 'gmfmtl': 2644, 'gmfnext': 2758, 'gmix3': 1068, 'gmix3k': 1132, 'gmix3l': 1072, 'gmix3s': 1162, 'gmixf': 2796, 'gmixk': 2820, 'gmixkg': 2836, 'gmixkq': 2824, 'gmixq': 2808, 'gmixt': 2792, 'gmmix': 1056, 'gmmnl': 2462, 'gmmnot': 2374, 'gmnotch': 2090, 'gmnsp': 2864, 'gmout': 2714, 'gmpeak': 2276, 'gmphone': 1774, 'gmtilt': 2180, 'gmtnc': 1430, 'gmtnf': 1448, 'gmtnhp': 1446, 'gmtnk0': 1228, 'gmtnk1': 1308, 'gmtns0': 1250, 'gmtns1': 1330, 'gmtone': 1188, 'gmtwin': 1536, 'gnext': 204, 'gnotchg': 2932, 'gnullf': 2936, 'gout': 192, 'gqbell': 2888, 'gqfix': 2884, 'gqmap': 426, 'gqmn': 2872, 'gqnot': 2856, 'gqph': 2876, 'gqres': 2848, 'gsetband': 208, 'gtable': 3036, 'gtdend': 600, 'gtdflat': 602, 'gtiltd': 540, 'gtiltg': 2900, 'gu16': 404, 'gvalid': 114}),
+    'mk2_hookH': (
+        "10b582b01a460ff2141303240094069c01940000000002b010bd0cb495f8b0220a610cbc000000000cb4354a00231360"
+        "53600cbc000000000cb4314a0023136053600cbc000000000cb42d4a0023136053600cbc0000000070b50c4605460000"
+        "00000fb4002810d026498d420dd1217803290ad12169002901d0234900e000211f4a6fea0103536011600fbc70bd7fb5"
+        "c0b0669b022b2cd1194b1c681a4dac4227d15c686fea0505ac4222d1174b1b681b78002b1dd1164b1c682378002b18d0"
+        "144800000000002813d0134841996a460000000000280cd06d4640f2001614f8010b15f8011b884203d1002806d0013e"
+        "f5d140b0bde87f400000000040b07fbd80da0624b8380224324e4350483c02244c3c0224b83c0224e43b022404110c08"
+        "08110c08000000004e4557204f4e4c590000bf00"
+        , {'_sH': 0, 'hinit': 40, 'hinit_next': 52, 'hinvalidate': 56, 'hinvalidate_next': 68, 'hload': 142, 'hload_compare': 222, 'hload_idle': 194, 'hload_next': 248, 'hload_resolve': 208, 'hload_same': 252, 'hload_stock': 242, 'hmenu': 284, 'hmenu_new': 296, 'hmenu_new_ptr': 292, 'hpost': 26, 'hpost_next': 36, 'hregister': 0, 'hregister_call': 18, 'hresponse': 88, 'hresponse_call': 94, 'hresponse_invalid': 126, 'hresponse_out': 138, 'hresponse_store': 128, 'hteardown': 72, 'hteardown_next': 84}),
+    'mk2_hookJ': (
+        "1fb582b040f23a110ff278120ff26c13022400940ff28c1401940000000002b0bde81f400000000007b500000000bde8"
+        "074040f23a1100220000000040f23a1c62450bd1dff828c11bb14a4bccf800307047ccf80030ccf80430704700000000"
+        "c4f83c31424b4ff0000cc3f800c0c3f804c00000000014f8081021b1dff8f8c03c4bccf800300000000094ed4f0ad4ed"
+        "067a00f022f80000000090ed4f0ad0ed067a00f01af80000000094ed4f0ad4ed067a00f012f80000000090ed4f0ad0ed"
+        "067a00f00af80000000094ed4f0ad4ed067a00f002f800000000dff894c0dcf80030dff890c0634517d1dff88cc0dcf8"
+        "0030dff880c063450fd19fed1b7af4ee477af1ee10fa08dd9fed187af4ee477af1ee10fa01dab0ee670a704787b0fbb9"
+        "dff84cc0dcf80030dff848c0634519d1dff844c0dcf80030dff838c0634511d1d4ed067a9fed087af4ee477af1ee10fa"
+        "08dd9fed067af4ee477af1ee10fa01da00000000000000000000a04100007a4488da0624444c4f488cda062400000000"
+        "00000000436c6b204c6f73733a0000bf494e5445524e414c0000bf00484f4c440000bf00636c6b6c6f73736d6f646500"
+        , {'_sJ': 0, 'jctor': 96, 'jctor_next': 114, 'jheld': 118, 'jheld_next': 134, 'jhold': 218, 'jhold_out': 282, 'jholdtxt': 412, 'jinternal': 400, 'jlabel': 388, 'jmax': 364, 'jmin': 360, 'jpost': 60, 'jpost_internal': 82, 'jpost_next': 92, 'jreg': 0, 'jreg_call': 26, 'jreg_next': 36, 'jset': 284, 'jset_rebuild': 356, 'jset_store': 352, 'jstore': 40, 'jstore_call': 42, 'jstore_next': 56, 'jt1': 138, 'jt1_next': 150, 'jt2': 154, 'jt2_next': 166, 'jt3': 170, 'jt3_next': 182, 'jt4': 186, 'jt4_next': 198, 'jt5': 202, 'jt5_next': 214, 'jvalues': 380, 'jxml': 420}),
+    'mk2_hookK': (
+        "1fb584b040f23b110ff290120ff28413022400940ff2901401940000000004b0bde81f400000000007b500000000bde8"
+        "074040f23b1100220000000040f23b1c624501d000000000dff838c103b14e4bccf8003070472de91750044600000000"
+        "20680168426859b38a4288bf0a4640f2e83302fb03f2b2fbf1f240f2e83c624588bf624641480168614588bf1146531a"
+        "01ebe301016041688368614584bf002100238a4203d9114640f2771306e00bb1013b03e002292cbf0239002141608360"
+        "bde817902de9ff512e4909682e4a914228d180462d490c684d6840f2e83c644588bf6446654588bf654664016d016426"
+        "b4fbf6f4b5fbf6f5002d08bf4ff6ff7508f5907700f012f808f5967700f00ef808f59c7700f00af808f5a27700f006f8"
+        "bff34f8fbde8ff5100000000386840b3b98849000022aa4209d0a2420ad2b2f5907f0ad2e02a0bd248f2e0330ae04ff6"
+        "ff7307e048f6420304e04ff6004301e04ff6806302fb01f6064433807380b380f380dff81cc0ccf800600132b2f5a07f"
+        "d9d3704790da0624444c4f4898da062468ef00e004110c0808110c08435055204d657465723a00006370756d65746572"
+        "0000bf00"
+        , {'_sK': 0, 'kbar': 300, 'kbar_loop': 310, 'kbar_ret': 386, 'kc_amber': 352, 'kc_bg': 340, 'kc_peak': 334, 'kc_put': 356, 'kc_red': 346, 'kdone': 192, 'kdraw': 196, 'kdraw_next': 296, 'kdraw_out': 292, 'klabel_meter': 412, 'kpeak_decay': 180, 'kpeak_old': 174, 'kpeak_save': 188, 'kpost': 60, 'kpost_meter': 72, 'kpost_next': 68, 'kpost_store': 80, 'kreg': 0, 'kreg_call1': 26, 'kreg_next': 36, 'kstart': 86, 'kstart_call': 92, 'kstore': 40, 'kstore_call': 42, 'kstore_next': 56, 'kvalues': 404, 'kxml_meter': 424}),
+    'mk2_hookL': (
+        "0ff2901300000000662903d1584b984208bf584870b4458900000000662903d1534b984208bf5348f0b4468900000000"
+        "662a1cd130b4504c2460504c24684ff01055ac420dd34e4dac420ad242f66045655d35b14b4c9db2cbf6d015256030bc"
+        "7047484c0025256030bc4ff482310000000016b52ded027b424c21680a0c4bf6d0139a4211d13d4a12684ff010539a42"
+        "0bd33b4b9a4208d289b207ee901af8ee677ac2ed4f7a00212160bdec027bbde8164000000000dff8c4c0ccf800400000"
+        "00002de9ff512ded027b2f4909682f4a914241d12849096891423dd1274c24684ff010518c4237d325498c4234d242f6"
+        "6041615c81bbd4ed067a9fed1a7af4ee477af1ee10fa27dd9fed177af4ee477af1ee10fa20da9fed157a77ee877afdee"
+        "e77a17ee905a282d38bf2825fa2d88bffa251048662100000000a8420cd00d4866212a46000000000e48a9b2cbf6d011"
+        "01600f4801210170bdec027bbde8ff51000000000000a04100007a440000003f40d00124e87301248cda0624a4da0624"
+        "00c00724a8da062488da0624444c4f4874d001245072657365742042504d3a00"
+        , {'_sL': 0, 'lblock': 114, 'lblock_done': 170, 'lblock_next': 178, 'lctor': 182, 'lctor_next': 190, 'lgetall': 8, 'lgetall_go': 20, 'lgetall_next': 24, 'lhalf': 364, 'llabel': 404, 'lmax': 360, 'lmin': 356, 'lpost': 48, 'lpost_next': 110, 'lpost_now': 98, 'lreg': 0, 'lreg_next': 4, 'lsetall': 28, 'lsetall_go': 40, 'lsetall_next': 44, 'ltick': 194, 'ltick_get': 310, 'ltick_next': 352, 'ltick_out': 344, 'ltick_set': 324}),
+    'mk2_hookN': (
+        "01b5000000002de90f50eff30080f1ee101a03b42ded100a189800000000bdec100a03bc80f30088e1ee101abde80f50"
+        "01b000bd2de90f50eff30080f1ee101a03b42ded100a2a982b992c9a00000000bdec100a03bc80f30088e1ee101abde8"
+        "0f500000000000bf"
+        , {'_sN': 0, 'nblock': 0, 'nblock_c': 26, 'nblock_orig': 2, 'nmidi': 52, 'nmidi_c': 76, 'nmidi_next': 98}),
+    'mk2_hookOm': (
+        "2de91f5083b040f24b110ff29c120ff27413042400940ff2981401940000000003b0bde81f50000000002de90f5040f2"
+        "4b11012200000000bde80f500000000040f24b1c62451bd110b5032b05d94448114601220000000001230021414813f0"
+        "010f18bf0846dff800c1ccf800003f48022b38bf0846dff8f8c0ccf8000010bd000000002de90f50eff30081f1ee102a"
+        "06b42ded100a00000000bdec100a06bc81f30088e1ee102abde80f5000000000dff8c0c0ccf800404ff0000c00000000"
+        "2de90710eff3008ca3f14f000e2819d80121814047f2ff72114213d0532b02d894f8751571b1244800682449884209d0"
+        "149a234840f200111943416082600168013101608cf30088bde80710000000002de90710eff3008ca3f14f000e2819d8"
+        "0121814047f66012114213d05a2b02d194f8541271b1104800681049884209d0129a0f4840f200211943416082600168"
+        "013101608cf30088bde807100000000040d001244f44534f00dd0624444c4f4890da062440dd062410be06244c504552"
+        "44dd062404110c08000000000000000000000000504f502d5550000043505500424f54480000bf004f53443a0000bf00"
+        "6f73646d6f646500"
+        , {'_sO': 0, 'oA_out': 260, 'oA_take': 230, 'oB_out': 340, 'oB_take': 310, 'octor': 176, 'octor_next': 188, 'odraw': 132, 'odraw_c': 150, 'odraw_next': 172, 'olabel': 424, 'opadA': 192, 'opadA_next': 268, 'opadB': 272, 'opadB_next': 348, 'opost': 64, 'opost_mode': 90, 'opost_next': 128, 'opost_set': 84, 'oreg': 0, 'oreg_call': 28, 'oreg_next': 38, 'ostore': 42, 'ostore_call': 52, 'ostore_next': 60, 'ostr_both': 416, 'ostr_cpu': 412, 'ostr_popup': 404, 'ovalues': 388, 'oxml': 432}),
+    'mk2_hookP': (
+        "2de91f5083b040f266110ff250220ff24423022400940ff2502401940000000003b0bde81f50000000002de90f5040f2"
+        "6611002200000000bde80f5000000000662a06d1dff8f4c101b401208cf8000001bc40f2661c624510d110b5012b05d9"
+        "774811460022000000000023dff8d4c1002003b17448ccf8000010bd0000000010b5000000000fb4eff300836d4c2068"
+        "6d49884202d160680130606083f300880fbc10bd0fb4eff300836648002140f22822043a8150fcd1f021c16083f30088"
+        "0fbc4ff0000c000000009df84030072b01d0000000002de91f10eff3008c18980f2813d819994f390e290fd81a9a554b"
+        "0401241a641803eb4404a4f8402003eb4004208c01228a40104320848cf30088bde81f10000000002de9ff50eff3008c"
+        "4df804cd87b0474c0020206120684649884279d16068a168884204d0a0600021e1606161a161e568f02d6dd2a0690130"
+        "a0613e4f4af61060385c002831d04af204203e58a6f11050b0f5a02f29d24df6d84030584df6dc417158884221d149f2"
+        "3c703858a8b948f2d430385848f2d831795888420dd148f6e010385848f6e4117958884205d160690130606120283bd3"
+        "0ae000206061a06940f2ee21884233d302e0002060612fe042f6dc50c0f201003058102828d81027f02d24d20f20b5fb"
+        "f0f101fb105204eb41031b8cd340db0717d007200090002001900590029112f14f00039004eb4500b0f8400004901048"
+        "206130466946000000000135013fdbd101e00135d8e7e56007b05df804cb8cf30088bde8ff500000000000bf74d00124"
+        "40d0012400be06245045454bb83c02244c50455204110c0808110c084b656570204343733a0000bf6b65657063637300"
+        , {'_sP': 0, 'pb_busy': 434, 'pb_have': 326, 'pb_loop': 472, 'pb_next': 546, 'pb_out': 552, 'pb_post': 534, 'pb_ready': 456, 'pb_save': 550, 'pb_unsteady': 450, 'pblock': 280, 'pblock_next': 566, 'pctor': 164, 'pctor_clr': 178, 'pctor_next': 198, 'pedit': 64, 'pfinal': 128, 'pfinal_call': 130, 'pfinal_out': 156, 'plabel': 604, 'pmidi': 202, 'pmidi_cc': 214, 'pmidi_next': 276, 'pmidi_out': 268, 'pmidi_stock': 210, 'ppost': 82, 'ppost_mode': 108, 'ppost_next': 124, 'ppost_set': 102, 'ppost_store': 118, 'preg': 0, 'preg_call': 28, 'preg_next': 38, 'pstore': 42, 'pstore_call': 52, 'pstore_next': 60, 'pvalues': 596, 'pxml': 616}),
 }
 # END FROZEN_MK2
 
@@ -471,9 +804,9 @@ def check_stage2_ram(d):
     if callers != sorted(POOL_CALLS):
         pm.refuse("The uncached pool has callers the patcher has not accounted for.",
                   f"found {[hex(c) for c in callers]}")
-    ranges = [("compressor store", pm.PATCH_RAM, pm.PATCH_RAM + pm.PATCH_SUM + 4),
-              ("EQ store", pm.EQ_STORE, pm.EQ_STORE_END),
-              ("auto makeup flag", pm.AUTO_RAM, pm.AUTO_RAM + 8)]
+    # Every range the micro patcher itself declares (2.3.10's included, so the
+    # layout is proved for what is still to come), after RAM_DELTA.
+    ranges = pm.patch_ram_ranges()
     if HEAP_HI >= STACK_TOP:
         pm.refuse("The heap ends above the stack.")
     for what, lo, hi in ranges:
@@ -544,10 +877,11 @@ def stage2_guards(d):
     check_stage2_ram(d)
 
 
-def stage2(d):
+def stage2(d, gate=True):
     """Hooks C (delay switches), D (compressor CCs), E (compressor DSP),
     F (EQ CCs), G (EQ DSP) and the type gate, chained at the post call
-    exactly as the micro chains them: gate -> F -> D -> C -> stock post."""
+    exactly as the micro chains them: gate -> F -> D -> C -> stock post.
+    gate=False when stage 3 follows: Keep CCs' pmidi is the micro's gate."""
     for name, val in STAGE2.items():
         if getattr(pm, name) != val:
             raise SystemExit(f"internal error: {name} was not set before stage 2")
@@ -568,24 +902,211 @@ def stage2(d):
         org_e = put(pm.build_comp_dsp_hook(BASE + len(d)), "E compressor DSP")
         hook_f = put(pm.build_eq_midi_hook(BASE + len(d), hook_d), "F EQ CCs")
         org_g = put(pm.build_eq_dsp_hook(BASE + len(d)), "G EQ DSP")
-        org_t = BASE + len(d)
-        src = GATE_SRC.format(type=pm.MSG_TYPE_SP)
-        code, syms = mk2_assemble("gateT", src)
-        code = bytearray(code)
-        code[syms["tcc"]:syms["tcc"] + 4] = pm.enc_b_bl(org_t + syms["tcc"], hook_f, False)
-        code[syms["tstock"]:syms["tstock"] + 4] = pm.enc_b_bl(
-            org_t + syms["tstock"], pm.MIDI_POST_FN, False)
-        put(bytes(code), "T type gate")
+        org_t = hook_f
+        if gate:
+            org_t = BASE + len(d)
+            src = GATE_SRC.format(type=pm.MSG_TYPE_SP)
+            code, syms = mk2_assemble("gateT", src)
+            code = bytearray(code)
+            code[syms["tcc"]:syms["tcc"] + 4] = pm.enc_b_bl(org_t + syms["tcc"], hook_f, False)
+            code[syms["tstock"]:syms["tstock"] + 4] = pm.enc_b_bl(
+                org_t + syms["tstock"], pm.MIDI_POST_FN, False)
+            put(bytes(code), "T type gate")
     finally:
         pm.assemble = saved
-    if _REGEN:
-        return built
-    # Install: three stock words change, nothing else.
+    # Install: three stock words change, nothing else. (Under --reassemble
+    # too: stage 3 builds on top of it, and nothing is written in that case.)
     post, dsp = pm.MIDI_POST_CALL, pm.COMP_DSP_CALL
     d[post - BASE:post - BASE + 4] = pm.enc_b_bl(post, org_t, True)
     d[dsp - BASE:dsp - BASE + 4] = pm.enc_b_bl(dsp, org_e, True)
     struct.pack_into("<I", d, pm.EQ_VT_HANDLER - BASE, org_g | 1)
     return built
+
+
+# --- stage 3 machinery --------------------------------------------------------
+def _deep(v, f):
+    if isinstance(v, bool) or not isinstance(v, (int, tuple, list, dict)):
+        return v
+    if isinstance(v, int):
+        return f(v)
+    if isinstance(v, dict):
+        return {_deep(k, f): _deep(x, f) for k, x in v.items()}
+    return type(v)(_deep(x, f) for x in v)
+
+
+_MICRO_KEEP_GUARDS = pm.KEEP_GUARDS       # before any mapping: the micro addresses
+
+
+def shift_patch_ram():
+    """Move every patch-RAM constant in patch_micro.py by RAM_DELTA. Run once,
+    before stage 2, so every hook sees the MK2 layout."""
+    for name, val in list(vars(pm).items()):
+        if name.isupper() and not name.startswith("FROZEN"):
+            new = _deep(val, ram_shift)
+            if new != val:
+                setattr(pm, name, new)
+
+
+def code_map(v):
+    """A micro flash address as the MK2's, or refuse: nothing unmapped passes."""
+    if v in CODE_MAP:
+        return CODE_MAP[v]
+    if BASE <= v < 0x080e3e90:               # inside the micro's stock image
+        raise SystemExit(f"internal error: no MK2 address for micro {v:#x}")
+    return v
+
+
+def mk2_value(v):
+    if v in CODE_MAP:
+        return CODE_MAP[v]
+    return RAM_MAP.get(v, v)
+
+
+def transpile(name):
+    """Re-define one patch_micro function with every micro address literal in
+    its source replaced by the MK2's. Unknown flash literals refuse."""
+    import inspect, re, textwrap
+    src = textwrap.dedent(inspect.getsource(getattr(pm, name)))
+
+    def sub_flash(m):
+        return f"{code_map(int(m.group(0), 16)):#010x}"
+
+    def sub_ram(m):
+        v = int(m.group(0), 16)
+        if v in RAM_MAP:
+            return f"{RAM_MAP[v]:#010x}"
+        new = ram_shift(v)
+        if new == v and v not in RAM_ALLOWED:
+            raise SystemExit(f"internal error: {name} carries RAM address {v:#x}")
+        return f"{new:#010x}"
+    src = re.sub(r"\b0x0?80[0-9a-fA-F]{5}\b", sub_flash, src)
+    src = re.sub(r"\b0x240[0-9a-fA-F]{5}\b", sub_ram, src)
+    for old, new in FRAME_LITERALS.get(name, ()):
+        if src.count(old) != 1:
+            raise SystemExit(f"internal error: {name}: {old!r} is not there exactly once")
+        src = src.replace(old, new)
+    exec(compile(src, f"<mk2:{name}>", "exec"), vars(pm))
+
+
+# Dispatcher-frame offsets written as plain numbers in patch_micro.py rather
+# than from MSG_*_SP, so no constant override reaches them. Every [sp, #n] in
+# the stage-3 sources was read; these are the only ones into the MIDI
+# dispatcher's frame (the rest are the hooks' own frames, or the UI dispatcher's
+# and the pad handlers', which are identical on the MK2). Missed in cc5's first
+# build -- hook N read the channel, CC and value from the wrong words -- and
+# caught in emulation, before any hardware saw it.
+FRAME_LITERALS = {
+    "build_character_hook": (
+        ("ldr     r0, [sp, #224]", f"ldr     r0, [sp, #{96 + 0x48}]"),   # channel
+        ("ldr     r1, [sp, #228]", f"ldr     r1, [sp, #{96 + 0x4c}]"),   # CC number
+        ("ldr     r2, [sp, #232]          /* 96 + 0x88: value",
+         f"ldr     r2, [sp, #{96 + 0x50}]          /* 96 + 0x50: value"),
+        ("str     r0, [sp, #232]", f"str     r0, [sp, #{96 + 0x50}]"),   # (2.3.10 compressor types)
+    ),
+}
+
+
+def relocated_chr(obj):
+    """The Character object with its 24 address pairs and its work-area word
+    moved to the MK2 layout. Every old value is checked first."""
+    secs, exports = obj
+    secs = [list(s) for s in secs]
+    by_name = {s[0]: s for s in secs}
+    for sec, lo, hi, old in CHR_RELOC:
+        data = bytearray.fromhex(by_name[sec][2])
+        hw1, hw2 = struct.unpack_from("<HH", data, lo)
+        ht1, ht2 = struct.unpack_from("<HH", data, hi)
+        if (hw1 & 0xfbf0, ht1 & 0xfbf0) != (0xf240, 0xf2c0) or \
+                (pm._thm_imm16(ht1, ht2) << 16 | pm._thm_imm16(hw1, hw2)) != old or \
+                (hw2 >> 8) & 0xf != (ht2 >> 8) & 0xf:
+            pm.refuse(f"The Character object at {sec}+{lo:#x} is not what it should be.")
+        new = CHR_FLASH[old] if old in CHR_FLASH else ram_shift(old)
+        if new == old:
+            raise SystemExit(f"internal error: {old:#x} would not move")
+        struct.pack_into("<HH", data, lo, *pm._thm_put_imm16(hw1, hw2, new & 0xffff))
+        struct.pack_into("<HH", data, hi, *pm._thm_put_imm16(ht1, ht2, new >> 16))
+        by_name[sec][2] = data.hex()
+    wb = by_name[".rodata.chr_work_base"]
+    data = bytearray.fromhex(wb[2])
+    old, = struct.unpack_from("<I", data, 0)
+    if ram_shift(old) != pm.CHR_WORK_DEFAULT or old == pm.CHR_WORK_DEFAULT:
+        pm.refuse("The Character work-area word is not what the patcher expects.")
+    struct.pack_into("<I", data, 0, pm.CHR_WORK_DEFAULT)
+    wb[2] = data.hex()
+    return [tuple(s) for s in secs], exports
+
+
+def prepare_stage3():
+    """Point patch_micro's stage-3 constants and functions at the MK2."""
+    for name in STAGE3_GLOBALS:
+        setattr(pm, name, _deep(getattr(pm, name), mk2_value))
+    for name in ("SESSION_MGR", "SONG_STORE", "GLOBAL_STORE", "SESSION_DIRTY",
+                 "PC_MANAGER", "PC_LIST", "PC_PENDING", "PC_CURRENT"):
+        setattr(pm, name, RAM_MAP[getattr(pm, name)])
+    if hasattr(pm, "DISPLAY_OBJ"):
+        pm.DISPLAY_OBJ = RAM_MAP[pm.DISPLAY_OBJ]
+    pm.SESSION_MGR_GUARDS = SESSION_MGR_GUARDS_MK2
+    pm.CHR_SITE_CONTEXT = CHR_SITE_CONTEXT_MK2
+    pm.CHR_EQ_HEAD = 0x28c84                       # literal at 0x080983fc
+    pm.KEEP_GUARDS = tuple(
+        (va, GUARD_BYTES_MK2.get(old, raw), what)
+        for (va, raw, what), (old, _, _) in zip(pm.KEEP_GUARDS, _MICRO_KEEP_GUARDS))
+    pm.STOCK_SIZE = STOCK_SIZE                     # "is this stock?" checks
+    for name in STAGE3_FUNCS:
+        transpile(name)
+    stock_c_object = pm.c_object
+    pm.c_object = lambda key, path: relocated_chr(stock_c_object(key, path))
+
+
+def apply_settings_mk2(d, rows):
+    t = SETTINGS_VA - BASE
+    pages = [struct.unpack_from("<8H", d, t + 16 * p) for p in range(3)]
+    for page, want in zip(pages, SETTINGS_STOCK):
+        if page != tuple(want) + (0,) * (8 - len(want)):
+            pm.refuse("The Settings screen's rows are not what they should be.")
+    if word(d, 0x080799b0) != SETTINGS_VA:
+        pm.refuse("The Settings page builder does not read the expected table.")
+    new = SETTINGS_STOCK[2] + tuple(rows)
+    if len(new) > 8:
+        pm.refuse("Settings page 3 has eight rows; this build needs more.")
+    struct.pack_into("<8H", d, t + 32, *new, *([0] * (8 - len(new))))
+    vprint(f"Settings page 3: {', '.join(f'{r:#x}' for r in new)}")
+
+
+def stage3(d):
+    """The 2.3.9-mod set, in the micro's own order (its main(), --v239), less
+    Flip UI: the MK2 already flips its screen and touch natively."""
+    saved, pm.assemble = pm.assemble, mk2_assemble
+    try:
+        pm.apply_program_change(d)
+        apply_settings_mk2(d, (pm.CLK_ID, 0x66, pm.OSD_ID, pm.KEEP_ID))
+        j_org, j_syms = pm.apply_clock_hold(d)
+        l_org, l_syms = pm.apply_preset_bpm(d, j_org, j_syms)
+        l_entries = (l_org + l_syms["lpost"], l_org + l_syms["ltick"],
+                     l_org + l_syms["lblock"])
+        pm.apply_cpu_meter(d, j_org, j_syms, chained=l_entries, row=False)
+        n_org, n_syms = pm.apply_character(d, pm.CHR_FEATURE_AUTO)
+        pm.apply_osd(d, n_org, n_syms, j_org, j_syms, modes=True)
+        pm.apply_keep_ccs(d, j_org, j_syms)
+    finally:
+        pm.assemble = saved
+
+
+def check_no_micro_anywhere(d):
+    """No micro address in anything appended: as a word, at any alignment, or
+    as a movw/movt pair. Covers every hook of every stage."""
+    bad_vals = {k for k, v in CODE_MAP.items() if k != v} | set(RAM_MAP)
+    bad_vals -= set(CODE_MAP.values()) | set(RAM_MAP.values())
+    tail = bytes(d[STOCK_SIZE:])
+    found = set()
+    for o in range(0, len(tail) - 3, 2):
+        w, = struct.unpack_from("<I", tail, o)
+        for v in (w, w & ~1):
+            if v in bad_vals:
+                found.add((BASE + STOCK_SIZE + o, v))
+    if found:
+        pm.refuse("A hook still carries a micro address.",
+                  *(f"{a:#010x}: {v:#010x}" for a, v in sorted(found)[:12]))
 
 
 def write_frozen():
@@ -661,6 +1182,7 @@ def main():
     guard_cstr(d, PRODUCT_VA, PRODUCT, "product name")
     if word(d, PTR_TABLE_VA) & 0xfff00001 != 0x08000001:
         pm.refuse("The table after the version string is not where expected.")
+    shift_patch_ram()
     stage2_guards(d)
     print("     ok   The code is where the patch expects to find it")
 
@@ -682,14 +1204,25 @@ def main():
                 continue
             print(f"     ok   {what:<28} {cc}")
 
-    stage2(d)
+    stage2(d, gate=False)
+    prepare_stage3()
+    stage3(d)
     if _REGEN:
         write_frozen()
         sys.exit("  Rerun without --reassemble to build with the new blobs.")
+    check_no_micro_anywhere(d)
+    check_stage2_ram(d)
     for what, cc in pm.FEATURES:
         if "ch 1" in what or "global" in what:
             print(f"     ok   {what:<28} {cc}")
     print(f"     ok   {'Compressor auto makeup, ch 1':<28} CC 46")
+    for what in ("Character chain, ch 1        CC 14-29",
+                 "OSD: pop-ups and CPU bar     TOOLS > Settings",
+                 "Keep CCs: OFF/ON             TOOLS > Settings",
+                 "ProgChange: OFF/ON/NEW ONLY  TOOLS > Settings",
+                 "Clk Loss: INTERNAL/HOLD      TOOLS > Settings",
+                 "Preset BPM, HOLD capture     TOOLS > Settings"):
+        print(f"     ok   {what}")
 
     write_string(d, ATTRIB_VA, VER_VA, ATTRIB_STOCK, ATTRIB_NEW)
     if len(VERSION) > pm.VER_DISPLAY_MAX:
