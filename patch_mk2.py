@@ -48,7 +48,14 @@ import patch_micro as pm                # noqa: E402  the hook generators
 BASE = 0x08040000
 STOCK_SHA = "35ab7995ad0eca8484f3b28bc76389f10b2037dbb21a4a394e950d9329073e86"
 STOCK_SIZE = 674896
-VERSION = "2.3.4-cc1"                   # 9 characters: see pm.VER_DISPLAY_MAX
+VERSION = "2.3.4-cc2"                   # 9 characters: see pm.VER_DISPLAY_MAX
+
+# CCs left out of this build. 2026-10-27, cc1 on hardware: CC 89 (Loop
+# Crossfade) on a Sample pad gave sudden full-scale distorted output at any
+# value above 0. The code it reaches is byte-identical to the micro's and to
+# the stock Loop Fade encoder's path, so the cause is not yet known. It stays
+# out until it is -- a CC that can do that is not shipped on a guess.
+DISABLED_CCS = {89}
 
 # --- every micro address this stage uses, and its MK2 twin -----------------
 MK2 = {
@@ -111,9 +118,34 @@ def mk2_hooks():
         for cc, kind, arg in arms:
             if kind in ("jump", "enum", "jbool", "stop"):
                 arg = m2(arg)                  # a case address, not an offset
+            if cc in DISABLED_CCS:
+                # The arm must STAY: the frozen machine code is laid out for
+                # exactly this list, and dropping one shifts every branch
+                # after it onto the wrong arm. Point it at the stock default
+                # instead -- exactly where an unknown CC goes. Only a branching
+                # arm can be redirected this way.
+                if kind not in ("jump", "enum", "jbool", "stop"):
+                    raise SystemExit(f"internal error: CC{cc} cannot be disabled")
+                arg = m2(ret)
             new_arms.append((cc, kind, arg))
         out.append((label, m2(hook), m2(ret), vslot, new_arms))
     return out
+
+
+def check_dispatch(code, arms, label):
+    """The frozen code's CC compares must be exactly this hook's arm list, in
+    order. If they are not, its branch fix-ups land on the wrong arms."""
+    found, o = [], 0
+    while o + 6 <= len(code):
+        hw, = struct.unpack_from("<H", code, o)
+        if hw & 0xff00 != 0x2b00:              # cmp r3, #imm8
+            break
+        found.append(hw & 0xff)
+        o += 6                                 # cmp (2) + beq.w (4)
+    want = [cc for cc, _, _ in arms]
+    if found != want:
+        pm.refuse(f"The {label} hook's frozen code does not match its CC list.",
+                  f"code compares {found}", f"list has      {want}")
 
 
 def word(d, va):
@@ -207,13 +239,17 @@ def main():
     pm.TAPER = m2(pm.TAPER)
     pm.CLASSB_SETPARAM = m2(pm.CLASSB_SETPARAM)
     for label, hook, ret, vslot, arms in hooks:
-        org = pm._append(d, bytearray(pm.build(BASE + len(d), ret, vslot, arms,
-                                               label[0])))
+        code = pm.build(BASE + len(d), ret, vslot, arms, label[0])
+        check_dispatch(code, arms, label)
+        org = pm._append(d, bytearray(code))
         d[hook - BASE:hook - BASE + 4] = pm.enc_bne_w(hook, org)
         vprint(f"{label:16} at {org:#010x}, "
                + ", ".join(f"CC{c}" for c, _, _ in arms))
     for what, cc in pm.FEATURES:
         if "per pad" in what or "slicer" in what or what.startswith("Stop"):
+            if any(cc == f"CC {n}" for n in DISABLED_CCS):
+                print(f"     --   {what:<28} {cc}  (left out of this build)")
+                continue
             print(f"     ok   {what:<28} {cc}")
 
     write_string(d, ATTRIB_VA, VER_VA, ATTRIB_STOCK, ATTRIB_NEW)
