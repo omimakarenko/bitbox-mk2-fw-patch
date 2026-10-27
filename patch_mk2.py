@@ -71,7 +71,7 @@ import patch_micro as pm                # noqa: E402  the hook generators
 BASE = 0x08040000
 STOCK_SHA = "35ab7995ad0eca8484f3b28bc76389f10b2037dbb21a4a394e950d9329073e86"
 STOCK_SIZE = 674896
-VERSION = "2.3.4-cc6"                   # 9 characters: see pm.VER_DISPLAY_MAX
+VERSION = "2.3.4-cc7"                   # 9 characters: see pm.VER_DISPLAY_MAX
 
 # CCs left out of this build. 2026-10-27, cc1 on hardware: CC 89 (Loop
 # Crossfade) on a Sample pad gave sudden full-scale distorted output at any
@@ -1095,7 +1095,8 @@ def stage3(d, upto="full"):
     saved, pm.assemble = pm.assemble, mk2_assemble
     try:
         pm.apply_program_change(d)
-        rows = (pm.CLK_ID, 0x66) if upto != "full" else (pm.CLK_ID, 0x66, pm.OSD_ID, pm.KEEP_ID)
+        # No OSD row until the MK2 has its own renderer (see unhook_drawing).
+        rows = (pm.CLK_ID, 0x66) if upto != "full" else (pm.CLK_ID, 0x66, pm.KEEP_ID)
         apply_settings_mk2(d, rows)
         j_org, j_syms = pm.apply_clock_hold(d)
         l_org, l_syms = pm.apply_preset_bpm(d, j_org, j_syms)
@@ -1109,8 +1110,33 @@ def stage3(d, upto="full"):
             return
         pm.apply_osd(d, n_org, n_syms, j_org, j_syms, modes=True)
         pm.apply_keep_ccs(d, j_org, j_syms)
+        unhook_drawing(d, l_org, l_syms)
     finally:
         pm.assemble = saved
+
+
+UI_PRESENT_SITE = 0x0805b950            # bl 0x0804368c, every UI tick (micro 0x0805bbb4)
+UI_PRESENT_FN = 0x0804368c
+
+
+def unhook_drawing(d, l_org, l_syms):
+    """Take the OSD (hook O's odraw) and the CPU bar (hook K's kdraw) back off
+    the UI tick, leaving Preset BPM's ltick, which draws nothing.
+
+    Both draw straight into the LCD layers in the micro's layout: its LTDC is
+    240 wide by 320 high (0x080461a2), the UI rotated in software; the MK2's is
+    320 by 240 (0x08042dd0). The bar writes 320 rows into a 240-row frame --
+    80 rows past its end -- and rebooted the module on cc6 the moment the OSD
+    row was set to CPU (hardware, 2026-10-28). The pop-up lands transposed and
+    was never seen. Until the MK2 has a renderer of its own, nothing draws."""
+    site = UI_PRESENT_SITE
+    if pm.branch_target(d, site) < BASE + STOCK_SIZE:
+        pm.refuse("The UI tick is not hooked as expected.")
+    tick = l_org + l_syms["ltick"]
+    nxt = l_org + l_syms["ltick_next"]
+    d[site - BASE:site - BASE + 4] = pm.enc_b_bl(site, tick, True)
+    d[nxt - BASE:nxt - BASE + 4] = pm.enc_b_bl(nxt, UI_PRESENT_FN, False)
+    vprint(f"UI tick: {site:#x} -> ltick {tick:#x} -> stock present {UI_PRESENT_FN:#x}")
 
 
 def check_no_micro_anywhere(d):
