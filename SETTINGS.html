@@ -423,29 +423,30 @@
 <div class="wrap">
   <aside class="side">
     <p class="brand">Bitbox Micro<br>community modification</p>
-    <nav class="nav"><a href="index.html">Overview</a><a href="INSTALLING.html">Installing</a><a href="CC-REFERENCE.html">CC reference</a><a href="PAD-CONTROLS.html">Pad controls</a><a href="DEVICES.html">Devices</a><a href="CHARACTER.html">Character</a><a href="COMPRESSOR.html">Compressor</a><a href="EQ-FILTER.html">EQ and Filter</a><a href="SETTINGS.html" aria-current="page">Settings</a><a href="LIMITATIONS.html">Limitations</a><a href="CHANGELOG.html">Changelog</a><a href="LICENSE.html">Licence</a></nav>
+    <nav class="nav"><a href="index.html">Overview</a><a href="INSTALLING.html">Installing</a><a href="CC-REFERENCE.html">CC reference</a><a href="PAD-CONTROLS.html">Pad controls</a><a href="CLIP-MODES.html">Clip modes</a><a href="DEVICES.html">Devices</a><a href="CHARACTER.html">Character</a><a href="COMPRESSOR.html">Compressor</a><a href="EQ-FILTER.html">EQ and Filter</a><a href="SETTINGS.html" aria-current="page">Settings</a><a href="LIMITATIONS.html">Limitations</a><a href="CHANGELOG.html">Changelog</a><a href="LICENSE.html">Licence</a></nav>
     <nav class="toc">
       <p class="toc-label">On this page</p>
-      <a href="#osd"><span class="n">1</span><span>OSD</span></a><a class="sub" href="#the-pop-up"><span class="n"></span><span>The Pop-Up</span></a><a class="sub" href="#the-cpu-bar"><span class="n"></span><span>The CPU Bar</span></a><a href="#preset-bpm"><span class="n">2</span><span>Preset BPM</span></a><a class="sub" href="#using-it"><span class="n"></span><span>Using It</span></a><a class="sub" href="#with-a-clock"><span class="n"></span><span>With a Clock</span></a><a class="sub" href="#capturing-a-tempo"><span class="n"></span><span>Capturing a Tempo</span></a><a href="#keep-ccs"><span class="n">3</span><span>Keep CCs</span></a><a href="#clk-loss"><span class="n">4</span><span>Clk Loss</span></a><a class="sub" href="#what-it-fixes"><span class="n"></span><span>What It Fixes</span></a><a class="sub" href="#what-hold-keeps-through"><span class="n"></span><span>What HOLD Keeps Through</span></a><a href="#flip-ui"><span class="n">5</span><span>Flip UI</span></a><a class="sub" href="#what-turns"><span class="n"></span><span>What Turns</span></a><a class="sub" href="#what-stays-put"><span class="n"></span><span>What Stays Put</span></a><a href="#progchange"><span class="n">6</span><span>ProgChange</span></a><a class="sub" href="#new-only"><span class="n"></span><span>NEW ONLY</span></a>
+      <a href="#osd"><span class="n">1</span><span>OSD</span></a><a class="sub" href="#the-pop-up"><span class="n"></span><span>The Pop-Up</span></a><a class="sub" href="#the-cpu-bar"><span class="n"></span><span>The CPU Bar</span></a><a href="#preset-bpm"><span class="n">2</span><span>Preset BPM</span></a><a class="sub" href="#using-it"><span class="n"></span><span>Using It</span></a><a class="sub" href="#with-a-clock"><span class="n"></span><span>With a Clock</span></a><a class="sub" href="#capturing-a-tempo"><span class="n"></span><span>Capturing a Tempo</span></a><a href="#theme"><span class="n">3</span><span>Theme</span></a><a class="sub" href="#the-five-themes"><span class="n"></span><span>The Five Themes</span></a><a class="sub" href="#your-own-theme"><span class="n"></span><span>Your Own Theme</span></a><a href="#keep-ccs"><span class="n">4</span><span>Keep CCs</span></a><a href="#clk-loss"><span class="n">5</span><span>Clk Loss</span></a><a class="sub" href="#what-it-fixes"><span class="n"></span><span>What It Fixes</span></a><a class="sub" href="#what-hold-keeps-through"><span class="n"></span><span>What HOLD Keeps Through</span></a><a href="#flip-ui"><span class="n">6</span><span>Flip UI</span></a><a class="sub" href="#what-turns"><span class="n"></span><span>What Turns</span></a><a class="sub" href="#what-stays-put"><span class="n"></span><span>What Stays Put</span></a><a href="#progchange"><span class="n">7</span><span>ProgChange</span></a><a class="sub" href="#new-only"><span class="n"></span><span>NEW ONLY</span></a>
     </nav>
   </aside>
   <main class="main">
     <header class="masthead">
       <p class="eyebrow">Settings</p>
       <h1>Bitbox Micro Firmware: Settings</h1>
-      <p>The pop-up, Preset BPM, Keep CCs and the rest, on the module itself.</p>
+      <p>The pop-up, Preset BPM, Keep CCs, themes and the rest, on the module itself.</p>
     </header>
   <div class="doc">
-    <p>Six of the patch's additions live on the module's own Settings screen, not on a CC. Set them once and they stay set, through preset changes and power cycles. Preset BPM is the exception: it belongs to each preset, and saves with it.</p>
+    <p>Seven of the patch's additions live on the module's own Settings screen, not on a CC. Set them once and they stay set, through preset changes and power cycles. Preset BPM is the exception: it belongs to each preset, and saves with it.</p>
     <p>Press TOOLS once to open Settings. Turn the top knob to pick a row and the bottom knob to change it. Scroll past MIDI Keys and you reach these rows, in this order:</p>
     <pre><code>MIDI Rec:    1010music's, unchanged
 ProgChange:  OFF / ON / NEW ONLY
 Clk Loss:    INTERNAL / HOLD
-Preset BPM:  40 to 250
+Preset BPM:  1 to 255
 SD Mode:     1010music's, unchanged
 Flip UI:     OFF / ON
 OSD:         OFF / POP-UP / CPU / BOTH
-Keep CCs:    OFF / ON</code></pre>
+Keep CCs:    OFF / ON
+Theme:       STOCK / AMBER / STAGE / CONTRAST / PHOSPHOR / SYNTHWAVE / CUSTOM</code></pre>
   </div>
   <section class="section" id="osd">
   <h2 class="sec"><span class="n">1</span>OSD</h2>
@@ -475,7 +476,7 @@ Keep CCs:    OFF / ON</code></pre>
   <div class="doc">
     <p>Set a preset's tempo on the module and save it with the preset. That was never possible before. The only way was to edit the preset file on a computer.</p>
     <h3 id="using-it">Using It</h3>
-    <p>Pick a tempo from 40 to 250 BPM, then save the preset. It loads at that tempo from then on. Each preset can have its own.</p>
+    <p>Pick a tempo from 1 to 255 BPM, then save the preset. It loads at that tempo from then on. Each preset can have its own.</p>
     <p>This is the tempo the module runs at when no clock is driving it. Synced delays and LFOs follow it. Most presets sit at 120 only because nothing on the module could change it.</p>
     <h3 id="with-a-clock">With a Clock</h3>
     <p>A running clock always sets the tempo. Change Preset BPM while one is running and you hear no change yet. Your tempo takes over when the clock stops, and it saves with the preset as normal.</p>
@@ -483,8 +484,27 @@ Keep CCs:    OFF / ON</code></pre>
     <p>With Clk Loss on HOLD, stop or unplug the clock and the tempo it was running at is copied into Preset BPM. Save the preset to keep it. Changing Preset BPM by hand ends a hold.</p>
   </div>
   </section>
+  <section class="section" id="theme">
+  <h2 class="sec"><span class="n">3</span>Theme</h2>
+  <div class="doc">
+    <p>Theme changes the screen's colours. Choose one of five built-in themes, or load your own.</p>
+    <h3 id="the-five-themes">The Five Themes</h3>
+    <ul>
+      <li>AMBER: warm vintage-sampler colours.</li>
+      <li>STAGE: dim red, for dark rooms.</li>
+      <li>CONTRAST: the most readable. Orange and blue replace red and green, for colour-blind users.</li>
+      <li>PHOSPHOR: a green-screen terminal.</li>
+      <li>SYNTHWAVE: magenta and cyan on violet.</li>
+    </ul>
+    <p>STOCK is 1010music's original. In every theme the pop-ups stay white on black, and the CPU bar keeps its green, amber and red.</p>
+    <h3 id="your-own-theme">Your Own Theme</h3>
+    <p>Build a theme in <a href="theme-maker.html">the theme maker</a>, which shows how readable each colour is. Save it as <code>theme.tml</code> at the top of the card, and set Theme to CUSTOM. In CUSTOM, the CPU bar uses your theme's green, yellow and red.</p>
+    <p>After changing the file, set Theme to another theme and back to CUSTOM to reload it. This works even if you swapped the card while the module was on.</p>
+    <p>If the card has no <code>theme.tml</code>, choosing CUSTOM creates one from the current theme. Missing or invalid colours fall back to Stock's.</p>
+  </div>
+  </section>
   <section class="section" id="keep-ccs">
-  <h2 class="sec"><span class="n">3</span>Keep CCs</h2>
+  <h2 class="sec"><span class="n">4</span>Keep CCs</h2>
   <div class="doc">
     <p>Loading a preset puts every pad back the way it was saved. Keep CCs keeps the changes you made from your controller instead.</p>
     <p>Say your vocal pad is on channel 6 and you have pushed its delay and reverb sends up for the last chorus. Load the next preset and both sends drop back to their saved values. With Keep CCs ON, the new preset's channel 6 pad comes up with the sends where you left them.</p>
@@ -493,7 +513,7 @@ Keep CCs:    OFF / ON</code></pre>
   </div>
   </section>
   <section class="section" id="clk-loss">
-  <h2 class="sec"><span class="n">4</span>Clk Loss</h2>
+  <h2 class="sec"><span class="n">5</span>Clk Loss</h2>
   <div class="doc">
     <p>Clk Loss keeps the tempo when the clock goes away.</p>
     <h3 id="what-it-fixes">What It Fixes</h3>
@@ -512,7 +532,7 @@ Keep CCs:    OFF / ON</code></pre>
   </div>
   </section>
   <section class="section" id="flip-ui">
-  <h2 class="sec"><span class="n">5</span>Flip UI</h2>
+  <h2 class="sec"><span class="n">6</span>Flip UI</h2>
   <div class="doc">
     <p>Flip UI is for a module mounted upside down. It turns the screen, touch, buttons and knobs the other way up, all together.</p>
     <h3 id="what-turns">What Turns</h3>
@@ -529,7 +549,7 @@ Keep CCs:    OFF / ON</code></pre>
   </div>
   </section>
   <section class="section" id="progchange">
-  <h2 class="sec"><span class="n">6</span>ProgChange</h2>
+  <h2 class="sec"><span class="n">7</span>ProgChange</h2>
   <div class="doc">
     <p>Stock firmware offers OFF and ON. The patch adds a third choice.</p>
     <h3 id="new-only">NEW ONLY</h3>

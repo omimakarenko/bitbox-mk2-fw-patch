@@ -162,14 +162,19 @@ You should see something like this:
      ok   Character chain, ch 1        CC 14-29
      ok   OSD: pop-ups and CPU bar     TOOLS > Settings
      ok   Keep CCs: OFF/ON             TOOLS > Settings
+     ok   Compressor type, ch 1        CC 47 / 48
+     ok   Theme, and your own          TOOLS > Settings
+     ok   Clip modes, per pad          CC 112-116
+     ok   Live Flip modes, per pad     CC 117
+     ok   Hold buttons, per pad        CC 78, 102, 104, 105, 107, 118, 119
      ok   ProgChange: OFF/ON/NEW ONLY  TOOLS > Settings
      ok   Clk Loss: INTERNAL/HOLD      TOOLS > Settings
      ok   Flip UI, screen and touch    TOOLS > Settings
      ok   Splash screen, so nobody blames 1010music for my work
 
-  Done. MICRO.BIN is ready -- 722,140 bytes.
+  Done. MICRO.BIN is ready -- 812,000 bytes.
 
-     Fingerprint  155b1f254bf93967cdd43ac9154e99e602d6619390e18180717586222919d478
+     Fingerprint  62f15b366fdac8181ca070b5ddf53476955c91ca80e184d526782cf8d49ac7b7
 ```
 
 Check that the fingerprint matches the one above. If it does, your firmware is
@@ -195,7 +200,7 @@ The splash on the next boot should read:
 ```text
 bitbox micro
 community fw
-2.3.9-mod
+2.3.10-mod
 ```
 
 If it still says `by 1010music` and `2.3.4`, nothing was flashed. Check that

@@ -3,7 +3,8 @@
 Your Bitbox has always had a bus compressor across Out 1 and 2, but the module
 only lets you switch it on and off. Threshold, ratio, attack, release and makeup
 gain were fixed. This patch puts all five on MIDI, adds auto makeup, and starts
-you on a classic glue setting.
+you on a classic glue setting. It also adds three Airwindows compressors to
+choose from.
 
 ## Where It Sits
 
@@ -98,20 +99,47 @@ threshold `115`, ratio `20`, attack `12`, release `31`, makeup `57`. That is
 −4 dB, 4:1, 10 ms, 250 ms and −4 dB of makeup. It is a headroom trim, not a
 musical setting.
 
+## Four Compressors
+
+CC 47 selects the compressor type, and each press of CC 48 steps to the next.
+Stock is the module's own compressor, described above. The other three are
+ports of Chris Johnson's Airwindows compressors:
+
+- Logical4: a punchy bus compressor with some saturation.
+- VariMu: a valve-style compressor that gets thick and heavy when pushed.
+- Thunder: a one-knob compressor that adds weight to the low end.
+
+All four use CC 41 to 45, for different controls:
+
+| CC | Stock | Logical4 | VariMu | Thunder |
+| -- | ----- | -------- | ------ | ------- |
+| **41** | Threshold | Threshold | Intensity | Thunder |
+| **42** | Ratio | Ratio | — | — |
+| **43** | Attack | Speed | Speed | — |
+| **44** | Release | Dry/Wet | Dry/Wet | — |
+| **45** | Makeup | Makeup | Output | Output |
+
+CC 40 turns the selected type on and off. The module starts on Stock, and the
+glue settings and Glue on a Button above apply to Stock. Each type remembers
+its own settings. Switching is click-free. Only the selected type uses any
+processing power.
+
+VariMu crushes hard at high Intensity. For weight without the crush, set
+Dry/Wet to about half.
+
 ## Auto Makeup
 
-Auto makeup sets the makeup for you, so the peaks stay at the level they went
-in. Pull the threshold down and the mix gets denser, not quieter. CC 46 on
-channel 1 switches it: `≥64` is on and `<64` is off. It is off at every
-power-on.
+Auto makeup sets the makeup gain for you, so the level stays the same as you
+compress harder. Each press of CC 46 on channel 1 steps it through Off, Normal
+and Hot. It works on every type.
+
+- Normal: for a mix with headroom.
+- Hot: for a mix that is already loud. On a quiet mix it adds too much gain.
 
 While it is on, CC 45 is ignored, including the makeup a glue button sends. The
 pop-up says `Makeup  Auto` if you move it. Switch auto off and the makeup stays
 where auto left it until you move CC 45.
 
-Expect a jump when you switch it on. At the starting values the level rises by
-about 6 dB at once. It also sounds louder than bypassed, because matching
-the peaks of a compressed mix raises its average.
 
 ## Setting It by Ear
 
@@ -147,14 +175,16 @@ from a kick on another channel. Bus compression with a fast attack and a loud
 kick already pumps convincingly, though the kick is compressed too. If you
 sequence CCs, you can also draw a threshold envelope in time with the kick.
 
-There is no wet/dry mix either. Use the outputs instead. Put the same sample on
+Stock has no wet/dry mix, though Logical4 and VariMu do, on CC 44. For Stock,
+use the outputs instead. Put the same sample on
 two pads with the same MIDI channel and Pad Note, route one to Out 1/2 and the
 other to Out 3/4, and mix them outside the box. Squash the first hard and blend
 it underneath. That is parallel compression, at the cost of a pad and an output
 pair.
 
-## They Last Until Power Off
+## What Power-On Keeps
 
-The settings survive a preset change. Power-on brings back the glue values
-above, with auto makeup off. See
+Settings survive a preset change. Through power-off, the module also keeps the
+type, the Airwindows types' settings and auto makeup. Stock returns to the glue
+settings above. See
 [what they have in common](DEVICES.md#what-they-have-in-common).

@@ -3,19 +3,20 @@
 The Bitbox Micro hides most of its controls behind the screen. This patch puts
 them on MIDI and adds what the module never had:
 
+- A jungle toolkit for Clip pads: loops that stretch to your tempo with an
+  early-'90s sampler's grain, 24 Live Flip modes to re-cut them live, and turntable
+  moves on hold buttons.
 - Airwindows effects across the whole mix: four slots, sixteen effects.
-- A master EQ and filter, and full control of the compressor.
+- A master EQ and filter, and four compressors, three of them Airwindows.
 - Per-pad sends, envelope, LFO, loop and granular controls.
-- A pop-up showing what every CC just changed.
+- A pop-up showing what every CC just changed, and screen themes.
 
-It all works live, while you play.
+Help documentation: https://modularpatcher.github.io/bitbox-micro-fw-patch/index.html
 
 It is unofficial. Nobody at 1010music wrote or endorsed it, so do not ask them
 for support. The splash reads `community fw`, so a patched unit is never
 mistaken for theirs. Assume it affects your warranty. It
 [cannot brick the module](INSTALLING.md#can-this-brick-my-module), though.
-
-Help documentation: https://modularpatcher.github.io/bitbox-micro-fw-patch/
 
 ## A Patcher, Not Firmware
 
@@ -39,12 +40,14 @@ script on the zip and copy the result to your card. The splash should then read
 - [CC reference](CC-REFERENCE.md): every number, its channel, and what to check
   when one seems dead.
 - [Pad controls](PAD-CONTROLS.md): what each pad parameter does.
+- [Clip modes](CLIP-MODES.md): loops that follow your tempo, Live Flip modes and
+  hold buttons.
 - [Devices](DEVICES.md): the three that act on the whole mix, and where they sit.
 - [The Character chain](CHARACTER.md): sixteen Airwindows effects in four slots.
 - [The EQ and filter](EQ-FILTER.md): ten algorithms on one encoder.
 - [The compressor](COMPRESSOR.md): bus glue to start, then every setting on
   MIDI.
-- [Settings](SETTINGS.md): the pop-up, Preset BPM, Keep CCs and more.
+- [Settings](SETTINGS.md): the pop-up, Preset BPM, Keep CCs, themes and more.
 - [Limitations](LIMITATIONS.md): what the patch will not do, and why.
 - [Changelog](CHANGELOG.md): what changed, newest first.
 
@@ -78,7 +81,10 @@ flash your firmware back before contacting you.
 
 ## Getting Help
 
-There is no support. It is one person's patch, given away as is. Ask in
+There is no support. It is one person's patch, given away as is. Ask
+questions in Discussions on the GitHub page you downloaded it from. Report a
+fault there as an issue, with the steps that cause it. Other users answer too.
+You can also ask in
 [the Mod Wiggler thread](https://www.modwiggler.com/forum/viewtopic.php?t=302078),
 r/modular or r/eurorack, where other users run the same controls on the same
 numbers. Please do not take questions to 1010music's Discord. It is not their

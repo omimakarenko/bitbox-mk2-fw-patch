@@ -1,7 +1,7 @@
 # Bitbox Micro Firmware: Settings
 
-Six of the patch's additions live on the module's own Settings screen, not on a
-CC. Set them once and they stay set, through preset changes and power cycles.
+Seven of the patch's additions live on the module's own Settings screen, not on
+a CC. Set them once and they stay set, through preset changes and power cycles.
 Preset BPM is the exception: it belongs to each preset, and saves with it.
 
 Press TOOLS once to open Settings. Turn the top knob to pick a row and the
@@ -12,11 +12,12 @@ this order:
 MIDI Rec:    1010music's, unchanged
 ProgChange:  OFF / ON / NEW ONLY
 Clk Loss:    INTERNAL / HOLD
-Preset BPM:  40 to 250
+Preset BPM:  1 to 255
 SD Mode:     1010music's, unchanged
 Flip UI:     OFF / ON
 OSD:         OFF / POP-UP / CPU / BOTH
 Keep CCs:    OFF / ON
+Theme:       STOCK / AMBER / STAGE / CONTRAST / PHOSPHOR / SYNTHWAVE / CUSTOM
 ```
 
 ## OSD
@@ -74,7 +75,7 @@ possible before. The only way was to edit the preset file on a computer.
 
 ### Using It
 
-Pick a tempo from 40 to 250 BPM, then save the preset. It loads at that tempo
+Pick a tempo from 1 to 255 BPM, then save the preset. It loads at that tempo
 from then on. Each preset can have its own.
 
 This is the tempo the module runs at when no clock is driving it. Synced delays
@@ -92,6 +93,35 @@ saves with the preset as normal.
 With Clk Loss on HOLD, stop or unplug the clock and the tempo it was running at
 is copied into Preset BPM. Save the preset to keep it. Changing Preset BPM by
 hand ends a hold.
+
+## Theme
+
+Theme changes the screen's colours. Choose one of five built-in themes, or
+load your own.
+
+### The Five Themes
+
+- AMBER: warm vintage-sampler colours.
+- STAGE: dim red, for dark rooms.
+- CONTRAST: the most readable. Orange and blue replace red and green, for
+  colour-blind users.
+- PHOSPHOR: a green-screen terminal.
+- SYNTHWAVE: magenta and cyan on violet.
+
+STOCK is 1010music's original. In every theme the pop-ups stay white on black,
+and the CPU bar keeps its green, amber and red.
+
+### Your Own Theme
+
+Build a theme in [the theme maker](theme-maker.html), which shows how readable
+each colour is. Save it as `theme.tml` at the top of the card, and set Theme to
+CUSTOM. In CUSTOM, the CPU bar uses your theme's green, yellow and red.
+
+After changing the file, set Theme to another theme and back to CUSTOM to
+reload it. This works even if you swapped the card while the module was on.
+
+If the card has no `theme.tml`, choosing CUSTOM creates one from the current
+theme. Missing or invalid colours fall back to Stock's.
 
 ## Keep CCs
 

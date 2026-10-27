@@ -1,0 +1,35 @@
+name: Something is wrong
+description: The patch does something it should not, or stops doing something it should.
+body:
+  - type: markdown
+    attributes:
+      value: |
+        There is no support: this is one person's patch, given away as is.
+        A clear report still helps everyone who uses it. Questions go in
+        Discussions, not here.
+  - type: input
+    id: version
+    attributes:
+      label: Patch version
+      description: The splash screen's last line, for example 2.3.10.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: What you did
+      description: Step by step. The preset, the pad and its type (Clip, Slicer, ...), its settings, and the CCs or buttons you sent.
+      placeholder: "1. "
+    validations:
+      required: true
+  - type: textarea
+    id: happened
+    attributes:
+      label: What happened, and what you expected
+    validations:
+      required: true
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else
+      description: A photo of the screen or a short recording helps more than a description.

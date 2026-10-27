@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: A question
+    url: https://github.com/modularpatcher/bitbox-micro-fw-patch/discussions
+    about: Ask in Discussions. Other users answer too.

@@ -5,6 +5,33 @@ something you would notice: what the module does differently once it is
 flashed, what the patcher does differently to your files, or what changed in
 the guide you are reading. None of them covers how any of it is built.
 
+## 2.3.10-mod — October 2026
+
+- Loops that really follow your tempo, 24 Live Flip modes to re-cut a loop live, and
+  turntablist skills.
+- Clip modes lock a Clip pad's loop to the clock:
+  - Vinyl speeds up and slows down like a turntable, so the pitch rises and
+    falls with the tempo.
+  - Jungle stretches like an early-'90s sampler, in a Modern or Old Skool
+    flavour.
+  - Key Lock stretches smoothly with no skips, keeping transients intact.
+  - Manual sets a pad's own tempo, off the clock, for slow junglist stretches.
+  - In Jungle and Key Lock the pitch is free: sequence notes into the pad and
+    the loop plays them, in time.
+- Live Flip modes: 24 ways to re-cut a loop live from one encoder, always in time:
+  repeats, reshuffles, chops, reverse swells and harmonies. The chops find
+  where the sound changes, so vocals and chords work as well as breaks.
+- Hold buttons: Pull Up, Power Down, Brake, Baby Scratch, Roll, Pitch Roll
+  and Freeze. Let go and the loop drops back in time.
+- Three Airwindows compressors beside the stock one: Logical4, VariMu and
+  Thunder. Auto makeup gain is improved, with a new Hot setting.
+- Themes: pick one of five, or roll your own in the theme maker, which shows
+  how readable each colour is.
+- The Character chain and compressor settings survive a power-off.
+- Preset BPM runs from 1 to 255, up from 40 to 250.
+- Lighter on the CPU, same sound.
+- Everything from 2.3.9-mod is unchanged and still there.
+
 ## 2.3.9-mod — October 2026
 
 - Sixteen Airwindows effects on the master bus, and a pop-up that shows what

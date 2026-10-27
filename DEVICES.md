@@ -8,7 +8,8 @@ master bus, after the delay and reverb returns, so they hear the finished sound.
 - **[The master EQ and filter](EQ-FILTER.md)**: tone and colour, with ten
   algorithms on one encoder.
 - **[The compressor](COMPRESSOR.md)**: dynamics, set up as a glue compressor
-  when it arrives. All five of its parameters are on MIDI, with auto makeup.
+  when it arrives, with three Airwindows compressors to switch to. Every
+  setting is on MIDI, with auto makeup.
 
 All three answer on **MIDI channel 1**, not on a pad's channel. They act on
 everything routed to Out 1 and Out 2. Pads on Out 3–6 skip them completely,
@@ -38,7 +39,10 @@ of the three as hard as you like.
 
 ## What They Have in Common
 
-None is stored in a preset. Their settings **survive a preset change** and last
-until you switch off. Power-on returns them to their starting values. There is
-no way to save them and no reset control. The compressor's on/off switch is the
-exception: the module keeps that with its own settings, as it always has.
+None is stored in a preset. Their settings **survive a preset change**. The
+Character chain survives power-off too. So do the compressor's type, the
+Airwindows types' settings and auto makeup.
+
+The EQ and the stock compressor's five settings return to their starting values
+at power-on. There is no reset control. The compressor's on/off switch is kept
+with the module's own settings, as it always has been.

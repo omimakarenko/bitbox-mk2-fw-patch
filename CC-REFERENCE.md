@@ -2,7 +2,9 @@
 
 This page lists every CC, its channel and the pad types that answer it, and what
 to check when one seems dead. [Pad controls](PAD-CONTROLS.md) says what each one
-does, and [devices](DEVICES.md) covers the three that act on the whole mix.
+does, [Clip modes](CLIP-MODES.md) covers the Clip pad's tempo, Live Flip modes and
+hold buttons, and [devices](DEVICES.md) covers the three that act on the whole
+mix.
 
 ## Which CC, Which Channel
 
@@ -17,6 +19,7 @@ does, and [devices](DEVICES.md) covers the three that act on the whole mix.
 | Play Thru | 90 | — | — | — | ✅ | — | ❌ |
 | Sustain + LFO | 87, 91–93 | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
 | Stop | 120/123 | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
+| Clip modes, Live Flip modes, hold buttons | 78, 102, 104, 105, 107, 112–119 | — | — | ✅ | — | — | ❌ |
 
 **Multi-Sample**: this is a Sample pad with a folder of WAVs loaded into it, not
 a separate mode, so it behaves exactly like a Sample pad. Switch it to another
@@ -50,7 +53,9 @@ whatever its type.
 | **43** | Compressor Attack | **1 only** | 0.5 … 100 ms | **exponential** |
 | **44** | Compressor Release | **1 only** | 10 ms … 1 s | **exponential** |
 | **45** | Compressor Makeup gain | **1 only** | −36 … +36 dB | linear |
-| **46** | Compressor auto makeup | **1 only** | `≥64` on, `<64` off | button |
+| **46** | Compressor auto makeup | **1 only** | any value above `0` steps Off, Normal, Hot | button |
+| **47** | Compressor type | **1 only** | four bands: Stock / Logical4 / VariMu / Thunder | stepped, 4 |
+| **48** | Compressor next type | **1 only** | any value above `0` | button |
 | **50** | EQ mode | **1 only** | ten bands, one per mode | stepped, 10 |
 | **51** | EQ encoder 2 | **1 only** | `0`–`127`, centre neutral | linear |
 | **52** | EQ encoder 3 | **1 only** | `0`–`127`, centre neutral | linear |
@@ -60,6 +65,7 @@ whatever its type.
 | **56** | EQ encoder 4 push | **1 only** | `≥64` held, `<64` released | button |
 | **57** | EQ master bypass | **1 only** | `≥64` out, `<64` in | button |
 | **59** | EQ filter slope | **1 only** | `≥64` is 24 dB, `<64` is 12 dB | button |
+| **78** | Baby Scratch | pad channel | `≥64` held, `<64` released | button |
 | **79** | Granular Density | pad channel | `0`–`127` | linear |
 | **80** | Granular Grain Size | pad channel | `0`–`127` | linear |
 | **81** | Granular Window | pad channel | `0`–`127` | linear |
@@ -75,10 +81,22 @@ whatever its type.
 | **91** | LFO Wave | pad channel | ten bands across the waveform list | stepped, 10 |
 | **92** | LFO Beat Sync | pad channel | `≥64` on, `<64` off | button |
 | **93** | LFO Retrigger | pad channel | `≥64` on, `<64` off | button |
+| **102** | Brake | pad channel | `≥64` held, `<64` released | button |
+| **104** | Freeze | pad channel | `≥64` held, `<64` released | button |
+| **105** | Pull Up | pad channel | `≥64` held, `<64` released | button |
+| **107** | Power Down | pad channel | `≥64` held, `<64` released | button |
 | **108** | Delay beat-sync | any (global) | `≥64` on, `<64` off | button |
 | **109** | Delay ping-pong | any (global) | `≥64` on, `<64` off | button |
 | **110** | Delay filter on/off | any (global) | `≥64` on, `<64` off | button |
 | **111** | Delay filter width | any (global) | `0`–`127` | linear |
+| **112** | Clip method: Stock, Vinyl, Jungle, Key Lock | pad channel | any value above `0` steps to the next | button |
+| **113** | Clip tempo: clock or Manual | pad channel | any value above `0` switches | button |
+| **114** | Manual tempo | pad channel | 1 … 255 BPM | linear |
+| **115** | Jungle cycle | pad channel | short to long | **exponential** |
+| **116** | Jungle flavour: Modern or Old Skool | pad channel | any value above `0` switches | button |
+| **117** | Live Flip mode | pad channel | 25 bands: Off, then the 24 modes | stepped, 25 |
+| **118** | Roll | pad channel | `≥64` held, `<64` released | button |
+| **119** | Pitch Roll | pad channel | `≥64` held, `<64` released | button |
 | **120** | Stop this pad — All Sound Off | pad channel | any value; releases the note | button |
 | **123** | Stop this pad — All Notes Off | pad channel | any value; same as 120 | button |
 
@@ -92,10 +110,13 @@ pad stop opens a [pop-up](SETTINGS.md#the-pop-up).
 - **CC 79 to 93, and 120/123**: per pad. Send them on the channel the pad
   listens on, the one you trigger it with. Eight pads on eight channels answer
   independently.
+- **CC 78, 102, 104, 105, 107 and 112 to 119**: the [Clip modes](CLIP-MODES.md),
+  per Clip pad, on its channel in the same way.
 - **CC 108 to 111**: the delay, which the whole preset shares. Send them on
   any channel.
 - **CC 14 to 29**: the [Character chain](CHARACTER.md), channel 1 only.
-- **CC 40 to 46**: the [compressor](COMPRESSOR.md), channel 1 only.
+- **CC 40 to 48**: the [compressor](COMPRESSOR.md), channel 1 only. All four
+  types share CC 41–45. Each uses them differently.
 - **CC 50 to 57, and 59**: the [EQ and filter](EQ-FILTER.md), channel 1 only.
 
 If a device ignores everything, put your controller on MIDI channel 1.

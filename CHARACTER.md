@@ -109,7 +109,7 @@ Three things are worth knowing before you stack slots.
 ### CPU
 
 One or two slots are light. All four at full, with the heaviest effect in each
-bank, take about a quarter of the processor. The two tape effects in Colour are
+bank, take about a fifth of the processor. The two tape effects in Colour are
 the heaviest. To watch the load, turn on the [CPU bar](SETTINGS.md#the-cpu-bar).
 
 ![The CPU bar at three loads, stacked: green only at a light load, green into
@@ -126,10 +126,10 @@ extreme settings. If tails turn long and grainy, back a slot off first.
 Some effects change the level as well as the sound. Match the levels first.
 Then judge.
 
-### Not Saved
+### Kept Through Power-Off
 
-Like the other devices, the chain survives a preset change but not power-off.
-See [what they have in common](DEVICES.md#what-they-have-in-common). At
-power-on every slot returns to Amount zero, its first effect and a centred Tone.
+The chain survives a preset change and power-off. Each slot comes back with
+the Amount, Tone and effect you left it on. See
+[what they have in common](DEVICES.md#what-they-have-in-common).
 
 The Airwindows licence travels with the patch, in [LICENSE](LICENSE).

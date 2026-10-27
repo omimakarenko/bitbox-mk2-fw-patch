@@ -423,7 +423,7 @@
 <div class="wrap">
   <aside class="side">
     <p class="brand">Bitbox Micro<br>community modification</p>
-    <nav class="nav"><a href="index.html">Overview</a><a href="INSTALLING.html" aria-current="page">Installing</a><a href="CC-REFERENCE.html">CC reference</a><a href="PAD-CONTROLS.html">Pad controls</a><a href="DEVICES.html">Devices</a><a href="CHARACTER.html">Character</a><a href="COMPRESSOR.html">Compressor</a><a href="EQ-FILTER.html">EQ and Filter</a><a href="SETTINGS.html">Settings</a><a href="LIMITATIONS.html">Limitations</a><a href="CHANGELOG.html">Changelog</a><a href="LICENSE.html">Licence</a></nav>
+    <nav class="nav"><a href="index.html">Overview</a><a href="INSTALLING.html" aria-current="page">Installing</a><a href="CC-REFERENCE.html">CC reference</a><a href="PAD-CONTROLS.html">Pad controls</a><a href="CLIP-MODES.html">Clip modes</a><a href="DEVICES.html">Devices</a><a href="CHARACTER.html">Character</a><a href="COMPRESSOR.html">Compressor</a><a href="EQ-FILTER.html">EQ and Filter</a><a href="SETTINGS.html">Settings</a><a href="LIMITATIONS.html">Limitations</a><a href="CHANGELOG.html">Changelog</a><a href="LICENSE.html">Licence</a></nav>
     <nav class="toc">
       <p class="toc-label">On this page</p>
       <a href="#prerequisites"><span class="n">1</span><span>Prerequisites</span></a><a class="sub" href="#presets-that-use-it"><span class="n"></span><span>Presets That Use It</span></a><a href="#preparing"><span class="n">2</span><span>Preparing</span></a><a class="sub" href="#getting-python"><span class="n"></span><span>Getting Python</span></a><a href="#building"><span class="n">3</span><span>Building</span></a><a href="#flashing"><span class="n">4</span><span>Flashing</span></a><a href="#checking-it-worked"><span class="n">5</span><span>Checking It Worked</span></a><a href="#if-something-goes-wrong"><span class="n">6</span><span>If Something Goes Wrong</span></a><a class="sub" href="#windows-cannot-find-python"><span class="n"></span><span>Windows Cannot Find Python</span></a><a class="sub" href="#if-it-stops-with-an-error"><span class="n"></span><span>If It Stops with an Error</span></a><a class="sub" href="#going-back-to-stock"><span class="n"></span><span>Going Back to Stock</span></a><a href="#can-this-brick-my-module"><span class="n">7</span><span>Can This Brick My Module?</span></a><a href="#when-new-firmware-lands"><span class="n">8</span><span>When New Firmware Lands</span></a>
@@ -538,14 +538,19 @@ python3 patch_micro.py MICRO.BIN patched/MICRO.BIN</code></pre>
      ok   Character chain, ch 1        CC 14-29
      ok   OSD: pop-ups and CPU bar     TOOLS &gt; Settings
      ok   Keep CCs: OFF/ON             TOOLS &gt; Settings
+     ok   Compressor type, ch 1        CC 47 / 48
+     ok   Theme, and your own          TOOLS &gt; Settings
+     ok   Clip modes, per pad          CC 112-116
+     ok   Live Flip modes, per pad     CC 117
+     ok   Hold buttons, per pad        CC 78, 102, 104, 105, 107, 118, 119
      ok   ProgChange: OFF/ON/NEW ONLY  TOOLS &gt; Settings
      ok   Clk Loss: INTERNAL/HOLD      TOOLS &gt; Settings
      ok   Flip UI, screen and touch    TOOLS &gt; Settings
      ok   Splash screen, so nobody blames 1010music for my work
 
-  Done. MICRO.BIN is ready -- 722,140 bytes.
+  Done. MICRO.BIN is ready -- 812,000 bytes.
 
-     Fingerprint  155b1f254bf93967cdd43ac9154e99e602d6619390e18180717586222919d478</code></pre>
+     Fingerprint  62f15b366fdac8181ca070b5ddf53476955c91ca80e184d526782cf8d49ac7b7</code></pre>
     <p>Check that the fingerprint matches the one above. If it does, your firmware is byte-for-byte the same as everyone else's running this patch.</p>
     <p>Add <code>-v</code> to see every change it makes.</p>
   </div>
@@ -568,7 +573,7 @@ python3 patch_micro.py MICRO.BIN patched/MICRO.BIN</code></pre>
     <p>The splash on the next boot should read:</p>
     <pre><code>bitbox micro
 community fw
-2.3.9-mod</code></pre>
+2.3.10-mod</code></pre>
     <p>If it still says <code>by 1010music</code> and <code>2.3.4</code>, nothing was flashed. Check that the file is named <code>MICRO.BIN</code> and sits in the card root. Then try again.</p>
     <p>Check the splash after every flash. It takes a second, and it saves you chasing a CC on firmware that was never installed.</p>
     <p>Then send one of the patch's CCs. A pop-up in the middle of the screen should name what it changed. That proves the patch is running and your controller is getting through. The <a href="CC-REFERENCE.html">CC reference</a> has the full list, and <a href="SETTINGS.html">Settings</a> covers the new rows on the Settings screen.</p>

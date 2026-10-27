@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bitbox Micro Theme Maker</title>
+<style>
+/* Layout: a bench sheet -- one column of hardware-style panels: the theme screens, then the maker, then the file. */
+:root {
+  color-scheme: dark;
+  --ink: #0f1012;          /* the page: a near-black with a faint blue bias, like an unlit panel */
+  --plate: #17191c;        /* raised panels */
+  --rule: #2a2d32;
+  --fg: #e7e4de;           /* warm off-white text */
+  --mute: #9a968e;
+  --mark: #e8c547;         /* silkscreen yellow, used sparingly for labels and focus */
+  --ok: #6fcf8a;
+  --warn: #f0a04b;
+  --bad: #ef6b5e;
+  --display: "Avenir Next Condensed", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  --body: system-ui, -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --pixel: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--ink); color: var(--fg); }
+body {
+  font-family: var(--body); font-size: 15px; line-height: 1.55;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 28px 64px;
+}
+.wrap { max-width: 1160px; margin: 0 auto; display: grid; gap: 40px; }
+h1, h2, h3 { font-family: var(--display); font-weight: 700; letter-spacing: 0.02em; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(30px, 5vw, 46px); line-height: 1.05; text-transform: uppercase; }
+h2 { font-size: 26px; text-transform: uppercase; }
+h3 { font-size: 20px; text-transform: uppercase; letter-spacing: 0.04em; }
+p { margin: 0; max-width: 70ch; }
+.lede { color: var(--mute); }
+.eyebrow { font-family: var(--display); font-weight: 600; font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--mark); }
+header.top { display: grid; gap: 12px; }
+.note { border-left: 3px solid var(--mark); padding: 10px 14px; background: var(--plate); color: var(--fg); max-width: 78ch; }
+.note strong { color: var(--mark); font-weight: 600; }
+
+.bar { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; }
+.toggle { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: var(--mute); cursor: pointer; }
+.toggle input { accent-color: var(--mark); width: 16px; height: 16px; }
+
+/* the theme gallery */
+.gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px; }
+.theme { background: var(--plate); border: 1px solid var(--rule); padding: 16px; display: grid; gap: 12px; min-width: 0; }
+.theme .hd { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.theme .what { color: var(--mute); font-size: 14px; }
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.figs { display: flex; flex-wrap: wrap; gap: 6px; font-family: var(--mono); font-size: 12px; }
+.chip { padding: 2px 8px; border: 1px solid var(--rule); color: var(--mute); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.chip.ok { color: var(--ok); border-color: color-mix(in srgb, var(--ok) 45%, var(--rule)); }
+.chip.warn { color: var(--warn); border-color: color-mix(in srgb, var(--warn) 45%, var(--rule)); }
+.chip.bad { color: var(--bad); border-color: color-mix(in srgb, var(--bad) 45%, var(--rule)); }
+button.use { font-family: var(--display); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; font-size: 14px;
+  background: transparent; color: var(--fg); border: 1px solid var(--rule); padding: 6px 12px; cursor: pointer; justify-self: start; }
+button.use:hover { border-color: var(--mark); color: var(--mark); }
+button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid var(--mark); outline-offset: 2px; }
+
+/* the screens, after the manual's screenshots of the Pads and Settings screens: 320 x 240 */
+.scr { position: relative; width: 100%; max-width: 100%; aspect-ratio: 4 / 3; container-type: inline-size; background: var(--bg); border: 4px solid #050506;
+  border-radius: 2px; overflow: hidden; font-family: var(--pixel); color: var(--txt); line-height: 1; }
+.strip { height: 9.5cqw; background: var(--bg0); display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 0 2cqw; font-size: 7.4cqw; color: var(--txt); }
+.strip .mid { text-align: center; }
+.pads { height: calc(100% - 9.5cqw); display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(3, 1fr); gap: 1.6cqw; padding: 1.6cqw; }
+.cell { background: var(--g2); display: grid; place-items: center; text-align: center; font-size: 7.6cqw; position: relative; padding: 1cqw; overflow: hidden; }
+.cell.wide { grid-column: span 2; }
+.cell.sel { background: var(--sec); }
+.cell .nm { white-space: pre; }
+.cell .bar2 { position: absolute; left: 1.6cqw; right: 1.6cqw; bottom: 1.6cqw; height: 3.2cqw; border: 0.5cqw solid var(--acc); }
+.cell .bar2 i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--acc); }
+.cell .q { position: absolute; left: 1.6cqw; right: 1.6cqw; bottom: 1.6cqw; height: 1.6cqw; background: var(--txt2); }
+.set { height: calc(100% - 9.5cqw); display: grid; grid-template-rows: 1.25fr repeat(5, 1fr); gap: 0.9cqw; padding: 0.9cqw 0; }
+.set .row { background: var(--g2); display: flex; align-items: center; padding: 0 2.4cqw; font-size: 7.6cqw; white-space: pre; overflow: hidden; }
+.set .row.head { justify-content: center; }
+.set .row.sel { background: var(--sec); }
+/* the patch's own: a pop-up (298 x 38 at 11, 101) and the CPU bar along the bottom edge */
+.pop { position: absolute; left: 3.44%; top: 42.08%; width: 93.12%; height: 15.83%; background: var(--pbg); color: var(--ptx);
+  display: grid; align-content: center; justify-items: center; gap: 1.2cqw; font-size: 4.6cqw; white-space: pre; }
+.cpu { position: absolute; left: 0; right: 0; bottom: 0; height: 1.7%; min-height: 2px; background: var(--bbg); }
+.cpu i { position: absolute; top: 0; bottom: 0; }
+.capt { font-family: var(--mono); font-size: 11px; color: var(--mute); text-align: center; margin-top: 4px; }
+
+/* the maker */
+.maker { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+@media (max-width: 860px) { .maker { grid-template-columns: 1fr; } }
+.panel { background: var(--plate); border: 1px solid var(--rule); padding: 16px; display: grid; gap: 14px; min-width: 0; }
+.start { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+label.lbl { font-family: var(--display); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; font-size: 14px; color: var(--mute); }
+select, input[type=text], input.hex { font-family: var(--mono); font-size: 13px; background: var(--ink); color: var(--fg); border: 1px solid var(--rule); padding: 6px 8px; }
+.roles { display: grid; gap: 2px; }
+.group { font-family: var(--display); font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; font-size: 13px; color: var(--mark); padding: 12px 0 4px; }
+.role { display: grid; grid-template-columns: 34px 92px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--rule); }
+.role input[type=color] { width: 34px; height: 28px; border: 1px solid var(--rule); background: none; padding: 0; cursor: pointer; }
+.role input.hex { width: 92px; text-transform: uppercase; }
+.role input.hex.badhex { border-color: var(--bad); }
+.role .name { font-family: var(--mono); font-size: 13px; color: var(--fg); }
+.role .desc { color: var(--mute); font-size: 13px; line-height: 1.35; }
+.role .cr { font-family: var(--mono); font-size: 12px; font-variant-numeric: tabular-nums; white-space: nowrap; text-align: right; }
+.role .cr.ok { color: var(--ok); } .role .cr.warn { color: var(--warn); } .role .cr.bad { color: var(--bad); }
+@media (max-width: 520px) { .role { grid-template-columns: 34px 84px minmax(0, 1fr); } .role .cr { grid-column: 3; text-align: left; } .role input.hex { width: 84px; } }
+.filebox { display: grid; gap: 10px; }
+textarea { width: 100%; min-height: 360px; resize: vertical; font-family: var(--mono); font-size: 12px; line-height: 1.5; background: var(--ink); color: var(--fg); border: 1px solid var(--rule); padding: 10px; white-space: pre; overflow: auto; }
+.copied { color: var(--ok); font-size: 13px; min-height: 1.4em; }
+.steps { display: grid; gap: 8px; padding-left: 1.2em; margin: 0; max-width: 72ch; }
+.steps li::marker { color: var(--mark); font-family: var(--display); font-weight: 700; }
+code { font-family: var(--mono); font-size: 0.92em; color: var(--mark); }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <span class="eyebrow">Bitbox Micro · community firmware · <a href="index.html">the guide</a></span>
+    <h1>Bitbox Micro Themes</h1>
+    <p class="lede">Five themes beside Stock, and a maker for your own. Every colour on 1010's screens comes from one 34-entry palette, so a theme is a new set of those 34 colours. Each theme recolours the palette family by family: the pink selection, the cyan accent, the grey cells, the dark backgrounds, the status colours.</p>
+    <p class="note"><strong>Previews of the Pads and Settings screens</strong>, drawn from the manual's screenshots. On the module each colour also turns up on the other screens, such as the waveform view and the LFO and envelope graphs.</p>
+    <div class="bar">
+      <label class="toggle" for="q5"><input type="checkbox" id="q5"> Show at the screen's colour depth (5 bits a channel)</label>
+    </div>
+  </header>
+
+  <section aria-labelledby="g-h" style="display:grid; gap:16px">
+    <h2 id="g-h">The themes</h2>
+    <div class="gallery" id="gallery"></div>
+  </section>
+
+  <section aria-labelledby="m-h" style="display:grid; gap:16px">
+    <h2 id="m-h">Make your own</h2>
+    <p class="lede">Start from any theme, change what you like, and download or copy the file. Each figure is a contrast ratio for the pair that matters most for that colour (WCAG's measure: 4.5:1 is the usual minimum for small text). Green is comfortable, amber readable but low, red hard to read on the module's small screen. Stock itself falls short in two places: white text on its pink selection, and its cyan bar on that pink.</p>
+    <div class="maker">
+      <div class="panel">
+        <div class="start">
+          <label class="lbl" for="base">Start from</label>
+          <select id="base"></select>
+          <label class="lbl" for="tname">Name</label>
+          <input type="text" id="tname" value="My theme" maxlength="24" style="width:160px">
+        </div>
+        <div class="roles" id="roles"></div>
+      </div>
+      <div style="display:grid; gap:20px; min-width:0">
+        <div class="panel">
+          <h3>Preview</h3>
+          <div class="pair" id="mkscreens"></div>
+          <div class="figs" id="mkfigs"></div>
+        </div>
+        <div class="panel filebox">
+          <h3>theme.tml</h3>
+          <textarea id="file" readonly spellcheck="false" aria-label="The theme file"></textarea>
+          <div class="bar">
+            <button class="use" id="dl" type="button">Download theme.tml</button>
+            <button class="use" id="copy" type="button">Copy the file</button>
+            <span class="copied" id="copied" aria-live="polite"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-h" style="display:grid; gap:14px">
+    <h2 id="h-h">Putting it on the module</h2>
+    <ol class="steps">
+      <li>Download the file, or copy it into a text file, and save it as <code>theme.tml</code> at the top of the card, next to <code>settings.tml</code>. It is the same XML style the module already reads.</li>
+      <li>On the module, open TOOLS &gt; Settings and set <strong>Theme</strong> to <strong>Custom</strong>. If it is set to Custom already, turn Theme to another and back to Custom: the module reads the file again each time Custom is chosen.</li>
+      <li>If there is no <code>theme.tml</code> yet, choosing Custom writes one for you, filled with the theme on screen, so you always start from a working file.</li>
+      <li>A colour that is missing or mistyped shows as Stock's, so a slip can never leave the screen unreadable.</li>
+    </ol>
+    <p class="lede">In Custom the CPU bar follows your colours too: its green, amber and red take the theme's green, yellow and red. The built-in themes keep the stock green, amber and red, and the pop-ups stay white on black in every theme, so they always stand out.</p>
+  </section>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var THEMES = {"Stock": {"bg0": "000000", "bg": "141414", "bg2": "2B2B2B", "g1": "444444", "g2": "56565A", "g3": "666666", "g4": "707070", "g5": "AAAAAA", "txt": "FCFCFC", "txt2": "FFFFFF", "acc": "09D7F5", "accd": "046B7A", "sec": "FF6AF3", "red": "FF0000", "red2": "BB2222", "grn": "22BB22", "yel": "FFFF00", "yeld": "777100", "x1": "00FFCC", "x2": "BA00FF"}, "Amber": {"bg0": "000000", "bg": "16120C", "bg2": "2C241A", "g1": "463B2E", "g2": "5A4C3B", "g3": "6B5B47", "g4": "776650", "g5": "B8A58C", "txt": "FFF3E0", "txt2": "FFF8EC", "acc": "FFB000", "accd": "7A5200", "sec": "A8401C", "red": "FF3B1F", "red2": "B8321C", "grn": "9CC72B", "yel": "FFE066", "yeld": "7A6A1E", "x1": "FFD27A", "x2": "FF8A3D"}, "Stage": {"bg0": "000000", "bg": "0E0605", "bg2": "240F0D", "g1": "461C19", "g2": "56221E", "g3": "6A2A24", "g4": "76302A", "g5": "D27A6C", "txt": "F0CFC4", "txt2": "F8DACF", "acc": "FF9A3D", "accd": "9A2018", "sec": "C8231A", "red": "FF2A14", "red2": "B0241A", "grn": "D9A93F", "yel": "FFC15A", "yeld": "6B4C20", "x1": "FF7A5C", "x2": "D04A7A"}, "Contrast": {"bg0": "000000", "bg": "0E0E0E", "bg2": "2A2A2A", "g1": "303030", "g2": "3A3A3A", "g3": "707070", "g4": "7E7E7E", "g5": "C4C4C4", "txt": "FFFFFF", "txt2": "FFFFFF", "acc": "FFB000", "accd": "7A5600", "sec": "1F5FD6", "red": "FF7A00", "red2": "B85600", "grn": "3D9BFF", "yel": "FFE14D", "yeld": "7A6C25", "x1": "9AD0FF", "x2": "FFB0D8"}, "Phosphor": {"bg0": "000000", "bg": "07110A", "bg2": "132418", "g1": "1E3825", "g2": "274830", "g3": "2E5539", "g4": "356141", "g5": "72A882", "txt": "D8FFE2", "txt2": "E8FFEE", "acc": "FFC43D", "accd": "7A5A12", "sec": "1C7A36", "red": "FF4A3A", "red2": "B33A2E", "grn": "9AFF50", "yel": "F5FF5A", "yeld": "6E7A1E", "x1": "7AFFC8", "x2": "C2FF3A"}, "Synthwave": {"bg0": "000000", "bg": "130D19", "bg2": "291D35", "g1": "3D2D4F", "g2": "4D3961", "g3": "59436F", "g4": "644C7B", "g5": "AA98C2", "txt": "FFF0FF", "txt2": "FFF6FF", "acc": "2EE6FF", "accd": "0E6E7A", "sec": "B8166F", "red": "FF3B3B", "red2": "B82A3A", "grn": "3DFFB0", "yel": "FFE45C", "yeld": "7A6A2A", "x1": "AE85FF", "x2": "FF8AE0"}};
+  var BLURB = {
+    "Stock": "1010music's own colours, as the module ships: pink selection, cyan progress bars.",
+    "Amber": "A warm vintage-sampler look: rust selection, amber progress bars, brown-grey cells, cream text. Easy on the eyes for long sessions.",
+    "Stage": "Dim deep red for dark rooms and gigs, so the screen does not spoil your night vision. Orange progress bars.",
+    "Contrast": "The most readable: white on dark cells, a blue selection and amber bars; red/green status becomes orange/blue, which most colour-blind people can tell apart.",
+    "Phosphor": "A green-screen terminal: green selection on green-black cells, amber progress bars.",
+    "Synthwave": "Deep magenta selection, cyan progress bars, violet cells."
+  };
+  // the colours, by what they do: [key, name in the file, where it appears]
+  var ROLES = [
+    ["Backgrounds", [
+      ["bg", "background", "The dark background: the gaps between pads and rows, and behind the waveform view. In Custom, the CPU bar's background too."],
+      ["bg0", "black", "Pure black in Stock: the darkest parts of the screen, such as the top strip."],
+      ["bg2", "panel", "A dark panel grey (stock #2B2B2B), used in a few places."]]],
+    ["Cells and greys, darkest to lightest", [
+      ["g1", "grey1", "The darkest grey: lines and dividers."],
+      ["g2", "cell", "The pads, the Keys and Stop buttons, and the Settings rows. Most text sits on it."],
+      ["g3", "grey3", "A mid grey: keep it between cell and grey4."],
+      ["g4", "grey4", "A lighter grey: keep it between grey3 and grey5."],
+      ["g5", "grey5", "The lightest grey, for dimmed text. Keep it readable."]]],
+    ["Text", [
+      ["txt", "text", "The text on the cells and on the selection."],
+      ["txt2", "text-bright", "The brightest text and marks, and the white bar on a pad waiting for its quantise point. In Custom, the CPU bar's peak mark."]]],
+    ["Highlights", [
+      ["sec", "selection", "The selected pad and the highlighted Settings row (stock pink). Text sits on it, so keep it dark or rich enough to read."],
+      ["acc", "accent", "The progress bar along a playing pad, the waveform and its markers, and highlights in lists (stock cyan). It shows on the cells and on the selection."],
+      ["accd", "accent-dark", "The accent's dark partner (stock #046B7A), used in a few places."]]],
+    ["Status colours", [
+      ["red", "red", "Stock's bright red. In Custom, the CPU bar above 90%."],
+      ["red2", "red-dark", "Stock's darker red, used in three places."],
+      ["grn", "green", "Stock's green. In Custom, the CPU bar below 70%."],
+      ["yel", "yellow", "Stock's yellow. In Custom, the CPU bar from 70% to 90%."],
+      ["yeld", "yellow-dark", "Stock's dark olive, a dim yellow."]]],
+    ["Extras", [
+      ["x1", "teal", "Stock's teal (#00FFCC)."],
+      ["x2", "purple", "Stock's purple (#BA00FF)."]]]
+  ];
+  // the pair each colour is judged by: [against, minimum, label]
+  var JUDGE = {
+    txt: ["g2", 4.5, "on a cell"], txt2: ["bg0", 12, "on the strip"], g2: ["txt", 4.5, "under text"],
+    sec: ["txt", 3.0, "under text"], acc: ["g2", 2.0, "on a cell"], g5: ["bg", 5.5, "on background"],
+    red: ["bg", 4, "on background"], grn: ["bg", 4, "on background"], yel: ["bg", 8, "on background"],
+    x1: ["bg", 6, "on background"], x2: ["bg", 3, "on background"]
+  };
+  var q5 = false;
+  function quant(h) {
+    var o = "";
+    for (var i = 0; i < 6; i += 2) { var v = parseInt(h.substr(i, 2), 16) >> 3; o += ("0" + Math.round(v * 255 / 31).toString(16)).slice(-2); }
+    return o.toUpperCase();
+  }
+  function shown(h) { return "#" + (q5 ? quant(h) : h); }
+  function lum(h) {
+    var c = [0, 2, 4].map(function (i) { var v = parseInt(h.substr(i, 2), 16) / 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); });
+    return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+  }
+  function cr(a, b) { var x = lum(a), y = lum(b); if (y > x) { var t = x; x = y; y = t; } return (x + 0.05) / (y + 0.05); }
+  function grade(v, need) { return v >= need ? "ok" : v >= need * 0.75 ? "warn" : "bad"; }
+
+  var PADS = [["Kick", "Drum"], ["Snre", "Armk"], ["C3E6", "Arma"], ["16B ", "Beny"], ["Vox ", "Wah "], ["Hat ", "PO32"], ["Bass", "MI  "], ["Sub ", "Bass"]];
+  function padsScreen() {
+    var h = '<div class="strip"><span>17:3</span><span class="mid">Pads</span><span></span></div><div class="pads">' +
+      '<div class="cell"><span class="nm">Keys</span></div><div class="cell wide"><span class="nm">01a-UKB-EPN\n7A Dm STA</span></div><div class="cell"><span class="nm">Stop</span></div>';
+    PADS.forEach(function (p, i) {
+      var cls = "cell" + (i === 2 ? " sel" : "");
+      var extra = i === 2 ? '<span class="bar2"><i style="width:72%"></i></span>' : i === 3 ? '<span class="bar2"><i style="width:22%"></i></span>' : i === 6 ? '<span class="q"></span>' : "";
+      h += '<div class="' + cls + '"><span class="nm">' + p[0] + "\n" + p[1] + "</span>" + extra + "</div>";
+    });
+    return h + "</div>" + '<div class="pop"><span>COMPRESSOR</span><span>Type  Logical4</span></div>' +
+      '<div class="cpu"><i style="left:0;width:70%;background:var(--bok)"></i>' +
+      '<i style="left:70%;width:20%;background:var(--bwarn)"></i><i style="left:90%;width:4%;background:var(--bhot)"></i>' +
+      '<i style="left:97%;width:0.8%;background:var(--bpk)"></i></div>';
+  }
+  function setScreen(name) {
+    return '<div class="strip"><span>17:3</span><span class="mid"></span><span></span></div><div class="set">' +
+      '<div class="row head">2.3.10-mod</div>' +
+      '<div class="row sel">Brightness:  100.0%</div>' +
+      '<div class="row">Bright Fine: 0.0%</div>' +
+      '<div class="row">MasterVol:   99.6%</div>' +
+      '<div class="row">Compressor:  ON</div>' +
+      '<div class="row">Theme:       ' + name + "</div></div>";
+  }
+  // the patch's own colours: the built-in themes keep 2.3.9's fixed ones; Custom's CPU bar takes its families
+  var OWN_STOCK = { pbg: "101010", ptx: "FFFFFF", bok: "00FF00", bwarn: "FFA400", bhot: "FF0000", bpk: "FFFFFF", bbg: "101010" };
+  function own(t, stock) {
+    return stock ? OWN_STOCK : { pbg: OWN_STOCK.pbg, ptx: OWN_STOCK.ptx, bok: t.grn, bwarn: t.yel, bhot: t.red, bpk: t.txt2, bbg: t.bg };
+  }
+  function paint(el, t, stock) {
+    Object.keys(t).forEach(function (k) { el.style.setProperty("--" + k, shown(t[k])); });
+    var o = own(t, stock);
+    Object.keys(o).forEach(function (k) { el.style.setProperty("--" + k, shown(o[k])); });
+  }
+  function screens(t, name, stock) {
+    var wrap = document.createElement("div"); wrap.className = "pair";
+    [["Pads screen", padsScreen()], ["Settings", setScreen(name)]].forEach(function (s) {
+      var box = document.createElement("div");
+      var d = document.createElement("div"); d.className = "scr"; d.setAttribute("role", "img");
+      d.setAttribute("aria-label", "The " + s[0] + " in the " + name + " theme"); d.innerHTML = s[1]; paint(d, t, stock);
+      var c = document.createElement("div"); c.className = "capt"; c.textContent = s[0];
+      box.appendChild(d); box.appendChild(c); wrap.appendChild(box);
+    });
+    return wrap;
+  }
+  function figs(el, t) {
+    var rows = [["text on cell", "txt", "g2", 4.5], ["text on selection", "txt", "sec", 3], ["bar on cell", "acc", "g2", 2], ["bar on selection", "acc", "sec", 1.8]];
+    el.innerHTML = rows.map(function (r) {
+      var v = cr(t[r[1]], t[r[2]]); return '<span class="chip ' + grade(v, r[3]) + '">' + r[0] + " " + v.toFixed(1) + ":1</span>";
+    }).join("");
+  }
+
+  var gallery = document.getElementById("gallery");
+  function drawGallery() {
+    gallery.innerHTML = "";
+    Object.keys(THEMES).forEach(function (name) {
+      var t = THEMES[name], card = document.createElement("article");
+      card.className = "theme";
+      var hd = document.createElement("div"); hd.className = "hd";
+      hd.innerHTML = "<h3>" + name + "</h3>";
+      var b = document.createElement("button"); b.className = "use"; b.type = "button"; b.textContent = "Start from this";
+      b.addEventListener("click", function () { load(name); document.getElementById("m-h").scrollIntoView({behavior: "smooth", block: "start"}); });
+      hd.appendChild(b);
+      var p = document.createElement("p"); p.className = "what"; p.textContent = BLURB[name];
+      var f = document.createElement("div"); f.className = "figs"; figs(f, t);
+      card.appendChild(hd); card.appendChild(screens(t, name, true)); card.appendChild(p); card.appendChild(f);
+      gallery.appendChild(card);
+    });
+  }
+
+  // the maker
+  var cur = {}, baseSel = document.getElementById("base"), rolesEl = document.getElementById("roles");
+  Object.keys(THEMES).forEach(function (n) { var o = document.createElement("option"); o.value = n; o.textContent = n; baseSel.appendChild(o); });
+  ROLES.forEach(function (g) {
+    var h = document.createElement("div"); h.className = "group"; h.textContent = g[0]; rolesEl.appendChild(h);
+    g[1].forEach(function (r) {
+      var k = r[0], row = document.createElement("div"); row.className = "role";
+      row.innerHTML = '<input type="color" id="c-' + k + '" aria-label="' + r[1] + ' colour">' +
+        '<input class="hex" type="text" id="h-' + k + '" maxlength="7" aria-label="' + r[1] + ' as #RRGGBB">' +
+        '<div style="min-width:0"><div class="name">' + r[1] + '</div><div class="desc">' + r[2] + "</div></div>" +
+        '<span class="cr" id="r-' + k + '"></span>';
+      rolesEl.appendChild(row);
+      row.querySelector("#c-" + k).addEventListener("input", function (e) { set(k, e.target.value.slice(1)); });
+      row.querySelector("#h-" + k).addEventListener("input", function (e) {
+        var v = e.target.value.trim().replace(/^#/, "");
+        var good = /^[0-9a-fA-F]{6}$/.test(v); e.target.classList.toggle("badhex", !good);
+        if (good) set(k, v.toUpperCase(), true);
+      });
+    });
+  });
+  var mkHost = document.getElementById("mkscreens");
+  function set(k, v, fromHex) {
+    cur[k] = v.toUpperCase();
+    document.getElementById("c-" + k).value = "#" + cur[k];
+    if (!fromHex) { var h = document.getElementById("h-" + k); h.value = "#" + cur[k]; h.classList.remove("badhex"); }
+    refresh();
+  }
+  function refresh() {
+    var name = (document.getElementById("tname").value || "My theme").trim() || "My theme";
+    mkHost.innerHTML = ""; mkHost.appendChild(screens(cur, name.slice(0, 10)).children[0]); mkHost.appendChild(screens(cur, name.slice(0, 10)).children[1]);
+    figs(document.getElementById("mkfigs"), cur);
+    ROLES.forEach(function (g) { g[1].forEach(function (r) {
+      var k = r[0], el = document.getElementById("r-" + k), j = JUDGE[k];
+      if (!j) { el.textContent = ""; el.className = "cr"; return; }
+      var v = cr(cur[k], cur[j[0]]); el.textContent = j[2] + " " + v.toFixed(1) + ":1"; el.className = "cr " + grade(v, j[1]);
+    }); });
+    writeFile(name);
+  }
+  function load(name) {
+    baseSel.value = name;
+    var t = THEMES[name];
+    Object.keys(t).forEach(function (k) {
+      cur[k] = t[k];
+      document.getElementById("c-" + k).value = "#" + t[k];
+      var h = document.getElementById("h-" + k); h.value = "#" + t[k]; h.classList.remove("badhex");
+    });
+    refresh();
+  }
+  function xmlEsc(s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+  function writeFile(name) {
+    var lines = [];
+    lines.push('<?xml version="1.0" encoding="UTF-8"?>');
+    lines.push("<!-- A Bitbox Micro theme. Save as theme.tml at the top of the card,");
+    lines.push("     next to settings.tml, then set TOOLS > Settings > Theme to Custom.");
+    lines.push("     Colours are #RRGGBB. One that is missing or mistyped shows as");
+    lines.push("     Stock's, so the screen always stays readable.");
+    lines.push("");
+    ROLES.forEach(function (g) {
+      lines.push("     " + g[0] + ":");
+      g[1].forEach(function (r) { lines.push("       " + (r[1] + "            ").slice(0, 12) + " " + r[2].replace(/--/g, "-")); });
+    });
+    lines.push("-->");
+    lines.push("<document>");
+    lines.push('    <theme name="' + xmlEsc(name) + '"');
+    ROLES.forEach(function (g) { g[1].forEach(function (r) { lines.push("        " + r[1] + '="#' + cur[r[0]] + '"'); }); });
+    lines.push("    />");
+    lines.push("</document>");
+    document.getElementById("file").value = lines.join("\n") + "\n";
+  }
+  baseSel.addEventListener("change", function () { load(baseSel.value); });
+  document.getElementById("tname").addEventListener("input", refresh);
+  document.getElementById("copy").addEventListener("click", function () {
+    var ta = document.getElementById("file"), done = document.getElementById("copied");
+    function fallback() { ta.focus(); ta.select(); done.textContent = "Selected: press Cmd-C or Ctrl-C to copy."; }
+    try {
+      navigator.clipboard.writeText(ta.value).then(function () { done.textContent = "Copied. Save it as theme.tml."; }, fallback);
+    } catch (e) { fallback(); }
+  });
+  document.getElementById("dl").addEventListener("click", function () {
+    var text = document.getElementById("file").value, done = document.getElementById("copied");
+    try {
+      var url = URL.createObjectURL(new Blob([text], { type: "application/xml" }));
+      var a = document.createElement("a");
+      a.href = url; a.download = "theme.tml";
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+      done.textContent = "Downloaded theme.tml. Put it at the top of the card.";
+    } catch (e) { done.textContent = "Downloading is not available here: copy the file instead."; }
+  });
+  document.getElementById("q5").addEventListener("change", function (e) { q5 = e.target.checked; drawGallery(); refresh(); });
+
+  drawGallery();
+  load("Amber");
+})();
+</script>
+</body>
+</html>
