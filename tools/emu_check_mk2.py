@@ -185,7 +185,8 @@ print("6. block start chain: ok",ok,"end",hex(end) if isinstance(end,int) else e
 # ---- 7. UI tick: the present call (0x0805b950), r0 = display object
 DRAW=0x0805b950; DRAW_RET=0x0805b954
 h.mu.mem_map(0x30000000,0x100000)
-h.allow(0x30000000,0x30100000)
+FRAME=320*240*2                       # writes past a frame are bad writes
+for k in range(4): h.allow(0x30000000+k*0x26000,0x30000000+k*0x26000+FRAME)
 disp=0x24048000; h.allow(disp,disp+0x400); h.mu.mem_write(disp,b"\0"*0x400)
 for k,off in enumerate((0x120,0x12c,0x138,0x144)):
     h.mu.mem_write(disp+off,struct.pack("<IHH",0x30000000+k*0x26000,320,240))
@@ -200,8 +201,22 @@ for t in range(4):
     ok= end==DRAW_RET and all(h.mu.reg_read(r)==regs[r] for r in CS) and not h.badw
     lit=[sum(1 for i in range(0,0x26000,2) if h.mu.mem_read(0x30000000+k*0x26000+i,2)!=b"\0\0") for k in range(4)]
     print(f"7. UI tick {t}: ok={ok} end={hex(end) if isinstance(end,int) else end} pixels drawn per layer={lit} stock={[c[0] for c in h.calls]} badw={h.badw[:2]}")
+    if t==0 and len(sys.argv)>2:      # picture of layer 0 for a look
+        from PIL import Image
+        raw=bytes(h.mu.mem_read(0x30000000,FRAME)); im=Image.new("RGB",(320,240))
+        for i in range(320*240):
+            v=raw[2*i]|raw[2*i+1]<<8      # ARGB1555
+            im.putpixel((i%320,i//320),((v>>10&31)*8,(v>>5&31)*8,(v&31)*8))
+        im.resize((640,480),Image.NEAREST).save(sys.argv[2])
     h.mu.mem_write(0x30000000,b"\0"*0x98000)
 print("   OSD text:",bytes(h.mu.mem_read(0x2406dd58,56)).replace(b"\0",b"|"))
+# a portrait layer (the micro's 240x320) must get nothing at all
+for k,off in enumerate((0x120,0x12c,0x138,0x144)):
+    h.mu.mem_write(disp+off,struct.pack("<IHH",0x30000000+k*0x26000,240,320))
+regs={r:0x1000+i for i,r in enumerate(REGS)}; regs[UC_ARM_REG_R0]=disp
+end=h.run(bl_target(DRAW),regs,sp=sp,lr=DRAW_RET|1)
+lit=[sum(1 for i in range(0,FRAME,2) if h.mu.mem_read(0x30000000+k*0x26000+i,2)!=b"\0\0") for k in range(4)]
+print(f"7. UI tick, 240x320 layers: end={hex(end) if isinstance(end,int) else end} pixels drawn per layer={lit} (want all 0) badw={h.badw[:2]}")
 
 # ---- 8. pad CCs through the OSD's pad recorders into hooks A and B
 def bne_target(at):

@@ -71,7 +71,7 @@ import patch_micro as pm                # noqa: E402  the hook generators
 BASE = 0x08040000
 STOCK_SHA = "35ab7995ad0eca8484f3b28bc76389f10b2037dbb21a4a394e950d9329073e86"
 STOCK_SIZE = 674896
-VERSION = "2.3.4-cc7"                   # 9 characters: see pm.VER_DISPLAY_MAX
+VERSION = "2.3.4-cc8"                   # 9 characters: see pm.VER_DISPLAY_MAX
 
 # CCs left out of this build. 2026-10-27, cc1 on hardware: CC 89 (Loop
 # Crossfade) on a Sample pad gave sudden full-scale distorted output at any
@@ -603,17 +603,17 @@ FROZEN_MK2 = {
         "00000000436c6b204c6f73733a0000bf494e5445524e414c0000bf00484f4c440000bf00636c6b6c6f73736d6f646500"
         , {'_sJ': 0, 'jctor': 96, 'jctor_next': 114, 'jheld': 118, 'jheld_next': 134, 'jhold': 218, 'jhold_out': 282, 'jholdtxt': 412, 'jinternal': 400, 'jlabel': 388, 'jmax': 364, 'jmin': 360, 'jpost': 60, 'jpost_internal': 82, 'jpost_next': 92, 'jreg': 0, 'jreg_call': 26, 'jreg_next': 36, 'jset': 284, 'jset_rebuild': 356, 'jset_store': 352, 'jstore': 40, 'jstore_call': 42, 'jstore_next': 56, 'jt1': 138, 'jt1_next': 150, 'jt2': 154, 'jt2_next': 166, 'jt3': 170, 'jt3_next': 182, 'jt4': 186, 'jt4_next': 198, 'jt5': 202, 'jt5_next': 214, 'jvalues': 380, 'jxml': 420}),
     'mk2_hookK': (
-        "1fb584b040f23b110ff290120ff28413022400940ff2901401940000000004b0bde81f400000000007b500000000bde8"
-        "074040f23b1100220000000040f23b1c624501d000000000dff838c103b14e4bccf8003070472de91750044600000000"
-        "20680168426859b38a4288bf0a4640f2e83302fb03f2b2fbf1f240f2e83c624588bf624641480168614588bf1146531a"
+        "1fb584b040f23b110ff2bc120ff2b013022400940ff2bc1401940000000004b0bde81f400000000007b500000000bde8"
+        "074040f23b1100220000000040f23b1c624501d000000000dff864c103b1594bccf8003070472de91750044600000000"
+        "20680168426859b38a4288bf0a4640f2e83302fb03f2b2fbf1f240f2e83c624588bf62464c480168614588bf1146531a"
         "01ebe301016041688368614584bf002100238a4203d9114640f2771306e00bb1013b03e002292cbf0239002141608360"
-        "bde817902de9ff512e4909682e4a914228d180462d490c684d6840f2e83c644588bf6446654588bf654664016d016426"
+        "bde817902de9ff5139490968394a914228d1804638490c684d6840f2e83c644588bf6446654588bf654664016d016426"
         "b4fbf6f4b5fbf6f5002d08bf4ff6ff7508f5907700f012f808f5967700f00ef808f59c7700f00af808f5a27700f006f8"
-        "bff34f8fbde8ff5100000000386840b3b98849000022aa4209d0a2420ad2b2f5907f0ad2e02a0bd248f2e0330ae04ff6"
-        "ff7307e048f6420304e04ff6004301e04ff6806302fb01f6064433807380b380f380dff81cc0ccf800600132b2f5a07f"
-        "d9d3704790da0624444c4f4898da062468ef00e004110c0808110c08435055204d657465723a00006370756d65746572"
-        "0000bf00"
-        , {'_sK': 0, 'kbar': 300, 'kbar_loop': 310, 'kbar_ret': 386, 'kc_amber': 352, 'kc_bg': 340, 'kc_peak': 334, 'kc_put': 356, 'kc_red': 346, 'kdone': 192, 'kdraw': 196, 'kdraw_next': 296, 'kdraw_out': 292, 'klabel_meter': 412, 'kpeak_decay': 180, 'kpeak_old': 174, 'kpeak_save': 188, 'kpost': 60, 'kpost_meter': 72, 'kpost_next': 68, 'kpost_store': 80, 'kreg': 0, 'kreg_call1': 26, 'kreg_next': 36, 'kstart': 86, 'kstart_call': 92, 'kstore': 40, 'kstore_call': 42, 'kstore_next': 56, 'kvalues': 404, 'kxml_meter': 424}),
+        "bff34f8fbde8ff51000000003868e8b3c1073bd1b988b1f5a07f37d1f988f02934d144f60061c0f2020108440022aa42"
+        "09d0a2420ad2b2f5907f0ad2e02a0bd248f2e0330ae04ff6ff7307e048f6420304e04ff6004301e04ff6806300eb4206"
+        "3380a6f88032a6f80035a6f880370132b2f5a07fdbd3dff824c020f01f0600f52062ccf8006020369642fad3704700bf"
+        "90da0624444c4f4898da062468ef00e004110c0808110c08435055204d657465723a00006370756d657465720000bf00"
+        , {'_sK': 0, 'kbar': 300, 'kbar_loop': 334, 'kbar_ret': 428, 'kc_amber': 376, 'kc_bg': 364, 'kc_clean': 418, 'kc_peak': 358, 'kc_put': 380, 'kc_red': 370, 'kdone': 192, 'kdraw': 196, 'kdraw_next': 296, 'kdraw_out': 292, 'klabel_meter': 456, 'kpeak_decay': 180, 'kpeak_old': 174, 'kpeak_save': 188, 'kpost': 60, 'kpost_meter': 72, 'kpost_next': 68, 'kpost_store': 80, 'kreg': 0, 'kreg_call1': 26, 'kreg_next': 36, 'kstart': 86, 'kstart_call': 92, 'kstore': 40, 'kstore_call': 42, 'kstore_next': 56, 'kvalues': 448, 'kxml_meter': 468}),
     'mk2_hookL': (
         "0ff2901300000000662903d1584b984208bf584870b4458900000000662903d1534b984208bf5348f0b4468900000000"
         "662a1cd130b4504c2460504c24684ff01055ac420dd34e4dac420ad242f66045655d35b14b4c9db2cbf6d015256030bc"
@@ -657,6 +657,12 @@ FROZEN_MK2 = {
         "206130466946000000000135013fdbd101e00135d8e7e56007b05df804cb8cf30088bde8ff500000000000bf74d00124"
         "40d0012400be06245045454bb83c02244c50455204110c0808110c084b656570204343733a0000bf6b65657063637300"
         , {'_sP': 0, 'pb_busy': 434, 'pb_have': 326, 'pb_loop': 472, 'pb_next': 546, 'pb_out': 552, 'pb_post': 534, 'pb_ready': 456, 'pb_save': 550, 'pb_unsteady': 450, 'pblock': 280, 'pblock_next': 566, 'pctor': 164, 'pctor_clr': 178, 'pctor_next': 198, 'pedit': 64, 'pfinal': 128, 'pfinal_call': 130, 'pfinal_out': 156, 'plabel': 604, 'pmidi': 202, 'pmidi_cc': 214, 'pmidi_next': 276, 'pmidi_out': 268, 'pmidi_stock': 210, 'ppost': 82, 'ppost_mode': 108, 'ppost_next': 124, 'ppost_set': 102, 'ppost_store': 118, 'preg': 0, 'preg_call': 28, 'preg_next': 38, 'pstore': 42, 'pstore_call': 52, 'pstore_next': 60, 'pvalues': 596, 'pxml': 616}),
+    'mk2_osdsync': (
+        "2de9f04f8a4607465ff00008dff8a0b03c6800f00af87c6800f007f8b8f1000f01d0bff34f8fbde8f08f00b5dff884c0"
+        "002505f165064ff4207006fb00f62644163605f01f015fea55195fea8909404601b400220bebc20050f80900c8404ff6"
+        "ff73c00708bf48f6420336f81200baf1000f03d1984207d1002301e0984203d026f8123008f101080132b2f5957fe1d3"
+        "01bc404508d026f01f0006f51572ccf8000020309042fad30135262dc1d300bd60b2062468ef00e0"
+        , {'os_clean': 158, 'os_done': 38, 'os_layer': 42, 'os_next': 136, 'os_put': 128, 'os_px': 84, 'os_row': 50, 'os_rowdone': 168, 'os_show': 124, 'osd_sync': 0}),
 }
 # END FROZEN_MK2
 
@@ -1003,6 +1009,72 @@ def transpile(name):
 # and the pad handlers', which are identical on the MK2). Missed in cc5's first
 # build -- hook N read the channel, CC and value from the wrong words -- and
 # caught in emulation, before any hardware saw it.
+# Hook K's bar, landscape. The micro's kbar walks a 240x320 bitmap's 320
+# rows and paints 4 pixels at the start of each: on the MK2's 320x240 layer
+# that is 80 rows past the end of the frame (cc6 reboot). This one checks the
+# layer is 320x240, paints x = 0..319 on the bottom four rows (y 236..239,
+# where the micro's bar sits once its panel is turned), then cleans those
+# 2560 bytes from the D-cache.
+KBAR_MICRO = """kbar:                               /* r7 = bitmap, r4 level, r5 peak */
+    ldr     r0, [r7]
+    cbz     r0, kbar_ret
+    ldrh    r1, [r7, #4]
+    lsls    r1, r1, #1              /* stride in bytes */
+    movs    r2, #0
+kbar_loop:"""
+KBAR_MK2 = """kbar:                               /* r7 = layer, r4 level, r5 peak */
+    ldr     r0, [r7]
+    cbz     r0, kbar_ret
+    lsls    r1, r0, #31
+    bne     kbar_ret                /* odd address: not a frame */
+    ldrh    r1, [r7, #4]
+    cmp.w   r1, #320
+    bne     kbar_ret
+    ldrh    r1, [r7, #6]
+    cmp     r1, #240
+    bne     kbar_ret
+    movw    r1, #(236 * 640) & 0xffff
+    movt    r1, #(236 * 640) >> 16
+    add     r0, r0, r1              /* row 236 */
+    movs    r2, #0
+kbar_loop:"""
+
+KPUT_MICRO = """kc_put:
+    mul     r6, r2, r1
+    add     r6, r6, r0
+    strh    r3, [r6]
+    strh    r3, [r6, #2]
+    strh    r3, [r6, #4]
+    strh    r3, [r6, #6]
+    ldr     r12, =0xe000ef68        /* DCCMVAC: clean the line to RAM */
+    str     r6, [r12]
+    adds    r2, #1
+    cmp     r2, #320
+    blo     kbar_loop
+kbar_ret:
+    bx      lr
+"""
+KPUT_MK2 = """kc_put:
+    add.w   r6, r0, r2, lsl #1
+    strh    r3, [r6]
+    strh.w  r3, [r6, #640]
+    strh.w  r3, [r6, #1280]
+    strh.w  r3, [r6, #1920]
+    adds    r2, #1
+    cmp.w   r2, #320
+    blo     kbar_loop
+    ldr     r12, =0xe000ef68        /* DCCMVAC: clean the four rows to RAM */
+    bic     r6, r0, #31
+    add.w   r2, r0, #2560
+kc_clean:
+    str     r6, [r12]
+    adds    r6, #32
+    cmp     r6, r2
+    blo     kc_clean
+kbar_ret:
+    bx      lr
+"""
+
 FRAME_LITERALS = {
     "build_character_hook": (
         ("ldr     r0, [sp, #224]", f"ldr     r0, [sp, #{96 + 0x48}]"),   # channel
@@ -1011,6 +1083,7 @@ FRAME_LITERALS = {
          f"ldr     r2, [sp, #{96 + 0x50}]          /* 96 + 0x50: value"),
         ("str     r0, [sp, #232]", f"str     r0, [sp, #{96 + 0x50}]"),   # (2.3.10 compressor types)
     ),
+    "build_cpu_meter_hook": ((KBAR_MICRO, KBAR_MK2), (KPUT_MICRO, KPUT_MK2)),
 }
 
 
@@ -1034,6 +1107,7 @@ def relocated_chr(obj):
         struct.pack_into("<HH", data, lo, *pm._thm_put_imm16(hw1, hw2, new & 0xffff))
         struct.pack_into("<HH", data, hi, *pm._thm_put_imm16(ht1, ht2, new >> 16))
         by_name[sec][2] = data.hex()
+    landscape_chr(by_name)
     wb = by_name[".rodata.chr_work_base"]
     data = bytearray.fromhex(wb[2])
     old, = struct.unpack_from("<I", data, 0)
@@ -1042,6 +1116,116 @@ def relocated_chr(obj):
     struct.pack_into("<I", data, 0, pm.CHR_WORK_DEFAULT)
     wb[2] = data.hex()
     return [tuple(s) for s in secs], exports
+
+
+# The pop-up, landscape. chr_osd_tick ORs its two text lines into a 1-bit
+# mask (298 entries of 64 bits, 38 used: entry = x, bit = y) and hands both
+# layers to osd_sync, which on the micro walks them as 240x320 portrait --
+# and chr_osd_tick only gets that far when a layer IS 240x320, so on the MK2
+# the pop-up never drew at all. Its two size checks become 320x240 (the same
+# instructions, registers swapped: cmp r2,#240 does not fit 16 bits), and
+# osd_sync is replaced by this: the box at x 11..308, y 101..138, the same
+# place as the micro's once its panel is turned; white text on 0x8842, and on
+# hide, every pixel still showing the box goes back to black, as on the micro.
+OSD_SYNC_MK2 = """
+    .syntax unified
+    .thumb
+    .text
+    .global osd_sync
+    .type   osd_sync, %function
+osd_sync:                           /* r0 = the two layer pointers, r1 = show */
+    push    {r4, r5, r6, r7, r8, r9, r10, r11, lr}
+    mov     r10, r1
+    mov     r7, r0
+    movs    r8, #0                  /* pixels changed */
+    ldr     r11, =MASK
+    ldr     r4, [r7]
+    bl      os_layer
+    ldr     r4, [r7, #4]
+    bl      os_layer
+    cmp     r8, #0
+    beq     os_done
+    dsb
+os_done:
+    pop     {r4, r5, r6, r7, r8, r9, r10, r11, pc}
+
+os_layer:                           /* r4 = frame */
+    push    {lr}
+    ldr     r12, =0xe000ef68        /* DCCMVAC */
+    movs    r5, #0                  /* y in the box */
+os_row:
+    add.w   r6, r5, #101
+    mov.w   r0, #640
+    mul     r6, r6, r0
+    add     r6, r6, r4
+    adds    r6, #22                 /* x = 11 */
+    and     r1, r5, #31
+    lsrs    r9, r5, #5
+    lsls    r9, r9, #2              /* which word of the entry */
+    mov     r0, r8                  /* changed before this row */
+    push    {r0}
+    movs    r2, #0                  /* x in the box */
+os_px:
+    add.w   r0, r11, r2, lsl #3
+    ldr     r0, [r0, r9]
+    lsrs    r0, r0, r1
+    movw    r3, #0xffff
+    lsls    r0, r0, #31
+    it      eq
+    movweq  r3, #0x8842
+    ldrh.w  r0, [r6, r2, lsl #1]
+    cmp     r10, #0
+    bne     os_show
+    cmp     r0, r3                  /* hide: only what is still the box */
+    bne     os_next
+    movs    r3, #0
+    b       os_put
+os_show:
+    cmp     r0, r3
+    beq     os_next
+os_put:
+    strh.w  r3, [r6, r2, lsl #1]
+    add     r8, r8, #1
+os_next:
+    adds    r2, #1
+    cmp.w   r2, #298
+    blo     os_px
+    pop     {r0}
+    cmp     r0, r8
+    beq     os_rowdone
+    bic     r0, r6, #31             /* clean the row's 596 bytes */
+    add.w   r2, r6, #596
+os_clean:
+    str     r0, [r12]
+    adds    r0, #32
+    cmp     r0, r2
+    blo     os_clean
+os_rowdone:
+    adds    r5, #1
+    cmp     r5, #38
+    blo     os_row
+    pop     {pc}
+    .ltorg
+"""
+OSD_GUARD_MICRO = "f02a08bf b1f5a07f"   # cmp r2,#0xf0 ; it eq ; cmpeq.w r1,#0x140
+OSD_GUARDS = (0x086e, 0x089c)           # layer A and layer B in chr_osd_tick
+
+
+def landscape_chr(by_name):
+    """osd_sync replaced, chr_osd_tick's two size checks made 320x240."""
+    tick = by_name[".text.chr_osd_tick"]
+    data = bytearray.fromhex(tick[2])
+    for off in OSD_GUARDS:
+        if data[off:off + 8].hex() != OSD_GUARD_MICRO.replace(" ", ""):
+            pm.refuse("The pop-up's size check is not what the patcher expects.")
+        # cmp r1,#0xf0 ; it eq ; cmpeq.w r2,#0x140  (h == 240 and w == 320)
+        data[off:off + 8] = bytes.fromhex("f029 08bf b2f5a07f".replace(" ", ""))
+    tick[2] = data.hex()
+    mask = ram_shift(0x24069860)
+    code, syms = mk2_assemble("osdsync", OSD_SYNC_MK2.replace("=MASK", f"={mask:#010x}"))
+    if syms.get("osd_sync") != 0:
+        raise SystemExit("internal error: osd_sync must start its blob")
+    by_name[".text.osd_sync"][2] = code.hex()
 
 
 def prepare_stage3():
@@ -1095,8 +1279,7 @@ def stage3(d, upto="full"):
     saved, pm.assemble = pm.assemble, mk2_assemble
     try:
         pm.apply_program_change(d)
-        # No OSD row until the MK2 has its own renderer (see unhook_drawing).
-        rows = (pm.CLK_ID, 0x66) if upto != "full" else (pm.CLK_ID, 0x66, pm.KEEP_ID)
+        rows = (pm.CLK_ID, 0x66) if upto != "full" else (pm.CLK_ID, 0x66, pm.OSD_ID, pm.KEEP_ID)
         apply_settings_mk2(d, rows)
         j_org, j_syms = pm.apply_clock_hold(d)
         l_org, l_syms = pm.apply_preset_bpm(d, j_org, j_syms)
@@ -1110,7 +1293,6 @@ def stage3(d, upto="full"):
             return
         pm.apply_osd(d, n_org, n_syms, j_org, j_syms, modes=True)
         pm.apply_keep_ccs(d, j_org, j_syms)
-        unhook_drawing(d, l_org, l_syms)
     finally:
         pm.assemble = saved
 
