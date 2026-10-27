@@ -71,7 +71,7 @@ import patch_micro as pm                # noqa: E402  the hook generators
 BASE = 0x08040000
 STOCK_SHA = "35ab7995ad0eca8484f3b28bc76389f10b2037dbb21a4a394e950d9329073e86"
 STOCK_SIZE = 674896
-VERSION = "2.3.4-cc10"                  # 10 characters: see pm.VER_DISPLAY_MAX
+VERSION = "2.3.4-cc11"                  # 10 characters: see pm.VER_DISPLAY_MAX
 
 # CCs left out of this build. 2026-10-27, cc1 on hardware: CC 89 (Loop
 # Crossfade) on a Sample pad gave sudden full-scale distorted output at any
@@ -659,17 +659,19 @@ FROZEN_MK2 = {
         "40d0012400be06245045454bb83c02244c50455204110c0808110c084b656570204343733a0000bf6b65657063637300"
         , {'_sP': 0, 'pb_busy': 434, 'pb_have': 326, 'pb_loop': 472, 'pb_next': 546, 'pb_out': 552, 'pb_post': 534, 'pb_ready': 456, 'pb_save': 550, 'pb_unsteady': 450, 'pblock': 280, 'pblock_next': 566, 'pctor': 164, 'pctor_clr': 178, 'pctor_next': 198, 'pedit': 64, 'pfinal': 128, 'pfinal_call': 130, 'pfinal_out': 156, 'plabel': 604, 'pmidi': 202, 'pmidi_cc': 214, 'pmidi_next': 276, 'pmidi_out': 268, 'pmidi_stock': 210, 'ppost': 82, 'ppost_mode': 108, 'ppost_next': 124, 'ppost_set': 102, 'ppost_store': 118, 'preg': 0, 'preg_call': 28, 'preg_next': 38, 'pstore': 42, 'pstore_call': 52, 'pstore_next': 60, 'pvalues': 596, 'pxml': 616}),
     'mk2_osdsync': (
-        "2de9f04fd8b002685692426857928a465ff00008dff894b10025681e00f086f850905191284600f081f852905391681c"
-        "00f07cf854905591032005fb00f00723b0fbf3f404fb13045ff00009002700226e46a2f10a0000f07bf849ea07030343"
-        "b9463946074611f0020f03d123b92cb1012104e0022102e0032100e00021b1540134072c08bf00240132b2f5a07fe0d3"
-        "002756a850f8274005f160064ff4207006fb00f62644c1460ff2f80cee4600221ef8021036f8120059b13cf81130baf1"
-        "000f03d1984211d100230be098420dd008e0baf1000f09d04ff6ff73984205d148f6420326f8123008f101080132b2f5"
-        "a07fddd3c1450ad0dff8b4c026f01f0006f52072ccf8000020309042fad30137022fbed30135302dfff47fafb8f1000f"
-        "01d0bff34f8f58b0bde8f08f03380bdb122804db0438122806db262804da00f01f014009800070474ff0ff3000217047"
-        "b0f5957f23d20bebc00c0020509b002b07db5cf803305199cb4003f0010340ea8300529b002b07db5cf803305399cb40"
-        "03f0010340ea4300549b002b06db5cf803305599cb4003f00103184370470020704700bf00004288ffff008060b20624"
+        "2de9f04fdeb002685a9242685b925c915ff00008dff8f4b10025a81e00f0a0f850905191681e00f09bf8529053912846"
+        "00f096f854905591681c00f091f856905791a81c00f08cf858905991cdf87481ec0714bfff24c5f3400464005ff00009"
+        "00275ff000085ff0000a00226e46a2f1090000f087f809f00e0100f00e03194341ea070141ea080141ea0a01022318f0"
+        "040f07d1032329b902f0030c0123a44500d10023b354b9464746d04682460132b2f5a07fdbd3ddf87481ddf870a10027"
+        "5aa850f8274005f160064ff4207006fb00f62644c1460ff22c1cee4600221ef8021036f8120059b13cf81130baf1000f"
+        "03d1984214d100230ee0984210d00be0baf1000f0cd04ff6ff73984202d0b0f5004f05d148f6420326f8123008f10108"
+        "0132b2f5a07fdad3c1450ad0dff8e0c026f01f0006f52072ccf8000020309042fad30137022fbbd30135302dfff465af"
+        "b8f1000f01d0bff34f8f5eb0bde8f08f03380bdb122804db0438122806db262804da00f01f014009800070474ff0ff30"
+        "00217047b0f5957f3ad20bebc00c0020509b002b07db5cf803305199cb4003f0010340ea0310529b002b07db5cf80330"
+        "5399cb4003f0010340eac300549b002b07db5cf803305599cb4003f0010340ea8300569b002b07db5cf803305799cb40"
+        "03f0010340ea4300589b002b07db5cf803305999cb4003f0010340ea030070470020704700004288ffff008060b20624"
         "68ef00e0"
-        , {'os_ch': 124, 'os_clean': 260, 'os_co': 120, 'os_code': 82, 'os_cols': 420, 'os_cs': 126, 'os_cw': 116, 'os_done': 294, 'os_hole': 210, 'os_k': 300, 'os_kn': 328, 'os_ky': 318, 'os_lay': 146, 'os_lnext': 270, 'os_n1': 370, 'os_n2': 392, 'os_n3': 412, 'os_nb': 336, 'os_next': 236, 'os_nz': 414, 'os_put': 228, 'os_px': 176, 'os_row': 26, 'os_show': 204, 'osd_sync': 0}),
+        , {'os_bgput': 276, 'os_clean': 312, 'os_code': 110, 'os_cols': 516, 'os_cs': 164, 'os_done': 346, 'os_hole': 256, 'os_k': 352, 'os_kn': 380, 'os_ky': 370, 'os_lay': 192, 'os_lnext': 322, 'os_n0': 422, 'os_n1': 444, 'os_n2': 466, 'os_n3': 488, 'os_n4': 510, 'os_nb': 388, 'os_next': 288, 'os_nz': 512, 'os_put': 280, 'os_px': 222, 'os_row': 26, 'os_show': 250, 'osd_sync': 0}),
 }
 # END FROZEN_MK2
 
@@ -1157,10 +1159,12 @@ def relocated_chr(obj):
 #   - the box runs edge to edge (x 0..319), text where the micro had it;
 #   - OSD_PAD_T more rows above and below, OSD_PAD_G more between the lines
 #     (cc9, asked for after cc8 on hardware);
-#   - the layer has a 1-bit alpha, so "15% more see-through" is a screen
-#     door: one background pixel in 7 is left as the UI drew it (cc9);
-#   - every background pixel next to text (8 neighbours, in screen rows, so
-#     the gap between the lines gets its outline too) is black (cc10);
+#   - the layer has a 1-bit alpha, so "more see-through" is a screen door:
+#     one background pixel in 8, single pixels on a staggered grid (every
+#     4th of every 2nd row), left as the UI drew it (cc9: 1 in 7 on
+#     diagonals, read as coarse on hardware);
+#   - a black outline 2 pixels wide around the text (5x5 round, worked out
+#     in screen rows, so the gap between the lines gets it too; cc10 had 1);
 #   - white text, 0x8842 background; on hide, every pixel still showing the
 #     box goes back to 0, as on the micro.
 # Each row's codes (hole / background / text / outline) are worked out once
@@ -1176,71 +1180,81 @@ OSD_SYNC_MK2 = f"""
     .type   osd_sync, %function
 osd_sync:                           /* r0 = the two layer pointers, r1 = show */
     push    {{r4, r5, r6, r7, r8, r9, r10, r11, lr}}
-    sub     sp, sp, #352            /* codes 0..319, row params 320..343, layers 344 */
+    sub     sp, sp, #376            /* codes 0..319, row params 320..359, layers 360, show 368, changed 372 */
     ldr     r2, [r0]
-    str     r2, [sp, #344]
+    str     r2, [sp, #360]
     ldr     r2, [r0, #4]
-    str     r2, [sp, #348]
-    mov     r10, r1
+    str     r2, [sp, #364]
+    str     r1, [sp, #368]
     movs    r8, #0                  /* pixels changed */
     ldr     r11, =MASK
     movs    r5, #0                  /* y in the box */
 os_row:
-    subs    r0, r5, #1              /* mask rows for y-1, y, y+1 */
+    subs    r0, r5, #2
     bl      os_k
     str     r0, [sp, #320]
     str     r1, [sp, #324]
-    mov     r0, r5
+    subs    r0, r5, #1
     bl      os_k
     str     r0, [sp, #328]
     str     r1, [sp, #332]
-    adds    r0, r5, #1
+    mov     r0, r5
     bl      os_k
     str     r0, [sp, #336]
     str     r1, [sp, #340]
-    movs    r0, #3                  /* screen door phase: (3y) mod 7 */
-    mul     r0, r5, r0
-    movs    r3, #7
-    udiv    r4, r0, r3
-    mls     r4, r4, r3, r0
-    movs    r9, #0                  /* column x-1 */
-    movs    r7, #0                  /* column x */
+    adds    r0, r5, #1
+    bl      os_k
+    str     r0, [sp, #344]
+    str     r1, [sp, #348]
+    adds    r0, r5, #2
+    bl      os_k
+    str     r0, [sp, #352]
+    str     r1, [sp, #356]
+    str     r8, [sp, #372]          /* r8 and r10 hold columns while coding */
+    lsls    r4, r5, #31             /* screen door: holes on even rows only, */
+    ite     ne
+    movne   r4, #0xff               /*   none on odd ones; */
+    ubfxeq  r4, r5, #1, #1
+    lsls    r4, r4, #1              /*   at x mod 4 = 0 or 2, alternating */
+    movs    r9, #0                  /* columns x-2, x-1, x, x+1 */
+    movs    r7, #0
+    movs    r8, #0
+    movs    r10, #0
     movs    r2, #0
     mov     r6, sp
 os_code:
-    sub.w   r0, r2, #10             /* column x+1: mask entry x+1-11 */
+    sub.w   r0, r2, #9              /* column x+2: mask entry x+2-11 */
     bl      os_nb
-    orr.w   r3, r9, r7
-    orrs    r3, r3, r0              /* anything lit around x */
-    mov     r9, r7
-    mov     r1, r7                  /* column x */
-    mov     r7, r0
-    tst.w   r1, #2
-    bne     os_cw
-    cbnz    r3, os_co
-    cbz     r4, os_ch
-    movs    r1, #1                  /* background */
-    b       os_cs
-os_cw:
-    movs    r1, #2                  /* text */
-    b       os_cs
-os_co:
-    movs    r1, #3                  /* outline */
-    b       os_cs
-os_ch:
-    movs    r1, #0                  /* hole */
+    and     r1, r9, #14             /* x-2 and x+2: rows y-1..y+1 only (round) */
+    and     r3, r0, #14
+    orrs    r1, r1, r3
+    orr.w   r1, r1, r7
+    orr.w   r1, r1, r8
+    orr.w   r1, r1, r10             /* anything lit within 2 */
+    movs    r3, #2                  /* text */
+    tst.w   r8, #4
+    bne     os_cs
+    movs    r3, #3                  /* outline */
+    cbnz    r1, os_cs
+    and     r12, r2, #3
+    movs    r3, #1                  /* background */
+    cmp     r12, r4
+    bne     os_cs
+    movs    r3, #0                  /* hole */
 os_cs:
-    strb    r1, [r6, r2]
-    adds    r4, #1
-    cmp     r4, #7
-    it      eq
-    moveq   r4, #0
+    strb    r3, [r6, r2]
+    mov     r9, r7
+    mov     r7, r8
+    mov     r8, r10
+    mov     r10, r0
     adds    r2, #1
     cmp.w   r2, #320
     blo     os_code
+    ldr     r8, [sp, #372]
+    ldr     r10, [sp, #368]
     movs    r7, #0                  /* layer 0, 1 */
 os_lay:
-    add     r0, sp, #344
+    add     r0, sp, #360
     ldr.w   r4, [r0, r7, lsl #2]
     add.w   r6, r5, #{OSD_Y0}
     mov.w   r0, #640
@@ -1269,8 +1283,11 @@ os_hole:
     cmp     r10, #0                 /* hiding: never touched, leave it */
     beq     os_next
     movw    r3, #0xffff
-    cmp     r0, r3                  /* old text in it: back to background */
+    cmp     r0, r3                  /* old text or outline in it: */
+    beq     os_bgput
+    cmp     r0, #0x8000             /*   back to background */
     bne     os_next
+os_bgput:
     movw    r3, #0x8842
 os_put:
     strh.w  r3, [r6, r2, lsl #1]
@@ -1300,10 +1317,10 @@ os_lnext:
     beq     os_done
     dsb
 os_done:
-    add     sp, sp, #352
+    add     sp, sp, #376
     pop     {{r4, r5, r6, r7, r8, r9, r10, r11, pc}}
 
-os_k:                               /* r0 = screen row in the box (may be -1) */
+os_k:                               /* r0 = screen row in the box (may be < 0) */
     subs    r0, #{OSD_PAD_T}        /* -> r0 = word offset in the entry, r1 = bit; */
     blt     os_kn                   /*    r0 = -1: no mask row there */
     cmp     r0, #18
@@ -1323,38 +1340,56 @@ os_kn:
     movs    r1, #0
     bx      lr
 
-os_nb:                              /* r0 = mask entry -> bits: 2 row y-1, 1 y, 0 y+1 */
+os_nb:                              /* r0 = mask entry -> bits 4..0: rows y-2..y+2 */
     cmp.w   r0, #298                /* leaf: sp is still the caller's */
     bhs     os_nz
     add.w   r12, r11, r0, lsl #3
     movs    r0, #0
-    ldr     r3, [sp, #320]
+    ldr     r3, [sp, #320]          /* row y-2 -> bit 4 */
     cmp     r3, #0
-    blt     os_n1
+    blt     os_n0
     ldr     r3, [r12, r3]
     ldr     r1, [sp, #324]
     lsrs    r3, r1
     and     r3, r3, #1
-    orr.w   r0, r0, r3, lsl #2
-os_n1:
-    ldr     r3, [sp, #328]
+    orr.w   r0, r0, r3, lsl #4
+os_n0:
+    ldr     r3, [sp, #328]          /* row y-1 -> bit 3 */
     cmp     r3, #0
-    blt     os_n2
+    blt     os_n1
     ldr     r3, [r12, r3]
     ldr     r1, [sp, #332]
     lsrs    r3, r1
     and     r3, r3, #1
-    orr.w   r0, r0, r3, lsl #1
-os_n2:
-    ldr     r3, [sp, #336]
+    orr.w   r0, r0, r3, lsl #3
+os_n1:
+    ldr     r3, [sp, #336]          /* row y -> bit 2 */
     cmp     r3, #0
-    blt     os_n3
+    blt     os_n2
     ldr     r3, [r12, r3]
     ldr     r1, [sp, #340]
     lsrs    r3, r1
     and     r3, r3, #1
-    orrs    r0, r0, r3
+    orr.w   r0, r0, r3, lsl #2
+os_n2:
+    ldr     r3, [sp, #344]          /* row y+1 -> bit 1 */
+    cmp     r3, #0
+    blt     os_n3
+    ldr     r3, [r12, r3]
+    ldr     r1, [sp, #348]
+    lsrs    r3, r1
+    and     r3, r3, #1
+    orr.w   r0, r0, r3, lsl #1
 os_n3:
+    ldr     r3, [sp, #352]          /* row y+2 -> bit 0 */
+    cmp     r3, #0
+    blt     os_n4
+    ldr     r3, [r12, r3]
+    ldr     r1, [sp, #356]
+    lsrs    r3, r1
+    and     r3, r3, #1
+    orr.w   r0, r0, r3, lsl #0
+os_n4:
     bx      lr
 os_nz:
     movs    r0, #0
