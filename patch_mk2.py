@@ -71,7 +71,7 @@ import patch_micro as pm                # noqa: E402  the hook generators
 BASE = 0x08040000
 STOCK_SHA = "35ab7995ad0eca8484f3b28bc76389f10b2037dbb21a4a394e950d9329073e86"
 STOCK_SIZE = 674896
-VERSION = "2.3.4-cc5"                   # 9 characters: see pm.VER_DISPLAY_MAX
+VERSION = "2.3.4-cc6"                   # 9 characters: see pm.VER_DISPLAY_MAX
 
 # CCs left out of this build. 2026-10-27, cc1 on hardware: CC 89 (Loop
 # Crossfade) on a Sample pad gave sudden full-scale distorted output at any
@@ -441,10 +441,18 @@ CHR_RELOC = (
 )
 CHR_FLASH = {0x080bf564: 0x080c0684, 0x080c478c: 0x080c58dc}
 
-# Settings: the MK2 has three pages of eight rows (micro: two). Page 3 holds
-# four stock rows and four free slots -- exactly the four rows the patch adds.
-SETTINGS_VA = 0x080c7ebc                  # loaded at 0x080799b0 (micro 0x08077948)
+# Settings: the Tools screen has tabs (Main, Rec, MIDIIn), four rows each --
+# one per encoder, no scrolling. The page builder (0x0807974c) copies a tab's
+# rows from SETTINGS_VA + 16 * tab and its name from the six-pointer list at
+# TABS_VA, and counts tabs up to the first EMPTY name. Slots 4-6 hold the empty
+# string and their row pages are zero, so a fourth tab is a name pointer and
+# four row ids, with nothing stock moved. (cc5 put the rows on MIDIIn's slots
+# 5-8, which the screen never shows.)
+SETTINGS_VA = 0x080c7ebc                  # loaded at 0x0807976a (micro 0x08077702)
 SETTINGS_STOCK = ((97, 120, 156, 150), (127, 379, 194), (89, 90, 181, 195))
+TABS_VA = 0x080c7ea4                      # loaded at 0x08079796
+TABS_EMPTY = 0x080cb46c                   # "" -- what slots 4-6 point at
+TAB_NAME = "Patch"                        # the builder copies 7 characters
 
 # The stage-3 functions of patch_micro.py that are run here, with every micro
 # address in their source replaced through CODE_MAP / RAM_MAP / ram_shift.
@@ -1059,18 +1067,24 @@ def prepare_stage3():
 
 
 def apply_settings_mk2(d, rows):
+    """A fourth Tools tab, named TAB_NAME, holding the patch's rows."""
     t = SETTINGS_VA - BASE
-    pages = [struct.unpack_from("<8H", d, t + 16 * p) for p in range(3)]
-    for page, want in zip(pages, SETTINGS_STOCK):
+    pages = [struct.unpack_from("<8H", d, t + 16 * p) for p in range(6)]
+    for page, want in zip(pages, SETTINGS_STOCK + ((), (), ())):
         if page != tuple(want) + (0,) * (8 - len(want)):
             pm.refuse("The Settings screen's rows are not what they should be.")
-    if word(d, 0x080799b0) != SETTINGS_VA:
-        pm.refuse("The Settings page builder does not read the expected table.")
-    new = SETTINGS_STOCK[2] + tuple(rows)
-    if len(new) > 8:
-        pm.refuse("Settings page 3 has eight rows; this build needs more.")
-    struct.pack_into("<8H", d, t + 32, *new, *([0] * (8 - len(new))))
-    vprint(f"Settings page 3: {', '.join(f'{r:#x}' for r in new)}")
+    if word(d, 0x080799b0) != SETTINGS_VA or word(d, 0x080799b8) != TABS_VA:
+        pm.refuse("The Settings page builder does not read the expected tables.")
+    names = [word(d, TABS_VA + 4 * i) for i in range(6)]
+    if names[3:] != [TABS_EMPTY] * 3 or d[TABS_EMPTY - BASE] != 0 or \
+            0 in [d[n - BASE] for n in names[:3]]:
+        pm.refuse("The Tools tab names are not what they should be.")
+    if len(rows) > 4:
+        pm.refuse("A Tools tab shows four rows; this build needs more.")
+    org = pm._append(d, bytearray(TAB_NAME.encode() + b"\0"))
+    struct.pack_into("<I", d, TABS_VA + 12 - BASE, org)
+    struct.pack_into("<8H", d, t + 48, *rows, *([0] * (8 - len(rows))))
+    vprint(f"Tools tab 4 '{TAB_NAME}' at {org:#x}: {', '.join(f'{r:#x}' for r in rows)}")
 
 
 def stage3(d, upto="full"):
