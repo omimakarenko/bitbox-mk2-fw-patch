@@ -1073,19 +1073,26 @@ def apply_settings_mk2(d, rows):
     vprint(f"Settings page 3: {', '.join(f'{r:#x}' for r in new)}")
 
 
-def stage3(d):
+def stage3(d, upto="full"):
     """The 2.3.9-mod set, in the micro's own order (its main(), --v239), less
-    Flip UI: the MK2 already flips its screen and touch natively."""
+    Flip UI: the MK2 already flips its screen and touch natively.
+    upto: "settings" stops after H/J/L/K, "character" after N (diagnostic
+    builds for bisecting a hardware fault), "full" is everything."""
     saved, pm.assemble = pm.assemble, mk2_assemble
     try:
         pm.apply_program_change(d)
-        apply_settings_mk2(d, (pm.CLK_ID, 0x66, pm.OSD_ID, pm.KEEP_ID))
+        rows = (pm.CLK_ID, 0x66) if upto != "full" else (pm.CLK_ID, 0x66, pm.OSD_ID, pm.KEEP_ID)
+        apply_settings_mk2(d, rows)
         j_org, j_syms = pm.apply_clock_hold(d)
         l_org, l_syms = pm.apply_preset_bpm(d, j_org, j_syms)
         l_entries = (l_org + l_syms["lpost"], l_org + l_syms["ltick"],
                      l_org + l_syms["lblock"])
         pm.apply_cpu_meter(d, j_org, j_syms, chained=l_entries, row=False)
+        if upto == "settings":
+            return
         n_org, n_syms = pm.apply_character(d, pm.CHR_FEATURE_AUTO)
+        if upto == "character":
+            return
         pm.apply_osd(d, n_org, n_syms, j_org, j_syms, modes=True)
         pm.apply_keep_ccs(d, j_org, j_syms)
     finally:
@@ -1204,9 +1211,17 @@ def main():
                 continue
             print(f"     ok   {what:<28} {cc}")
 
-    stage2(d, gate=False)
-    prepare_stage3()
-    stage3(d)
+    # Diagnostic builds for bisecting a hardware fault (2026-10-28: cc5 stopped
+    # taking MIDI after a while). --upto=2 is cc4 with patch RAM moved;
+    # settings adds H/J/L/K; character adds N. Each keeps cc4's type gate,
+    # which Keep CCs (hook P) otherwise replaces.
+    upto = next((f.split("=", 1)[1] for f in flags if f.startswith("--upto=")), "full")
+    global VERSION
+    VERSION = {"2": "2.3.4-d1", "settings": "2.3.4-d2", "character": "2.3.4-d3"}.get(upto, VERSION)
+    stage2(d, gate=(upto != "full"))
+    if upto != "2":
+        prepare_stage3()
+        stage3(d, upto)
     if _REGEN:
         write_frozen()
         sys.exit("  Rerun without --reassemble to build with the new blobs.")
