@@ -71,7 +71,7 @@ import patch_micro as pm                # noqa: E402  the hook generators
 BASE = 0x08040000
 STOCK_SHA = "35ab7995ad0eca8484f3b28bc76389f10b2037dbb21a4a394e950d9329073e86"
 STOCK_SIZE = 674896
-VERSION = "2.3.4-cc8"                   # 9 characters: see pm.VER_DISPLAY_MAX
+VERSION = "2.3.4-cc9"                   # 9 characters: see pm.VER_DISPLAY_MAX
 
 # CCs left out of this build. 2026-10-27, cc1 on hardware: CC 89 (Loop
 # Crossfade) on a Sample pad gave sudden full-scale distorted output at any
@@ -658,11 +658,13 @@ FROZEN_MK2 = {
         "40d0012400be06245045454bb83c02244c50455204110c0808110c084b656570204343733a0000bf6b65657063637300"
         , {'_sP': 0, 'pb_busy': 434, 'pb_have': 326, 'pb_loop': 472, 'pb_next': 546, 'pb_out': 552, 'pb_post': 534, 'pb_ready': 456, 'pb_save': 550, 'pb_unsteady': 450, 'pblock': 280, 'pblock_next': 566, 'pctor': 164, 'pctor_clr': 178, 'pctor_next': 198, 'pedit': 64, 'pfinal': 128, 'pfinal_call': 130, 'pfinal_out': 156, 'plabel': 604, 'pmidi': 202, 'pmidi_cc': 214, 'pmidi_next': 276, 'pmidi_out': 268, 'pmidi_stock': 210, 'ppost': 82, 'ppost_mode': 108, 'ppost_next': 124, 'ppost_set': 102, 'ppost_store': 118, 'preg': 0, 'preg_call': 28, 'preg_next': 38, 'pstore': 42, 'pstore_call': 52, 'pstore_next': 60, 'pvalues': 596, 'pxml': 616}),
     'mk2_osdsync': (
-        "2de9f04f8a4607465ff00008dff8a0b03c6800f00af87c6800f007f8b8f1000f01d0bff34f8fbde8f08f00b5dff884c0"
-        "002505f165064ff4207006fb00f62644163605f01f015fea55195fea8909404601b400220bebc20050f80900c8404ff6"
-        "ff73c00708bf48f6420336f81200baf1000f03d1984207d1002301e0984203d026f8123008f101080132b2f5957fe1d3"
-        "01bc404508d026f01f0006f51572ccf8000020309042fad30135262dc1d300bd60b2062468ef00e0"
-        , {'os_clean': 158, 'os_done': 38, 'os_layer': 42, 'os_next': 136, 'os_put': 128, 'os_px': 84, 'os_row': 50, 'os_rowdone': 168, 'os_show': 124, 'osd_sync': 0}),
+        "2de9f04f8a4607465ff00008dff804b13c6800f00af87c6800f007f8b8f1000f01d0bff34f8fbde8f08f00b5dff8e8c0"
+        "002505f160064ff4207006fb00f626444ff0ff39e81e0cd3122804d30438122807d3262805d200f01f015fea50195fea"
+        "8909032005fb00f00723b0fbf3fe0efb130e404601b400220023b9f1000f0bdbb2f10b00b0f5957f06d20bebc00050f8"
+        "0900c84000f0010336f812007bb9bef1000f09d1baf1000f18d04ff6ff73984214d148f642030de048f6420301e04ff6"
+        "ff73baf1000f03d1984207d1002301e0984203d026f8123008f101080ef1010ebef1070f08bf4ff0000e0132b2f5a07f"
+        "c2d301bc404508d026f01f0006f52072ccf8000020309042fad30135302d90d300bd000060b2062468ef00e0"
+        , {'os_bg': 184, 'os_bit': 152, 'os_clean': 256, 'os_cmp': 194, 'os_done': 38, 'os_k': 98, 'os_kset': 86, 'os_layer': 42, 'os_next': 220, 'os_put': 212, 'os_px': 120, 'os_row': 50, 'os_rowdone': 266, 'os_show': 208, 'os_white': 190, 'osd_sync': 0}),
 }
 # END FROZEN_MK2
 
@@ -1119,22 +1121,30 @@ def relocated_chr(obj):
 
 
 # The pop-up, landscape. chr_osd_tick ORs its two text lines into a 1-bit
-# mask (298 entries of 64 bits, 38 used: entry = x, bit = y) and hands both
-# layers to osd_sync, which on the micro walks them as 240x320 portrait --
-# and chr_osd_tick only gets that far when a layer IS 240x320, so on the MK2
-# the pop-up never drew at all. Its two size checks become 320x240 (the same
-# instructions, registers swapped: cmp r2,#240 does not fit 16 bits), and
-# osd_sync is replaced by this: the box at x 11..308, y 101..138, the same
-# place as the micro's once its panel is turned; white text on 0x8842, and on
-# hide, every pixel still showing the box goes back to black, as on the micro.
-OSD_SYNC_MK2 = """
+# mask (298 entries of 64 bits, 38 used: entry = x, bit = y; line 1 in bits
+# 0..17, line 2 in 18..37) and hands both layers to osd_sync, which on the
+# micro walks them as 240x320 portrait -- and chr_osd_tick only gets that far
+# when a layer IS 240x320, so on the MK2 the pop-up never drew at all. Its two
+# size checks become 320x240 (the same instructions, registers swapped:
+# cmp r2,#320 does not fit 16 bits), and osd_sync is replaced by this:
+#   - the box runs edge to edge (x 0..319), text where the micro had it;
+#   - OSD_PAD_T more rows above and below, OSD_PAD_G more between the lines
+#     (cc9, asked for after cc8 on hardware);
+#   - the layer has a 1-bit alpha, so "15% more see-through" is a screen
+#     door: one background pixel in 7 is left as the UI drew it;
+#   - white text on 0x8842; on hide, every pixel still showing the box goes
+#     back to black, as on the micro.
+OSD_PAD_T, OSD_PAD_G = 3, 4
+OSD_H = 38 + 2 * OSD_PAD_T + OSD_PAD_G      # 48 rows
+OSD_Y0 = 120 - OSD_H // 2                   # centred: rows 96..143
+OSD_SYNC_MK2 = f"""
     .syntax unified
     .thumb
     .text
     .global osd_sync
     .type   osd_sync, %function
 osd_sync:                           /* r0 = the two layer pointers, r1 = show */
-    push    {r4, r5, r6, r7, r8, r9, r10, r11, lr}
+    push    {{r4, r5, r6, r7, r8, r9, r10, r11, lr}}
     mov     r10, r1
     mov     r7, r0
     movs    r8, #0                  /* pixels changed */
@@ -1147,33 +1157,69 @@ osd_sync:                           /* r0 = the two layer pointers, r1 = show */
     beq     os_done
     dsb
 os_done:
-    pop     {r4, r5, r6, r7, r8, r9, r10, r11, pc}
+    pop     {{r4, r5, r6, r7, r8, r9, r10, r11, pc}}
 
 os_layer:                           /* r4 = frame */
-    push    {lr}
+    push    {{lr}}
     ldr     r12, =0xe000ef68        /* DCCMVAC */
     movs    r5, #0                  /* y in the box */
 os_row:
-    add.w   r6, r5, #101
+    add.w   r6, r5, #{OSD_Y0}
     mov.w   r0, #640
     mul     r6, r6, r0
-    add     r6, r6, r4
-    adds    r6, #22                 /* x = 11 */
-    and     r1, r5, #31
-    lsrs    r9, r5, #5
+    add     r6, r6, r4              /* x = 0 of this row */
+    mov.w   r9, #-1                 /* no mask row: padding */
+    subs    r0, r5, #{OSD_PAD_T}
+    blo     os_k
+    cmp     r0, #18
+    blo     os_kset                 /* line 1 */
+    subs    r0, #{OSD_PAD_G}
+    cmp     r0, #18
+    blo     os_k                    /* the gap */
+    cmp     r0, #38
+    bhs     os_k                    /* bottom padding */
+os_kset:
+    and     r1, r0, #31
+    lsrs    r9, r0, #5
     lsls    r9, r9, #2              /* which word of the entry */
+os_k:
+    movs    r0, #3                  /* screen door phase: (3y) mod 7 */
+    mul     r0, r5, r0
+    movs    r3, #7
+    udiv    lr, r0, r3
+    mls     lr, lr, r3, r0
     mov     r0, r8                  /* changed before this row */
-    push    {r0}
-    movs    r2, #0                  /* x in the box */
+    push    {{r0}}
+    movs    r2, #0                  /* x */
 os_px:
-    add.w   r0, r11, r2, lsl #3
+    movs    r3, #0                  /* the mask bit */
+    cmp     r9, #0
+    blt     os_bit
+    subs    r0, r2, #11             /* the mask's x 0 is screen x 11 */
+    cmp.w   r0, #298
+    bhs     os_bit
+    add.w   r0, r11, r0, lsl #3
     ldr     r0, [r0, r9]
     lsrs    r0, r0, r1
-    movw    r3, #0xffff
-    lsls    r0, r0, #31
-    it      eq
-    movweq  r3, #0x8842
+    and     r3, r0, #1
+os_bit:
     ldrh.w  r0, [r6, r2, lsl #1]
+    cbnz    r3, os_white
+    cmp     lr, #0
+    bne     os_bg
+    cmp     r10, #0                 /* a hole in the background */
+    beq     os_next                 /* hiding: never touched, leave it */
+    movw    r3, #0xffff
+    cmp     r0, r3                  /* old text in it: back to background */
+    bne     os_next
+    movw    r3, #0x8842
+    b       os_put
+os_bg:
+    movw    r3, #0x8842
+    b       os_cmp
+os_white:
+    movw    r3, #0xffff
+os_cmp:
     cmp     r10, #0
     bne     os_show
     cmp     r0, r3                  /* hide: only what is still the box */
@@ -1187,14 +1233,18 @@ os_put:
     strh.w  r3, [r6, r2, lsl #1]
     add     r8, r8, #1
 os_next:
+    add     lr, lr, #1
+    cmp     lr, #7
+    it      eq
+    moveq.w lr, #0
     adds    r2, #1
-    cmp.w   r2, #298
+    cmp.w   r2, #320
     blo     os_px
-    pop     {r0}
+    pop     {{r0}}
     cmp     r0, r8
     beq     os_rowdone
-    bic     r0, r6, #31             /* clean the row's 596 bytes */
-    add.w   r2, r6, #596
+    bic     r0, r6, #31             /* clean the row's 640 bytes */
+    add.w   r2, r6, #640
 os_clean:
     str     r0, [r12]
     adds    r0, #32
@@ -1202,9 +1252,9 @@ os_clean:
     blo     os_clean
 os_rowdone:
     adds    r5, #1
-    cmp     r5, #38
+    cmp     r5, #{OSD_H}
     blo     os_row
-    pop     {pc}
+    pop     {{pc}}
     .ltorg
 """
 OSD_GUARD_MICRO = "f02a08bf b1f5a07f"   # cmp r2,#0xf0 ; it eq ; cmpeq.w r1,#0x140
