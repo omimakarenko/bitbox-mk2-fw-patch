@@ -309,3 +309,36 @@ for v in (40, 72, 104, 0):                 # Logical4, VariMu, Thunder, Stock
         if end!=CMP_CALL+4 or h.badw or not all(math.isfinite(x) for x in out) or any(h.mu.reg_read(r)!=regs[r] for r in CS): bad+=1; print("   CMP FAIL",v,blk,end,h.badw[:2])
     h.mu.hook_del(hk); del h.ret0
     print(f"10. CC 47 = {v:3}: store run word {run:#010x}, 12 DSP blocks, {bad} failures, last block changed by {chg:.3f}, stock calls {sorted(set(c[0] for c in h.calls))}")
+
+# ---- 11. 2.3.10: Clip modes -- CCs on a Clip voice (hook B's exit), the rate and
+# Beat Count shims, the preset-load finish (P -> N -> clip_loaded)
+h.terminal=set(v for v in CASES.values() if isinstance(v,int))|{0x080b867c,0x80b8916,0x80a1868,0x80b7e10}
+entry=bne_target(0x080b8dfe); bad=0; seen=0
+clkp=0x24044000
+for cc in (112,113,114,115,116,117,118,119,102,104,105,107,78):
+    for val in (0,40,80,127):
+        h.mu.mem_write(voice,b"\0"*0x1000)
+        h.mu.mem_write(voice+0x575,b"\1"); h.mu.mem_write(voice+0x254,b"\1"); h.mu.mem_write(voice+0x29,b"\1")
+        h.mu.mem_write(sp+0x38,struct.pack("<I",val<<7))
+        regs={r:0x1000+i for i,r in enumerate(REGS)}; regs[UC_ARM_REG_R3]=cc; regs[UC_ARM_REG_R4]=voice; regs[UC_ARM_REG_R9]=clkp
+        end=h.run(entry,regs,sp=sp,lr=0x0800fff1,count=200000)
+        if end!=0x080b867c or h.badw: bad+=1; print("   CLIP CC FAIL",cc,val,end,h.badw[:2])
+        else: seen+=1
+print(f"11a. Clip/Slicer voice, CC 78 and 102-119 x 4 values through hook B's exit: {seen} ok, {bad} failures")
+h.terminal=set()
+# rate shim at 0x080b691e (r5 voice, r4 segment, s0 factor) and beats at 0x080b53d4 (sl voice, fp clock)
+seg=0x2404e000; h.allow(seg,seg+0x200); h.mu.mem_write(seg,b"\0"*0x200); h.mu.mem_write(seg+0x18,struct.pack("<f",1.0))
+regs={r:0x1000+i for i,r in enumerate(REGS)}; regs[UC_ARM_REG_R5]=voice; regs[UC_ARM_REG_R4]=seg
+h.mu.reg_write(UC_ARM_REG_S0,0x3f800000)
+end=h.run(bl_target(0x080b691e),regs,sp=sp,lr=0x080b6923)
+s16=struct.unpack("<f",struct.pack("<I",h.mu.reg_read(UC_ARM_REG_S16)))[0]
+print("11b. rate shim: end",hex(end) if isinstance(end,int) else end,"s16 =",s16,"regs kept",all(h.mu.reg_read(r)==regs[r] for r in CS),"badw",h.badw[:2])
+regs={r:0x1000+i for i,r in enumerate(REGS)}; regs[UC_ARM_REG_R10]=voice; regs[UC_ARM_REG_R11]=clkp
+h.mu.mem_write(voice+0xb80,struct.pack("<I",4))
+end=h.run(bl_target(0x080b53d4),regs,sp=sp,lr=0x080b53d9)
+print("11c. beats shim: end",hex(end) if isinstance(end,int) else end,"r3 =",h.mu.reg_read(UC_ARM_REG_R3),"(stock count 4)","badw",h.badw[:2])
+# preset-load finish: both sites -> nfinal -> pfinal (P) -> FinalizeBankLoading (stub) -> clip_loaded
+for site in (0x0807e2f4,0x080822ac):
+    regs={r:0x1000+i for i,r in enumerate(REGS)}; regs[UC_ARM_REG_R0]=0x24011110
+    end=h.run(bl_target(site),regs,sp=sp,lr=(site+4)|1)
+    print(f"11d. load finish {site:#x}: end {hex(end) if isinstance(end,int) else end}, stock calls {[c[0] for c in h.calls]}, badw {h.badw[:2]}")

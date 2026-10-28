@@ -61,9 +61,11 @@ Dg, Q) and the master bus kept across power-off (hook S: 2.3.10's hook T
 without its themes). The pop-up and the CPU bar are drawn by the MK2's own
 landscape renderer (osd_sync replaced, hook K's bar rewritten).
 
+cc15 adds the Clip modes (2.3.10's hook R, apply_clip_modes): Vinyl, Jungle,
+Key Lock, Manual tempo, Live Flip and the hold buttons, per Clip pad.
+
 Not here: Flip UI (the MK2 flips its screen and touch natively), CC 89, and
-the rest of 2.3.10-mod: Clip modes (hook R; chr10 carries its code, unwired)
-and themes (the MK2's palette is its own).
+2.3.10-mod's themes (the MK2's palette is its own).
 
 tools/emu_check_mk2.py runs the hooks in an emulator; run it before flashing.
 
@@ -78,7 +80,7 @@ import patch_micro as pm                # noqa: E402  the hook generators
 BASE = 0x08040000
 STOCK_SHA = "35ab7995ad0eca8484f3b28bc76389f10b2037dbb21a4a394e950d9329073e86"
 STOCK_SIZE = 674896
-VERSION = "2.3.4-cc14"                  # 10 characters: see pm.VER_DISPLAY_MAX
+VERSION = "2.3.4-cc15"                  # 10 characters: see pm.VER_DISPLAY_MAX
 
 # CCs left out of this build. 2026-10-27, cc1 on hardware: CC 89 (Loop
 # Crossfade) on a Sample pad gave sudden full-scale distorted output at any
@@ -428,6 +430,7 @@ CODE_MAP.update({
     0x080b9b3e: 0x080ba476,   # eq: ... fetch
     0x080c5e64: 0x080c7134,   # manual: "settings.tml"
     0x080e3d98: 0x080e4b58,   # manual: the palette's flash image (Stock)
+    0x0809f45c: 0x080a07ec,   # eq: exp2, the pitch factor's (cc15)
 })
 # The micro's third SESSION_MGR literal (0x080921e8) has no aligned twin; the
 # other two do, and 78 literals in the MK2 hold the MK2's value.
@@ -1708,6 +1711,7 @@ def stage3(d, upto="full", hook_e=None):
         if hook_e is not None:                     # 2.3.10: the micro's order, less T and R
             pm.apply_comp_type(d, n_org, n_syms)
             apply_saves(d, n_org, n_syms)
+            apply_clip_modes(d, n_org, n_syms)
     finally:
         pm.assemble = saved
 
@@ -1864,6 +1868,93 @@ def apply_saves(d, n_org, n_syms):
     return org, syms
 
 
+# --- R: Clip modes (2.3.10's Clip Tempo, cc15) -------------------------------------
+# pm.apply_clip_tempo with the MK2's places: the same sites (the pitch factor,
+# hook B's no-match exit, both preset-load finishes through hook P, the
+# segment renderer's read, the Beat Count read, the streamer's vtable read)
+# and Preset BPM's range widened to 1-255. Hook B is found by the origin main()
+# gave it, not by searching for the micro's bytes. Guards read off the MK2.
+CLIP_GUARDS_MK2 = (
+    (0x080b53d4, "daf8803b", "ldr.w r3, [sl, #0xb80], the clip timing's Beat Count read"),
+    (0x080b6a20, "d4e90223fff756fe8146", "ldrd r2, r3, [r4, #8]; bl 0x080b66d4; mov sb, r0: the read"),
+    (0x080b66d4, "f0b50446406a1546", "the read's entry"),
+    (0x080b53da, "002b40f0f580", "cmp r3, #0; bne.w: Auto or the count"),
+    (0x080b55ca, "07ee903a", "vmov s15, r3: the count, used as read"),
+    (0x080b5224, "2de9f04f8246006a", "the clip timing's entry"),
+    (0x080b5a34, "2de9f04f1d46", "the segment start's entry"),
+    (0x080a5954, "016a79b1", "the sample's frame count"),
+    (0x08094de4, "2de9f04387b0", "PostSetParam's entry"),
+    (0x080b85b2, "012385f82930", "the setter: +0x29 = 1 for a Clip or Slicer pad"),
+    (0x0806aca8, "0293fa2301932823", "BPM:'s registration: max 250, min 40"),
+    (0x080b691a, "e9f767ff", "bl 0x080a07ec, the pitch factor's exp2"),
+    (0x080b691e, "94ed068a", "vldr s16, [r4, #0x18], the segment's base rate"),
+    (0x080b6922, "f0ee408a", "vmov.f32 s17, s0, the factor kept for the second path"),
+    (0x080b8dec, "9df83430", "ldrb r3, [sp, #0x34], the CC number hook B dispatches on"),
+)
+CLIP_RATE_SITE_MK2 = 0x080b691e          # micro 0x080b57f6
+CLIP_BEATS_SITE_MK2 = 0x080b53d4         # micro 0x080b42ac
+CLIP_READ_SITE_MK2 = 0x080b6a24          # micro 0x080b58fc
+CLIP_CC_RET_MK2 = 0x080b867c             # micro 0x080b7554
+STRM_VT_READ_MK2 = 0x080cb3bc            # micro 0x080ca600: the streamer's vtable read
+STRM_READ_MK2 = 0x0809b394               # micro 0x0809a008
+CLIP_BPM_REG_MK2 = ((0x0806acae, 0x28), (0x0806acaa, 0xfa))   # micro 0x0806a8b6 / 0x0806a8b2
+KEEP_FINAL_SITES_MK2 = (0x0807e2f4, 0x080822ac)               # micro 0x0807c4e0 / 0x0807f98c
+HOOK_B_ORG = None                        # set by main() when hook B is appended
+
+
+def apply_clip_modes(d, n_org, n_syms):
+    """Install the Clip modes' sites (after hooks B, N and P)."""
+    for va, raw, what in CLIP_GUARDS_MK2:
+        guard_bytes(d, va, raw, what)
+    if pm.branch_target(d, 0x080b691a) != code_map(0x0809f45c):
+        pm.refuse("The pitch factor's exp2 call is not what the Clip modes expect.")
+    # 1. the pitch factor
+    d[CLIP_RATE_SITE_MK2 - BASE:CLIP_RATE_SITE_MK2 - BASE + 4] = pm.enc_b_bl(
+        CLIP_RATE_SITE_MK2, n_org + n_syms["nclip_rate"], True)
+    # 2. CC 102-119 and 78: hook B's no-match exit
+    b_blob, b_syms = pm.FROZEN["hookB"]
+    fb = HOOK_B_ORG + b_syms["fB"] - b_syms["_sB"]
+    if bytes(d[fb - BASE:fb - BASE + 4]) != pm.enc_b_bl(fb, CLIP_CC_RET_MK2, False):
+        pm.refuse("Hook B's exit is not the branch the Clip modes expect.")
+    d[fb - BASE:fb - BASE + 4] = pm.enc_b_bl(fb, n_org + n_syms["nclip_cc"], False)
+    # 3. preset loads: both FinalizeBankLoading sites, already wrapped by P
+    pfinal = {pm.branch_target(d, site) for site in KEEP_FINAL_SITES_MK2}
+    if len(pfinal) != 1 or min(pfinal) < BASE + STOCK_SIZE:
+        pm.refuse("The FinalizeBankLoading sites do not lead to Keep CCs' wrapper.")
+    pfinal = pfinal.pop()
+    if bytes(d[pfinal - BASE:pfinal - BASE + 2]) != bytes.fromhex("10b5"):
+        pm.refuse("Keep CCs' wrapper does not begin as the Clip modes expect.")
+    p = n_org + n_syms["nfinal_p"]
+    if bytes(d[p - BASE:p - BASE + 4]) != b"\0\0\0\0":
+        pm.refuse("The Clip modes' load shim is not where the patcher expects it.")
+    d[p - BASE:p - BASE + 4] = pm.enc_b_bl(p, pfinal, True)
+    for site in KEEP_FINAL_SITES_MK2:
+        d[site - BASE:site - BASE + 4] = pm.enc_b_bl(site, n_org + n_syms["nfinal"], True)
+    # 4b. the segment renderer's read
+    d[CLIP_READ_SITE_MK2 - BASE:CLIP_READ_SITE_MK2 - BASE + 4] = pm.enc_b_bl(
+        CLIP_READ_SITE_MK2, n_org + n_syms["njread"], True)
+    # 4. the Beat Count read
+    d[CLIP_BEATS_SITE_MK2 - BASE:CLIP_BEATS_SITE_MK2 - BASE + 4] = pm.enc_b_bl(
+        CLIP_BEATS_SITE_MK2, n_org + n_syms["nclip_beats"], True)
+    # 4c. the streamer's read, through its vtable
+    if word(d, STRM_VT_READ_MK2) != STRM_READ_MK2 | 1:
+        pm.refuse("The streamer's vtable read entry is not what the Clip modes expect.")
+    struct.pack_into("<I", d, STRM_VT_READ_MK2 - BASE, (n_org + n_syms["c_clip_sread"]) | 1)
+    # 5. Preset BPM 1-255: the registration and hook L's HOLD clamp
+    lo, hi = pm.CLIP_BPM_RANGE
+    for (va, old), new in zip(CLIP_BPM_REG_MK2, (lo, hi)):
+        if bytes(d[va - BASE:va - BASE + 2]) != bytes((old, 0x23)):
+            pm.refuse(f"Preset BPM's registration at {va:#x} is not what the Clip modes expect.")
+        d[va - BASE] = new
+    clamp = bytes.fromhex("282d38bf2825fa2d88bffa25")
+    hits = [i for i in range(STOCK_SIZE, len(d) - len(clamp)) if d[i:i + len(clamp)] == clamp]
+    if len(hits) != 1:
+        pm.refuse("Hook L's HOLD capture clamp is not where the Clip modes expect it.")
+    i = hits[0]
+    d[i:i + len(clamp)] = bytes((lo, 0x2d, 0x38, 0xbf, lo, 0x25, hi, 0x2d, 0x88, 0xbf, hi, 0x25))
+    vprint(f"R Clip modes: rate {CLIP_RATE_SITE_MK2:#x}, B exit {fb:#x}, beats, read, streamer, BPM {lo}-{hi}")
+
+
 UI_PRESENT_SITE = 0x0805b950            # bl 0x0804368c, every UI tick (micro 0x0805bbb4)
 UI_PRESENT_FN = 0x0804368c
 
@@ -1947,7 +2038,7 @@ def write_frozen():
 
 
 def main():
-    global VERBOSE, REASSEMBLE
+    global VERBOSE, REASSEMBLE, HOOK_B_ORG
     flags = sys.argv[1:]
     VERBOSE = "-v" in flags or "--verbose" in flags
     REASSEMBLE = "--reassemble" in flags
@@ -2014,6 +2105,8 @@ def main():
         check_dispatch(code, arms, label)
         org = pm._append(d, bytearray(code))
         d[hook - BASE:hook - BASE + 4] = pm.enc_bne_w(hook, org)
+        if label[0] == "B":
+            HOOK_B_ORG = org
         vprint(f"{label:16} at {org:#010x}, "
                + ", ".join(f"CC{c}" for c, _, _ in arms))
     for what, cc in pm.FEATURES:
@@ -2051,7 +2144,10 @@ def main():
                  "Clk Loss: INTERNAL/HOLD      TOOLS > Settings",
                  "Preset BPM, HOLD capture     TOOLS > Settings",
                  "Compressor type, ch 1        CC 47 / 48",
-                 "Character and compressor     kept across power-off"):
+                 "Character and compressor     kept across power-off",
+                 "Clip modes, per pad          CC 112-116",
+                 "Live Flip modes, per pad     CC 117",
+                 "Hold buttons, per pad        CC 78, 102, 104, 105, 107, 118, 119"):
         print(f"     ok   {what}")
 
     write_string(d, ATTRIB_VA, VER_VA, ATTRIB_STOCK, ATTRIB_NEW)
