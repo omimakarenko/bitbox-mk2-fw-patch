@@ -8,6 +8,8 @@ hands out:
   3. boot: the clock constructor chain    4. Settings registrations
   5. Settings posts                       6. the engine block start
   7. the UI tick (pop-up and CPU bar)     8. pad CCs through hooks A and B
+  9. the saved master bus: boot posts to the C, then SetParam and the
+     settings.tml write from the UI tick   10. compressor types (CC 47) on the DSP call
 Known limit: Unicorn's M7 has no double-precision FPU, so one Character
 effect set stops at a vmov.f64 (the MK2 hardware has one: stock uses it 533x)."""
 import struct, sys, random
@@ -239,3 +241,71 @@ for site,vslot,ret,tag in ((0x080b336e,0x40,0x080b2168,"A"),(0x080b8dfe,0x38,0x0
         if h.badw or end is None or isinstance(end,tuple): bad+=1; print("   PAD FAIL",tag,cc,end,h.badw[:2])
     print(f"8. pad hook {tag}: CC 64-127 through the recorder, {bad} failures; OSD ACC now {h.mu.mem_read(0x2406dd44,12).hex()}")
 h.terminal=set()
+
+# ---- 9. 2.3.10: the saved master bus (hook S + chr10's chr_post / UI-tick save)
+GSTORE=0x2401d040; SAVE_FN=0x0808bdd8; SETP=0x080893b2
+SAVE_IDS=(0x18d,0x18e,0x18f,0x191,0x192,0x193,0x195,0x196)
+# a) boot: apply-all posts of the saved rows go to the C, not the engine
+seed=(0, 64|64<<7|64<<14|64<<21, 0)
+vals={0x18d:20|40<<7|60<<14|80<<21, 0x18e:10|20<<7|30<<14|40<<21, 0x18f:1|2<<7|3<<14|0<<21}
+consumed=0
+for pid in SAVE_IDS+(0x16b,):
+    v=vals.get(pid,0) if pid!=0x16b else 2
+    regs={r:0x1000+i for i,r in enumerate(REGS)}; regs[UC_ARM_REG_R0]=0x24023cb8; regs[UC_ARM_REG_R1]=0x400; regs[UC_ARM_REG_R2]=pid; regs[UC_ARM_REG_R3]=v
+    h.mu.mem_write(sp,struct.pack("<II",0,0))
+    end=h.run(bl_target(POST_A),regs,sp=sp,lr=POST_RET|1)
+    ok= end==POST_RET and h.mu.reg_read(UC_ARM_REG_SP)==sp and all(h.mu.reg_read(r)==regs[r] for r in CS) and not h.badw
+    stock_post=[c for c in h.calls if c[0] in ("0x8094de4",)]
+    if ok and not stock_post: consumed+=1
+    else: print("   SAVE POST",hex(pid),ok,end,[c[0] for c in h.calls],h.badw[:2])
+print(f"9a. boot posts of the 8 saved rows + Comp Type: {consumed}/9 taken by the C, none to the engine")
+print("    CHR store after restore:",h.mu.mem_read(0x2406dc00,24).hex())
+# b) a live change, then UI ticks across ~2 s of DWT time: SetParam on the global store, then the settings.tml write
+fr=bytearray(0x18); fr[0]=7; struct.pack_into("<III",fr,8,0,15,77<<7); h.mu.mem_write(sp+0x40,bytes(fr))
+regs={r:0x1000+i for i,r in enumerate(REGS)}; regs[UC_ARM_REG_R0]=0x24011110; regs[UC_ARM_REG_R1]=sp+0x40
+h.run(bl_target(POST_SITE),regs,sp=sp,lr=RET|1)
+for k,off in enumerate((0x120,0x12c,0x138,0x144)):
+    h.mu.mem_write(disp+off,struct.pack("<IHH",0x30000000+k*0x26000,320,240))
+sets=[]; saves=[]
+for t in range(10):
+    h.mu.mem_write(0xE0001004,struct.pack("<I",(t*240_000_000)&0xffffffff))   # 0.5 s a tick at 480 MHz
+    regs={r:0x1000+i for i,r in enumerate(REGS)}; regs[UC_ARM_REG_R0]=disp
+    end=h.run(bl_target(DRAW),regs,sp=sp,lr=DRAW_RET|1)
+    if end!=DRAW_RET or h.badw: print("   UI TICK FAIL",t,end,h.badw[:2])
+    sets+=[(t,c[1][1],c[1][2]) for c in h.calls if c[0]==hex(SETP) and c[1][0]==hex(GSTORE)]
+    saves+=[(t,c[1][:3]) for c in h.calls if c[0]==hex(SAVE_FN)]
+print("9b. SetParam(global store, id, value):",[(t,i) for t,i,v in sets][:12])
+print("    settings.tml writes:",saves)
+want=['0x240238b8','0x80c7134',hex(GSTORE)]
+print("    write args as the Settings screen's:", bool(saves) and all(s[1]==want for s in saves))
+
+# ---- 10. 2.3.10: compressor types -- CC 47 picks a type, the DSP call runs cmp_block
+CMP_CALL=0x080983a8
+for v in (40, 72, 104, 0):                 # Logical4, VariMu, Thunder, Stock
+    for cc,val in ((47,v),(40,127),(41,127),(42,127),(43,64),(44,64),(45,64)):
+        fr=bytearray(0x18); fr[0]=7; struct.pack_into("<III",fr,8,0,cc,val<<7); h.mu.mem_write(sp+0x40,bytes(fr))
+        regs={r:0x1000+i for i,r in enumerate(REGS)}; regs[UC_ARM_REG_R0]=0x24011110; regs[UC_ARM_REG_R1]=sp+0x40
+        end=h.run(bl_target(POST_SITE),regs,sp=sp,lr=RET|1)
+    run=struct.unpack("<I",h.mu.mem_read(0x2406c104,4))[0]
+    obj=0x2404a000; h.allow(obj,obj+0x2000); msg=0x2404c000; h.allow(msg,msg+0x400)
+    bL=0x2404d000; bR=0x2404d400; h.allow(bL,bL+0x800)
+    h.mu.mem_write(obj,b"\0"*0x2000); h.mu.mem_write(msg,b"\0"*0x400)
+    h.mu.mem_write(obj,struct.pack("<I",obj+0x1f00))                    # its vtable ...
+    h.mu.mem_write(obj+0x1f00+0x54,struct.pack("<I",0x080a340d))        # ... with the stock msg-override default
+    def fetch(mu,addr,size,ud):
+        if addr==0x080a4630:
+            mu.mem_write(mu.reg_read(UC_ARM_REG_R1),struct.pack("<I",bL)); mu.mem_write(mu.reg_read(UC_ARM_REG_R2),struct.pack("<I",bR))
+    hk=h.mu.hook_add(UC_HOOK_CODE,fetch,begin=0x080a4630,end=0x080a4630)
+    h.ret0={0x080a9498:msg+0x100, 0x080a4588:48}
+    import math
+    bad=0
+    for blk in range(12):
+        h.mu.mem_write(bL,struct.pack("<96f",*[0.6*math.sin(i*0.2) for i in range(96)]))
+        h.mu.mem_write(bR,struct.pack("<96f",*[0.6*math.sin(i*0.2) for i in range(96)]))
+        regs={r:0x1000+i for i,r in enumerate(REGS)}; regs[UC_ARM_REG_R0]=obj; regs[UC_ARM_REG_R1]=msg
+        end=h.run(bl_target(CMP_CALL),regs,sp=sp,lr=(CMP_CALL+4)|1)
+        out=struct.unpack("<48f",h.mu.mem_read(bL,192))
+        chg=max(abs(o-0.6*math.sin(i*0.2)) for i,o in enumerate(out))
+        if end!=CMP_CALL+4 or h.badw or not all(math.isfinite(x) for x in out) or any(h.mu.reg_read(r)!=regs[r] for r in CS): bad+=1; print("   CMP FAIL",v,blk,end,h.badw[:2])
+    h.mu.hook_del(hk); del h.ret0
+    print(f"10. CC 47 = {v:3}: store run word {run:#010x}, 12 DSP blocks, {bad} failures, last block changed by {chg:.3f}, stock calls {sorted(set(c[0] for c in h.calls))}")

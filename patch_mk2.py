@@ -55,8 +55,15 @@ source swapped through CODE_MAP / RAM_MAP (anything unmapped refuses), and the
 Character C object relocated pair by pair (CHR_RELOC). All patch RAM moves up
 by RAM_DELTA, as one block, to clear the MK2's larger stack.
 
+From 2.3.10-mod (cc13): the Character runs from its 2.3.10 object (chr10,
+relocated by CHR10_RELOC), with the compressor types (CC 47 / 48, hooks Da,
+Dg, Q) and the master bus kept across power-off (hook S: 2.3.10's hook T
+without its themes). The pop-up and the CPU bar are drawn by the MK2's own
+landscape renderer (osd_sync replaced, hook K's bar rewritten).
+
 Not here: Flip UI (the MK2 flips its screen and touch natively), CC 89, and
-2.3.10-mod's additions (Clip modes, compressor types, themes, saving).
+the rest of 2.3.10-mod: Clip modes (hook R; chr10 carries its code, unwired)
+and themes (the MK2's palette is its own).
 
 tools/emu_check_mk2.py runs the hooks in an emulator; run it before flashing.
 
@@ -71,7 +78,7 @@ import patch_micro as pm                # noqa: E402  the hook generators
 BASE = 0x08040000
 STOCK_SHA = "35ab7995ad0eca8484f3b28bc76389f10b2037dbb21a4a394e950d9329073e86"
 STOCK_SIZE = 674896
-VERSION = "2.3.4-cc12"                  # 10 characters: see pm.VER_DISPLAY_MAX
+VERSION = "2.3.4-cc13"                  # 10 characters: see pm.VER_DISPLAY_MAX
 
 # CCs left out of this build. 2026-10-27, cc1 on hardware: CC 89 (Loop
 # Crossfade) on a Sample pad gave sudden full-scale distorted output at any
@@ -253,7 +260,15 @@ RAM_MAP = {
     0x24022908: 0x24023c48,   # PC_PENDING = PC_MANAGER + 0x390
     0x2402290c: 0x24023c4c,   # PC_CURRENT = PC_MANAGER + 0x394 (offset unchanged, 23)
     0x24002e7c: 0x24004280,   # DISPLAY_OBJ (32 pairs)
+    0x24002f24: 0x24004328,   # DISPLAY_OBJ + 0xa8, its DMA2D (literal 0x08042868 / 0x080435f4)
+    0x24009c80: 0x2400b084,   # the SD card object (literal 0x0808c920 / 0x0808c5a4)
+    0x24022970: 0x24023cb0,   # the tml read's FIL = MANAGER - 8 (literal 0x0808ee94 / 0x0808e598)
 }
+# Stock RAM the chr10 object names that is the same on the MK2: the palette
+# (0x24000000, literal 0x080426a4 / 0x08043430), the SDRAM allocator's pointer
+# (0x24000088, literal 0x08042df0 / 0x08043b7c), the UI object (0x24000dc8,
+# literal 0x08040e80 / 0x08040e84).
+RAM_SAME = {0x24000000, 0x24000004, 0x24000088, 0x24000dc8}
 RAM_ALLOWED = {0x24000000, 0x2407c000, 0x24080000}   # bounds checks, not objects
 
 # Every micro flash address stage 3 reads, guards, calls or branches to. "eq":
@@ -377,6 +392,43 @@ CODE_MAP = {
     0x080e25a8: 0x080df288,   # manual
     0x080e3e64: 0x080e4c24,   # manual
 }
+# 2.3.10 (cc13): what the compressor types, the saved master bus and the
+# chr10 object's externs read, call or guard. Function entries checked by
+# their first 16 bytes, call sites by their targets, data by its bytes.
+CODE_MAP.update({
+    0x08042dc0: 0x08043b4c,   # eq: the SDRAM bump allocator (clip_x_alloc)
+    0x08042e58: 0x08043be4,   # eq: malloc
+    0x08042ebc: 0x08043c48,   # eq: free
+    0x0804440c: 0x08045128,   # eq: the SD card check
+    0x0804a500: 0x0804a614,   # eq: HAL EnableCLUT
+    0x0804a536: 0x0804a64a,   # eq: its wait
+    0x0804a8b0: 0x0804a9c4,   # call target: HAL ConfigCLUT (boot's call, 0x080433d8)
+    0x08056edc: 0x08056c78,   # eq: f_open
+    0x080576a6: 0x08057442,   # eq: f_close
+    0x0807d3c0: 0x0807f824,   # eq: handler B's SetParam call
+    0x0807d3ec: 0x0807f850,   # eq: handler B's settings.tml write
+    0x0808c154: 0x0808bdd8,   # eq: the settings.tml write
+    0x0808ed14: 0x0808e418,   # call target: the tml write (whole block at -0x8fc)
+    0x0808edc4: 0x0808e4c8,   # call target: the tml read
+    0x0809a008: 0x0809b394,   # eq: the streamer's read
+    0x0809d06c: 0x0809e3fc,   # eq: ~XMLDocument
+    0x0809d608: 0x0809e998,   # eq: FirstChildElement
+    0x0809dca8: 0x0809f038,   # eq: Attribute
+    0x0809e50c: 0x0809f89c,   # eq: XMLDocument()
+    0x080a2064: 0x080a340c,   # lit: the compressor override slot's default (MK2 literal 0x080ba5d0)
+    0x080a31e0: 0x080a4588,   # eq: the bus frame count
+    0x080a3288: 0x080a4630,   # eq: the bus fetch
+    0x080a45ac: 0x080a5954,   # eq: a sample's frame count
+    0x080a82b8: 0x080a9498,   # eq: the bus descriptor
+    0x080b40fc: 0x080b5224,   # eq: the clip timing
+    0x080b490c: 0x080b5a34,   # eq: the segment start
+    0x080b7554: 0x080b867c,   # eq: hook B's no-match exit (CLIP_CC_RET)
+    0x080b9b24: 0x080ba45c,   # eq: the compressor DSP's descriptor call
+    0x080b9b2a: 0x080ba462,   # eq: ... frame count
+    0x080b9b3e: 0x080ba476,   # eq: ... fetch
+    0x080c5e64: 0x080c7134,   # manual: "settings.tml"
+    0x080e3d98: 0x080e4b58,   # manual: the palette's flash image (Stock)
+})
 # The micro's third SESSION_MGR literal (0x080921e8) has no aligned twin; the
 # other two do, and 78 literals in the MK2 hold the MK2's value.
 SESSION_MGR_GUARDS_MK2 = (0x0806dae4, 0x0806e018)
@@ -441,6 +493,212 @@ CHR_RELOC = (
 )
 CHR_FLASH = {0x080bf564: 0x080c0684, 0x080c478c: 0x080c58dc}
 
+# The 2.3.10 object (chr10: the Character, the compressor types, the Clip
+# modes, the themes and the saved master bus in one) builds 194 addresses
+# with movw/movt pairs: (section, movw offset, movt offset, micro value).
+# Generated as CHR_RELOC was (resync disassembly, cross-checked by the
+# halfword scan; they differ on three, all looked at: two build 0x24000088
+# with movs+movt, the same on the MK2, and one movw sits after a literal pool
+# the disassembly misreads -- clip_read+0x1aa6, added by hand). Each value
+# moves by ram_shift, RAM_MAP or CODE_MAP, or is in RAM_SAME; anything else
+# refuses. No literal-pool word in the object holds an address.
+CHR10_RELOC = (
+    ('.text.chr_block', 0x004a, 0x0052, 0x2406c2a8),
+    ('.text.chr_block', 0x0284, 0x0292, 0x2406c2a8),
+    ('.text.chr_block', 0x04ea, 0x0500, 0x2406c2a8),
+    ('.text.chr_cc', 0x001c, 0x0030, 0x2406c308),
+    ('.text.chr_cc', 0x00bc, 0x00c0, 0x2406c304),
+    ('.text.chr_cc', 0x00f4, 0x00fa, 0x2406a708),
+    ('.text.chr_cc', 0x017e, 0x0186, 0x2406c204),
+    ('.text.chr_cc', 0x01be, 0x01c6, 0x2406c204),
+    ('.text.chr_cc', 0x01c2, 0x01d0, 0x2406c304),
+    ('.text.chr_cc', 0x03d8, 0x03dc, 0x2406c304),
+    ('.text.chr_cc', 0x05c8, 0x05cc, 0x2406c304),
+    ('.text.chr_osd_tick', 0x0010, 0x0018, 0x2406a64c),
+    ('.text.chr_osd_tick', 0x0022, 0x002e, 0x2406a748),
+    ('.text.chr_osd_tick', 0x005e, 0x0062, 0x2401bc80),
+    ('.text.chr_osd_tick', 0x00fc, 0x0108, 0x080c5e64),
+    ('.text.chr_osd_tick', 0x0104, 0x010c, 0x24022578),
+    ('.text.chr_osd_tick', 0x0116, 0x011e, 0x2406c0d0),
+    ('.text.chr_osd_tick', 0x0296, 0x02a6, 0x080e3d98),
+    ('.text.chr_osd_tick', 0x0332, 0x033a, 0x2406a64c),
+    ('.text.chr_osd_tick', 0x034c, 0x0354, 0x2406a64c),
+    ('.text.chr_osd_tick', 0x037e, 0x0386, 0x2406c0d0),
+    ('.text.chr_osd_tick', 0x03aa, 0x03cc, 0x2406a64c),
+    ('.text.chr_osd_tick', 0x041e, 0x0426, 0x24002f24),
+    ('.text.chr_osd_tick', 0x0538, 0x053c, 0x24000dc8),
+    ('.text.chr_osd_tick', 0x055c, 0x0564, 0x24069420),
+    ('.text.chr_osd_tick', 0x06b8, 0x06c0, 0x2406c358),
+    ('.text.chr_osd_tick', 0x06f4, 0x06fc, 0x2406c0d0),
+    ('.text.chr_osd_tick', 0x07b8, 0x07bc, 0x2406c0d0),
+    ('.text.chr_osd_tick', 0x07d2, 0x07d6, 0x2406c0d0),
+    ('.text.chr_osd_tick', 0x0834, 0x083c, 0x2406c0d0),
+    ('.text.chr_osd_tick', 0x0862, 0x0866, 0x2406c0d0),
+    ('.text.chr_osd_tick', 0x0c4a, 0x0c58, 0x2406c358),
+    ('.text.chr_osd_tick', 0x0cd2, 0x0cdc, 0x24069420),
+    ('.text.chr_osd_tick', 0x0cfe, 0x0d02, 0x080bf564),
+    ('.text.chr_osd_tick', 0x10e6, 0x10f6, 0x2406c358),
+    ('.text.chr_osd_tick', 0x1138, 0x113e, 0x080c478c),
+    ('.text.chr_osd_tick', 0x1182, 0x1186, 0x2406c358),
+    ('.text.chr_osd_tick', 0x1192, 0x119e, 0x24069420),
+    ('.text.chr_osd_tick', 0x13d4, 0x13dc, 0x2406bd28),
+    ('.text.chr_osd_tick', 0x14ae, 0x14b2, 0x2406a748),
+    ('.text.chr_osd_tick', 0x1a22, 0x1a30, 0x2406c358),
+    ('.text.chr_osd_tick', 0x1ed2, 0x1eda, 0x2406a64c),
+    ('.text.chr_osd_tick', 0x1eec, 0x1ef4, 0x2406a64c),
+    ('.text.chr_osd_tick', 0x2010, 0x2018, 0x2406bd28),
+    ('.text.chr_osd_tick', 0x2014, 0x201c, 0x2406c0d0),
+    ('.text.chr_osd_tick', 0x223a, 0x223e, 0x2406c358),
+    ('.text.chr_osd_tick', 0x2258, 0x225c, 0x24069420),
+    ('.text.chr_osd_tick', 0x2364, 0x236c, 0x24069420),
+    ('.text.chr_osd_tick', 0x2828, 0x2830, 0x2406c358),
+    ('.text.chr_osd_tick', 0x2de6, 0x2dee, 0x2406c358),
+    ('.text.chr_osd_tick', 0x2e9c, 0x2ea4, 0x2406c358),
+    ('.text.chr_osd_tick', 0x2ecc, 0x2ed4, 0x2406c358),
+    ('.text.chr_post', 0x0014, 0x0018, 0x2406c200),
+    ('.text.chr_post', 0x005a, 0x0060, 0x2406c210),
+    ('.text.chr_post', 0x0124, 0x0128, 0x2406a710),
+    ('.text.chs_rows', 0x0006, 0x000e, 0x2406c200),
+    ('.text.chs_rows', 0x00c0, 0x00c8, 0x2406a700),
+    ('.text.clip_beats', 0x000e, 0x0014, 0x2406bb08),
+    ('.text.clip_cc', 0x005c, 0x0064, 0x2406bb18),
+    ('.text.clip_cc', 0x0114, 0x0128, 0x2406c311),
+    ('.text.clip_cc', 0x011c, 0x012c, 0x2406c308),
+    ('.text.clip_cc', 0x016c, 0x0174, 0x2406bb18),
+    ('.text.clip_cc', 0x01fa, 0x0202, 0x2406c308),
+    ('.text.clip_cc', 0x021c, 0x0220, 0x2406c311),
+    ('.text.clip_cc', 0x0274, 0x0284, 0x2406c311),
+    ('.text.clip_cc', 0x0278, 0x0288, 0x2406c308),
+    ('.text.clip_cc', 0x0326, 0x032a, 0x2406c311),
+    ('.text.clip_cc', 0x05aa, 0x05b2, 0x2406a200),
+    ('.text.clip_cc', 0x06b6, 0x06bc, 0x2406c311),
+    ('.text.clip_cc', 0x07ce, 0x07d2, 0x2406a200),
+    ('.text.clip_cc', 0x07e0, 0x07e4, 0x2406ef10),
+    ('.text.clip_jgl', 0x0006, 0x000a, 0x2406a200),
+    ('.text.clip_jgl_cycle', 0x0008, 0x0010, 0x2406bd08),
+    ('.text.clip_jgl_head', 0x0040, 0x0048, 0x2406a640),
+    ('.text.clip_loaded', 0x0004, 0x000c, 0x2406bb08),
+    ('.text.clip_loaded', 0x0014, 0x001c, 0x2406be3c),
+    ('.text.clip_loaded', 0x0052, 0x0060, 0x24015f28),
+    ('.text.clip_loaded', 0x0056, 0x0066, 0x2406bffc),
+    ('.text.clip_loaded', 0x02aa, 0x02b0, 0x2406a400),
+    ('.text.clip_man_set', 0x0000, 0x0008, 0x2406a6b0),
+    ('.text.clip_mode_bpm', 0x0004, 0x000c, 0x2406a6b0),
+    ('.text.clip_rate', 0x000c, 0x0014, 0x2406bb00),
+    ('.text.clip_rate', 0x00fa, 0x00fe, 0x2406a200),
+    ('.text.clip_rate', 0x0124, 0x0128, 0x2406ef00),
+    ('.text.clip_rate', 0x0184, 0x018c, 0x2406a200),
+    ('.text.clip_rate', 0x0530, 0x0534, 0x2406bffc),
+    ('.text.clip_read', 0x001e, 0x0026, 0x2406bf38),
+    ('.text.clip_read', 0x007a, 0x007e, 0x2406bf38),
+    ('.text.clip_read', 0x0110, 0x0114, 0x2406a200),
+    ('.text.clip_read', 0x012e, 0x0132, 0x2406ef00),
+    ('.text.clip_read', 0x0158, 0x015e, 0x2406bf38),
+    ('.text.clip_read', 0x0202, 0x0206, 0x2406bf52),
+    ('.text.clip_read', 0x03f6, 0x03fa, 0x2406bf52),
+    ('.text.clip_read', 0x0402, 0x0406, 0x2406bf38),
+    ('.text.clip_read', 0x040e, 0x0412, 0x2406bf52),
+    ('.text.clip_read', 0x0490, 0x0498, 0x2406bf38),
+    ('.text.clip_read', 0x04fc, 0x0504, 0x2406bf38),
+    ('.text.clip_read', 0x0586, 0x058c, 0x2406bf38),
+    ('.text.clip_read', 0x05ba, 0x05be, 0x2406bf52),
+    ('.text.clip_read', 0x05d2, 0x05d8, 0x2406bf38),
+    ('.text.clip_read', 0x05ea, 0x05f0, 0x2406bf38),
+    ('.text.clip_read', 0x060e, 0x0612, 0x2406bf38),
+    ('.text.clip_read', 0x0626, 0x062c, 0x2406bf52),
+    ('.text.clip_read', 0x0638, 0x063c, 0x2406bf52),
+    ('.text.clip_read', 0x064e, 0x0654, 0x2406bf38),
+    ('.text.clip_read', 0x0668, 0x066e, 0x2406bf52),
+    ('.text.clip_read', 0x067c, 0x0680, 0x2406bf52),
+    ('.text.clip_read', 0x069a, 0x06a0, 0x2406bf38),
+    ('.text.clip_read', 0x0830, 0x0836, 0x2406bf38),
+    ('.text.clip_read', 0x14ca, 0x14ce, 0x2406bf52),
+    ('.text.clip_read', 0x17ce, 0x17d4, 0x2406bf52),
+    ('.text.clip_read', 0x1892, 0x1898, 0x2406bf52),
+    ('.text.clip_read', 0x18a0, 0x18a4, 0x2406bf38),
+    ('.text.clip_read', 0x18ac, 0x18b2, 0x2406bf52),
+    ('.text.clip_read', 0x18c2, 0x18c8, 0x2406bf52),
+    ('.text.clip_read', 0x18da, 0x18e0, 0x2406bf52),
+    ('.text.clip_read', 0x18f2, 0x18f8, 0x2406bf52),
+    ('.text.clip_read', 0x190a, 0x1910, 0x2406bf52),
+    ('.text.clip_read', 0x1922, 0x1928, 0x2406bf52),
+    ('.text.clip_read', 0x193a, 0x193e, 0x2406bf52),
+    ('.text.clip_read', 0x194a, 0x194e, 0x2406bf52),
+    ('.text.clip_read', 0x195a, 0x195e, 0x2406bf52),
+    ('.text.clip_read', 0x196c, 0x1970, 0x2406bf52),
+    ('.text.clip_read', 0x197e, 0x1982, 0x2406bf52),
+    ('.text.clip_read', 0x1990, 0x1994, 0x2406bf52),
+    ('.text.clip_read', 0x19a2, 0x19a6, 0x2406bf52),
+    ('.text.clip_read', 0x1a08, 0x1a10, 0x2406bf52),
+    ('.text.clip_read', 0x1a50, 0x1a58, 0x2406bf52),
+    ('.text.clip_read', 0x1aa6, 0x1aaa, 0x2406bf52),
+    ('.text.clip_read', 0x1ac8, 0x1acc, 0x2406bf38),
+    ('.text.clip_read', 0x1ad4, 0x1ada, 0x2406bf52),
+    ('.text.clip_read', 0x1aea, 0x1af0, 0x2406bf52),
+    ('.text.clip_read', 0x1b02, 0x1b08, 0x2406bf52),
+    ('.text.clip_read', 0x1b1a, 0x1b1e, 0x2406bf52),
+    ('.text.clip_read', 0x1b32, 0x1b36, 0x2406bf52),
+    ('.text.clip_read', 0x1b4a, 0x1b50, 0x2406bf52),
+    ('.text.clip_read', 0x1b60, 0x1b64, 0x2406bf52),
+    ('.text.clip_read', 0x1b6c, 0x1b70, 0x2406bf52),
+    ('.text.clip_read', 0x1b78, 0x1b7c, 0x2406bf52),
+    ('.text.clip_read', 0x1b86, 0x1b8a, 0x2406bf52),
+    ('.text.clip_read', 0x1b94, 0x1b98, 0x2406bf52),
+    ('.text.clip_read', 0x1ba2, 0x1ba6, 0x2406bf52),
+    ('.text.clip_read', 0x1bb0, 0x1bb4, 0x2406bf52),
+    ('.text.clip_read', 0x1bc8, 0x1bd0, 0x2406bf38),
+    ('.text.clip_read', 0x1bde, 0x1be4, 0x2406bf38),
+    ('.text.clip_read', 0x1fcc, 0x1fd4, 0x2406bf52),
+    ('.text.clip_read', 0x1fe6, 0x1fea, 0x2406bf38),
+    ('.text.clip_read', 0x3618, 0x361e, 0x2406bf52),
+    ('.text.clip_read', 0x362a, 0x362e, 0x2406bf38),
+    ('.text.clip_read', 0x41d6, 0x41e8, 0x2406bf52),
+    ('.text.clip_read', 0x4526, 0x452c, 0x2406bf38),
+    ('.text.clip_read', 0x4570, 0x4576, 0x2406bf38),
+    ('.text.clip_read', 0x4594, 0x459a, 0x2406bf38),
+    ('.text.clip_read', 0x4620, 0x4624, 0x2406bf52),
+    ('.text.clip_read', 0x46d0, 0x46d4, 0x2406bf38),
+    ('.text.clip_read', 0x471e, 0x4722, 0x2406bf52),
+    ('.text.clip_read', 0x474a, 0x4750, 0x2406bf38),
+    ('.text.clip_read', 0x4784, 0x478c, 0x2406bf52),
+    ('.text.clip_read', 0x4936, 0x493c, 0x2406bf52),
+    ('.text.clip_read', 0x495a, 0x495e, 0x2406bf52),
+    ('.text.clip_read', 0x4968, 0x496e, 0x2406bf38),
+    ('.text.clip_reset', 0x0006, 0x000c, 0x2406bb9c),
+    ('.text.clip_reset', 0x0020, 0x0028, 0x2406bb9c),
+    ('.text.clip_reset', 0x0024, 0x0034, 0x2406bd08),
+    ('.text.clip_reset', 0x005a, 0x0060, 0x2406be39),
+    ('.text.clip_reset', 0x0064, 0x0080, 0x2406be39),
+    ('.text.clip_reset', 0x0156, 0x015c, 0x2406bf52),
+    ('.text.clip_reset', 0x0160, 0x0168, 0x2406bb9c),
+    ('.text.clip_reset', 0x0164, 0x016e, 0x2406bd08),
+    ('.text.clip_reset', 0x0188, 0x018c, 0x2406bcfd),
+    ('.text.clip_reset', 0x01c6, 0x01ce, 0x2406be39),
+    ('.text.clip_sread', 0x001e, 0x0024, 0x2406a640),
+    ('.text.clip_sum', 0x0000, 0x0004, 0x2406bb00),
+    ('.text.clip_tail_of', 0x0000, 0x0004, 0x2406bf38),
+    ('.text.cmp_block', 0x000c, 0x0018, 0x2406ab00),
+    ('.text.cmp_block', 0x04ee, 0x04f2, 0x080a2065),
+    ('.text.cmp_post', 0x0008, 0x0010, 0x2401bc80),
+    ('.text.cmp_post', 0x001c, 0x0020, 0x2406a700),
+    ('.text.cmp_run_aw', 0x000c, 0x0014, 0x2406a854),
+    ('.text.cmp_run_aw', 0x25a8, 0x25ac, 0x2406a854),
+    ('.text.cmp_run_aw', 0x2b0e, 0x2b16, 0x2406a854),
+    ('.text.cmp_wake', 0x0002, 0x0008, 0x2406a798),
+    ('.text.osd_sync', 0x0006, 0x000a, 0x24069418),
+    ('.text.osd_sync', 0x0010, 0x0018, 0x2406c0e0),
+    ('.text.osd_sync', 0x0074, 0x0080, 0x24069418),
+    ('.text.osd_sync', 0x014c, 0x0158, 0x24069418),
+    ('.text.slot_reset', 0x0002, 0x0008, 0x2406c254),
+    ('.text.thm_job', 0x000a, 0x0012, 0x2406a650),
+    ('.text.thm_load', 0x000a, 0x000e, 0x24022970),
+    ('.text.thm_load', 0x0042, 0x0046, 0x24009c80),
+    ('.text.thm_load', 0x0416, 0x041a, 0x2406a64c),
+    ('.text.thm_osd_col', 0x0000, 0x0006, 0x2406c0e0),
+    ('.text.thm_post', 0x0012, 0x0018, 0x2406a64c),
+    ('.text.thm_post', 0x005a, 0x0068, 0x080e3d98),
+)
+
 # Settings: the Tools screen has tabs (Main, Rec, MIDIIn), four rows each --
 # one per encoder, no scrolling. The page builder (0x0807974c) copies a tab's
 # rows from SETTINGS_VA + 16 * tab and its name from the six-pointer list at
@@ -464,6 +722,7 @@ STAGE3_FUNCS = (
     "build_character_hook", "apply_character",
     "_osd_pad_rec", "_osd_post", "_keep_skip", "build_osd_hook", "apply_osd",
     "build_keep_hook", "apply_keep_ccs",
+    "build_comp_type_hook", "apply_comp_type",          # 2.3.10 (cc13)
 )
 # Module constants they read that carry micro code addresses.
 STAGE3_GLOBALS = (
@@ -474,6 +733,8 @@ STAGE3_GLOBALS = (
     "OSD_PAD_SITES", "OSD_SLICER_GUARD", "OSD_GRANULAR_GUARD", "OSD_SETPARAM",
     "KEEP_CALLS", "KEEP_GUARDS", "KEEP_FINAL_SITES", "FINALIZE_FN",
     "KEEP_SETPARAM",
+    "CMP_CALLS", "CMP_EXTERNS", "CLIP_EXTERNS", "THEME_EXTERNS", "COMP_SITES",   # 2.3.10 (cc13)
+    "CLIP_CC_RET",
 )
 
 # Generated by `patch_mk2.py ... --reassemble` with clang 18; see mk2_assemble.
@@ -487,6 +748,42 @@ FROZEN_MK2 = {
         "06e0ac22ed1141f67f7305fb03f5ad0a2b46002482b00094019443f6b840c2f2024040f20001c0f203010000000002b0"
         "30bd"
         , {'_sC': 0, 'cbool': 38, 'cbs': 28, 'cfl': 36, 'cpost': 6, 'cpp': 32, 'csend': 64, 'csetp': 90, 'cwd': 50}),
+    'mk2_hookDa': (
+        "03b4ddf850c0bcf1000f40f0b080ddf854c0bcf1280f04d0acf12903052b2cd9a5e04df6b840c2f202404ef2b801c2f2"
+        "02410268a2f11053b3f5a02f0cd24ff6a073d358b3f1c00f06d14ff6a473d35848f6a04c634503d004308842e9d386e0"
+        "ddf858c0bcf5005fb4bf0023012348f65841c0f20201535479e04df60022c2f2064211684cf2de0cc1f2100c61450fd0"
+        "c2f800c00ff2b04002f1040102f1180c90ed000a81ed000a043004316145f7d3052b5fd0042b11d1dff880040168d0f8"
+        "04c06fea0c0c614508d1dff874c4614503d0dff870c4614500d148e0ddf858c01cf07f0f08bf4ceadc1c00ee10cab8ee"
+        "400a03eb43000ff2644101eb8001d1ed000a91ed011a886820ee200a30ee010a002801d0bceec00a02eb830080ed010a"
+        "012b11d8dff814040168d0f804c06fea0c0c614508d1dff808c4614503d0dff804c4614500d129e0d2f800c053688cea"
+        "030c93688cea030cd3688cea030c13698cea030c53698cea030cc2f818c003bc00000000ddf858c0f048bcf5ac5f09db"
+        "ef49bcf52c5fa8bfee4901606fea0101416003e0002101604160d5e76ded031a92ed010ad2ed020ab7ee001ac1ee200a"
+        "71ee600af4ee600af1ee10fa55d63aa0d0ec031a30ee210a20ee020a60eea20a71eee11a80fe210ac0fea10af2ee001a"
+        "80fe610ac0fee10abdeec02afdeee02a12ee100a12ee901a072888bf0720072988bf072102ee100ab8eec22a30ee420a"
+        "02ee901af8eee22a70eee20a00ebc000084424a1c54b1b68dff818c3634508bf01f2441101eb800191ed001ad1ed011a"
+        "71eec11a00eea11a91ed092ad1ed0a2a72eec22a00eea22a32ee412a00ee021ab0ee410afdec031a02e0fdec031a15e0"
+        "0ca0d0ed000ab4ee600af1ee10fac8bfb0ee600af1ee600ab4ee600af1ee10fab8bfb0ee600a82ed050a55e700205061"
+        "52e700bf0000104200002042cdcc4c3ea2bc064100000080ae4731409a99b140ec5104410000304148e15a41a4708341"
+        "ec5198416666ac4100000080f6280c40f6288c40d7a3d04066660a41a4702d411f854f4152b86e41e17a884100000080"
+        "d7a3d03f7b144e40713d9a400ad7cb40a470fd400ad717410ad72f41000048410000008014ae873fec5108401f854b40"
+        "52b88640295ca740295cc7406666e640666602410000008014ae073f6666863f14aec73fe17a04400ad7234033334340"
+        "85eb61400000804000000080295c8f3db81e053ecdcc4c3eb81e853e0ad7a33e14aec73e6666e63e5c8f023f00000080"
+        "000000800000008000000080000000800000008000000080000000800000008000000080000000800000008000000080"
+        "000000800000008000000080000000800000008000000080000000800000008000000080000000800000008000000080"
+        "000000800000008000000000a4706d40cdccec40e17a304133336b410ad79141c3f5ae41d7a3ca413d0ae94100000000"
+        "14ae474014aec740b81e15418fc245411f857741ae4793410000aa41d7a3c241000000005c8f2240713da2405c8ff240"
+        "b81e2141e17a48411f856f4100008c41e17a9e4100000000f628fc3f9a9979403333bb40295cf740713d1a41ae473941"
+        "5c8f5641cdcc744100000000e17ab43f5c8f3240cdcc8440295caf405c8fda4085eb014148e1164148e12a4100000000"
+        "9a99593fec51d83fd7a32040e17a54400ad78340e17a9c40cdccb440ae47d14000000000c3f5a83ec3f5283f48e17a3f"
+        "6666a63f7b14ce3f8fc2f53f52b80e4085eb214000000000000000000000000000000000000000000000000000000000"
+        "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000020c00624"
+        "4155544f41484f54000040c100000040a005000040380000000000008002203b000020c2000000006002983a0000803f"
+        "000000005542953e0000c04101000000e7a239400000f043010000004002903b000010c200000000"
+        , {'_sD': 0, 'dauto': 372, 'dauto_off': 404, 'dfound': 96, 'dk36': 676, 'dmakeup': 412, 'dmk_clamp': 624, 'dmk_nan': 618, 'dmk_zero': 668, 'dnext': 368, 'dnextc': 88, 'donoff': 34, 'dout': 366, 'dparam': 122, 'dscale': 1372, 'dscan': 50, 'dseed': 160, 'dseeded': 176, 'dstock': 1352, 'dstore': 280, 'dsum': 328, 'dsum_on': 326, 'dtab': 692, 'dtk': 680, 'dval': 220, 'dval_on': 218}),
+    'mk2_hookDg': (
+        "ddf848c0bcf1000f0dd1ddf84cc0acf1290cbcf1040f06d8dff814c0dcf800c0044b9c4501d0000000000000000000bf"
+        "04c1062452504d43"
+        , {'_sDg': 0, 'dg_dr': 38, 'dg_skip': 42}),
     'mk2_hookDr': (
         "03b4ddf850c0bcf1000f40f0a280ddf854c0bcf1280f04d0acf12903052b2cd997e04df6b840c2f202404ef2b801c2f2"
         "02410268a2f11053b3f5a02f0cd24ff6a073d358b3f1c00f06d14ff6a473d35848f6a04c634503d004308842e9d378e0"
@@ -631,6 +928,19 @@ FROZEN_MK2 = {
         "01b000bd2de90f50eff30080f1ee101a03b42ded100a2a982b992c9a00000000bdec100a03bc80f30088e1ee101abde8"
         "0f500000000000bf"
         , {'_sN': 0, 'nblock': 0, 'nblock_c': 26, 'nblock_orig': 2, 'nmidi': 52, 'nmidi_c': 76, 'nmidi_next': 98}),
+    'mk2_hookNc': (
+        "01b5000000002de90f50eff30080f1ee101a03b42ded100a189800000000bdec100a03bc80f30088e1ee101abde80f50"
+        "01b000bd2de90f50eff30080f1ee101a03b42ded100a2a982b992c9a000000002c90bdec100a03bc80f30088e1ee101a"
+        "bde80f5000000000dff88cc1dcf800c0624b9c4508d0dff888c1dcf800c0614b9c4501d0000000002de90f50eff30082"
+        "f1ee103a0cb42ded100a00000000bdec100a0cbc82f30088e1ee103abde80f5070472de90f50eff30080f1ee101a03b4"
+        "2ded100a284621460000000010ee102abdec100a00ee102a03bc80f30088e1ee101abde80f5094ed068a70474e2b03d0"
+        "662b19d3772b17d82de90f50eff30080f1ee101a03b42ded100a204649461a46269b00000000bdec100a03bc80f30088"
+        "e1ee101abde80f50000000002de90f50eff30080f1ee101a03b42ded100a86b0ddf878c0cdf800c0ddf87cc0cdf804c0"
+        "ddf880c0cdf808c0ddf884c0cdf80cc0ddf888c0cdf810c0ddf88cc0cdf814c0189819991a9a1b9b9ded060a00000000"
+        "06b01290bdec100a03bc80f30088e1ee101abde80f5070472de90f50eff30080f1ee101a03b42ded100a504659460000"
+        "00001590bdec100a03bc80f30088e1ee101abde80f50704710b5000000002de90f50eff30080f1ee101a03b42ded100a"
+        "00000000bdec100a03bc80f30088e1ee101abde80f5010bd04c1062452504d4384c1062442504d43"
+        , {'_sN': 0, 'nblock': 0, 'nblock_c': 26, 'nblock_orig': 2, 'nclip_beats': 408, 'nclip_beats_c': 430, 'nclip_cc': 236, 'nclip_cc_c': 274, 'nclip_cc_go': 248, 'nclip_cc_out': 296, 'nclip_rate': 178, 'nclip_rate_c': 200, 'ncomp': 104, 'ncomp_c': 136, 'ncomp_call': 154, 'ncomp_e': 132, 'nfinal': 456, 'nfinal_c': 480, 'nfinal_p': 458, 'njread': 300, 'njread_c': 380, 'nmidi': 52, 'nmidi_c': 76, 'nmidi_next': 100}),
     'mk2_hookOm': (
         "2de91f5083b040f24b110ff29c120ff27413042400940ff2981401940000000003b0bde81f50000000002de90f5040f2"
         "4b11012200000000bde80f500000000040f24b1c62451bd110b5032b05d94448114601220000000001230021414813f0"
@@ -658,11 +968,40 @@ FROZEN_MK2 = {
         "206130466946000000000135013fdbd101e00135d8e7e56007b05df804cb8cf30088bde8ff500000000000bf74d00124"
         "40d0012400be06245045454bb83c02244c50455204110c0808110c084b656570204343733a0000bf6b65657063637300"
         , {'_sP': 0, 'pb_busy': 434, 'pb_have': 326, 'pb_loop': 472, 'pb_next': 546, 'pb_out': 552, 'pb_post': 534, 'pb_ready': 456, 'pb_save': 550, 'pb_unsteady': 450, 'pblock': 280, 'pblock_next': 566, 'pctor': 164, 'pctor_clr': 178, 'pctor_next': 198, 'pedit': 64, 'pfinal': 128, 'pfinal_call': 130, 'pfinal_out': 156, 'plabel': 604, 'pmidi': 202, 'pmidi_cc': 214, 'pmidi_next': 276, 'pmidi_out': 268, 'pmidi_stock': 210, 'ppost': 82, 'ppost_mode': 108, 'ppost_next': 124, 'ppost_set': 102, 'ppost_store': 118, 'preg': 0, 'preg_call': 28, 'preg_next': 38, 'pstore': 42, 'pstore_call': 52, 'pstore_next': 60, 'pvalues': 596, 'pxml': 616}),
+    'mk2_hookQ': (
+        "2de91f5083b040f26b110ff27c020ff26803042400940ff27c0401940000000003b0bde81f50000000002de90f5040f2"
+        "6b11002200000000bde80f500000000040f26b1c624514d12de90f50eff30081f1ee102a06b42ded100a184600000000"
+        "bdec100a06bc81f30088e1ee102abde80f900000000000bf00000000000000000000000000000000436f6d7020547970"
+        "653a0000636f6d70747970650000bf0053544f434b0000bf4c4f474943414c340000bf00564152494d5500005448554e"
+        "44455200"
+        , {'_sQ': 0, 'qlabel': 136, 'qpost': 64, 'qpost_call': 92, 'qpost_next': 114, 'qreg': 0, 'qreg_call': 28, 'qreg_next': 38, 'qstore': 42, 'qstore_call': 52, 'qstore_next': 60, 'qv0': 160, 'qv1': 168, 'qv2': 180, 'qv3': 188, 'qvalues': 120, 'qxml': 148}),
+    'mk2_hookS': (
+        "2de91f5083b0039840f28d1101220ff2cc13002400946ff0704401940ff2c814029400000000039840f28e1101220ff2"
+        "c413002400946ff0704401940ff2c014029400000000039840f28f1101220ff2b813002400946ff0704401940ff2b414"
+        "029400000000039840f2911101220ff2ac13002400946ff0704401940ff2a414029400000000039840f2921101220ff2"
+        "a013002400946ff0704401940ff29814029400000000039840f2931101220ff29413002400946ff0704401940ff28c14"
+        "029400000000039840f2951101220ff28813002400946ff0704401940ff28014029400000000039840f2961101220ff2"
+        "7c13002400946ff0704401940ff2741402940000000003b0bde81f50000000002de90f50009840f28d114ff000020000"
+        "0000009840f28e11284a00000000009840f28f114ff0000200000000009840f29111234a00000000009840f29211214a"
+        "00000000009840f293111f4a00000000009840f295114ff0400200000000009840f296114ff07f0200000000bde80f50"
+        "00000000a2f28d1cbcf1120f01d9000000002de90f50eff30081f1ee10ca2de902102ded100a10461946000000001690"
+        "bdec100a06bc81f30088e1ee102abde80f50bcf1000fe2d0704700bf40201008a40ce60f40001000c0ff1f0043687220"
+        "416d6f756e743a00636872616d6f756e740000bf43687220546f6e653a0000bf636872746f6e65004368722054797065"
+        "3a0000bf6368727479706500436f6d7020313a00636d7076616c73310000bf00436f6d7020323a00636d7076616c7332"
+        "0000bf00436f6d7020333a00636d7076616c73330000bf00436f6d7020343a00636d7076616c73340000bf00436f6d70"
+        "20353a00636d7076616c73350000bf00"
+        , {'_sS': 0, 'schr': 402, 'schr_call': 426, 'sclabel0': 476, 'sclabel1': 500, 'sclabel2': 520, 'sclabel3': 540, 'sclabel4': 560, 'sclabel5': 580, 'sclabel6': 600, 'sclabel7': 620, 'scxml0': 488, 'scxml1': 512, 'scxml2': 532, 'scxml3': 548, 'scxml4': 568, 'scxml5': 588, 'scxml6': 608, 'scxml7': 628, 'spost': 388, 'spost_next': 398, 'sreg': 0, 'sreg_c0': 34, 'sreg_c1': 66, 'sreg_c2': 98, 'sreg_c3': 130, 'sreg_c4': 162, 'sreg_c5': 194, 'sreg_c6': 226, 'sreg_c7': 258, 'sreg_next': 268, 'sstore': 272, 'sstore_c0': 286, 'sstore_c1': 298, 'sstore_c2': 312, 'sstore_c3': 324, 'sstore_c4': 336, 'sstore_c5': 348, 'sstore_c6': 362, 'sstore_c7': 376, 'sstore_next': 384}),
     'mk2_osdsync': (
         "2de9f04f8a4607465ff00008dff8a8b03c6800f00af87c6800f007f8b8f1000f01d0bff34f8fbde8f08f00b5dff88cc0"
         "002505f1ce064ff4207006fb00f6264405f1020000f01f015fea50195fea8909c646002248f64203b2f10b00b0f5957f"
         "08d20bebc00050f80900c840c00718bf4ff6ff7336f81200baf1000f03d1984207d1002301e0984203d026f8123008f1"
         "01080132b2f5a07fdcd3c64508d026f01f0006f52072ccf8000020309042fad30135222dbdd300bd60b2062468ef00e0"
+        , {'os_bit': 116, 'os_clean': 166, 'os_done': 38, 'os_layer': 42, 'os_next': 146, 'os_put': 138, 'os_px': 84, 'os_row': 50, 'os_rowdone': 176, 'os_show': 134, 'osd_sync': 0}),
+    'mk2_osdsync10': (
+        "2de9f04f8a4607465ff00008dff8a8b03c6800f00af87c6800f007f8b8f1000f01d0bff34f8fbde8f08f00b5dff88cc0"
+        "002505f1ce064ff4207006fb00f6264405f1020000f01f015fea50195fea8909c646002248f64203b2f10b00b0f5957f"
+        "08d20bebc00050f80900c840c00718bf4ff6ff7336f81200baf1000f03d1984207d1002301e0984203d026f8123008f1"
+        "01080132b2f5a07fdcd3c64508d026f01f0006f52072ccf8000020309042fad30135222dbdd300bda8b2062468ef00e0"
         , {'os_bit': 116, 'os_clean': 166, 'os_done': 38, 'os_layer': 42, 'os_next': 146, 'os_put': 138, 'os_px': 84, 'os_row': 50, 'os_rowdone': 176, 'os_show': 134, 'osd_sync': 0}),
 }
 # END FROZEN_MK2
@@ -892,11 +1231,14 @@ def stage2_guards(d):
     check_stage2_ram(d)
 
 
-def stage2(d, gate=True):
+def stage2(d, gate=True, comp=False):
     """Hooks C (delay switches), D (compressor CCs), E (compressor DSP),
     F (EQ CCs), G (EQ DSP) and the type gate, chained at the post call
     exactly as the micro chains them: gate -> F -> D -> C -> stock post.
-    gate=False when stage 3 follows: Keep CCs' pmidi is the micro's gate."""
+    gate=False when stage 3 follows: Keep CCs' pmidi is the micro's gate.
+    comp (2.3.10, cc13): D is the auto-makeup-table variant (Da), and gate
+    Dg sits between F and D, as the micro's --comp-types build has them.
+    Returns hook E's origin, which the Character's ncomp takes over."""
     for name, val in STAGE2.items():
         if getattr(pm, name) != val:
             raise SystemExit(f"internal error: {name} was not set before stage 2")
@@ -912,10 +1254,13 @@ def stage2(d, gate=True):
             return org
 
         hook_c = put(pm.build_midi_hook(BASE + len(d)), "C delay switches")
-        hook_d = put(pm.build_comp_hook(BASE + len(d), hook_c, full_range=True),
+        hook_d = put(pm.build_comp_hook(BASE + len(d), hook_c, full_range=True, auto_table=comp),
                      "D compressor CCs")
         org_e = put(pm.build_comp_dsp_hook(BASE + len(d)), "E compressor DSP")
-        hook_f = put(pm.build_eq_midi_hook(BASE + len(d), hook_d), "F EQ CCs")
+        eq_next = hook_d
+        if comp:
+            eq_next = put(pm.build_comp_gate_hook(BASE + len(d), hook_d, hook_c), "Dg Type gate")
+        hook_f = put(pm.build_eq_midi_hook(BASE + len(d), eq_next), "F EQ CCs")
         org_g = put(pm.build_eq_dsp_hook(BASE + len(d)), "G EQ DSP")
         org_t = hook_f
         if gate:
@@ -935,7 +1280,7 @@ def stage2(d, gate=True):
     d[post - BASE:post - BASE + 4] = pm.enc_b_bl(post, org_t, True)
     d[dsp - BASE:dsp - BASE + 4] = pm.enc_b_bl(dsp, org_e, True)
     struct.pack_into("<I", d, pm.EQ_VT_HANDLER - BASE, org_g | 1)
-    return built
+    return org_e
 
 
 # --- stage 3 machinery --------------------------------------------------------
@@ -974,6 +1319,8 @@ def code_map(v):
 def mk2_value(v):
     if v in CODE_MAP:
         return CODE_MAP[v]
+    if v & 1 and v - 1 in CODE_MAP:            # a Thumb function pointer
+        return CODE_MAP[v - 1] | 1
     return RAM_MAP.get(v, v)
 
 
@@ -1110,27 +1457,56 @@ FRAME_LITERALS = {
 }
 
 
-def relocated_chr(obj):
-    """The Character object with its 24 address pairs and its work-area word
-    moved to the MK2 layout. Every old value is checked first."""
+def _reloc_pair(data, sec, lo, hi, old, new):
+    hw1, hw2 = struct.unpack_from("<HH", data, lo)
+    ht1, ht2 = struct.unpack_from("<HH", data, hi)
+    if (hw1 & 0xfbf0, ht1 & 0xfbf0) != (0xf240, 0xf2c0) or \
+            (pm._thm_imm16(ht1, ht2) << 16 | pm._thm_imm16(hw1, hw2)) != old or \
+            (hw2 >> 8) & 0xf != (ht2 >> 8) & 0xf:
+        pm.refuse(f"The Character object at {sec}+{lo:#x} is not what it should be.")
+    struct.pack_into("<HH", data, lo, *pm._thm_put_imm16(hw1, hw2, new & 0xffff))
+    struct.pack_into("<HH", data, hi, *pm._thm_put_imm16(ht1, ht2, new >> 16))
+
+
+def chr10_value(old):
+    """Where a chr10 address lives on the MK2, or refuse."""
+    if old in RAM_SAME:
+        return old
+    if old in CHR_FLASH:                            # the font - 0x100, the LFO labels
+        return CHR_FLASH[old]
+    if ram_shift(old) != old:
+        return ram_shift(old)
+    if old in RAM_MAP:
+        return RAM_MAP[old]
+    new = mk2_value(old)
+    if new == old:
+        raise SystemExit(f"internal error: chr10 address {old:#x} has no MK2 place")
+    return new
+
+
+def relocated_chr(obj, key="chr"):
+    """The Character object with its address pairs and its work-area word
+    moved to the MK2 layout, and the pop-up drawn landscape. Every old value
+    is checked first."""
     secs, exports = obj
     secs = [list(s) for s in secs]
     by_name = {s[0]: s for s in secs}
-    for sec, lo, hi, old in CHR_RELOC:
-        data = bytearray.fromhex(by_name[sec][2])
-        hw1, hw2 = struct.unpack_from("<HH", data, lo)
-        ht1, ht2 = struct.unpack_from("<HH", data, hi)
-        if (hw1 & 0xfbf0, ht1 & 0xfbf0) != (0xf240, 0xf2c0) or \
-                (pm._thm_imm16(ht1, ht2) << 16 | pm._thm_imm16(hw1, hw2)) != old or \
-                (hw2 >> 8) & 0xf != (ht2 >> 8) & 0xf:
-            pm.refuse(f"The Character object at {sec}+{lo:#x} is not what it should be.")
-        new = CHR_FLASH[old] if old in CHR_FLASH else ram_shift(old)
-        if new == old:
+    if key == "chr":
+        table = [(sec, lo, hi, old, CHR_FLASH[old] if old in CHR_FLASH else ram_shift(old))
+                 for sec, lo, hi, old in CHR_RELOC]
+        mask = ram_shift(0x24069860)
+    elif key == "chr10":
+        table = [(sec, lo, hi, old, chr10_value(old)) for sec, lo, hi, old in CHR10_RELOC]
+        mask = ram_shift(0x24069418) + 0x490      # chr10's osd_sync: base + 0x490
+    else:
+        raise SystemExit(f"internal error: no MK2 relocation for C object {key!r}")
+    for sec, lo, hi, old, new in table:
+        if new == old and old not in RAM_SAME:
             raise SystemExit(f"internal error: {old:#x} would not move")
-        struct.pack_into("<HH", data, lo, *pm._thm_put_imm16(hw1, hw2, new & 0xffff))
-        struct.pack_into("<HH", data, hi, *pm._thm_put_imm16(ht1, ht2, new >> 16))
+        data = bytearray.fromhex(by_name[sec][2])
+        _reloc_pair(data, sec, lo, hi, old, new)
         by_name[sec][2] = data.hex()
-    landscape_chr(by_name)
+    landscape_chr(by_name, mask, "osdsync" if key == "chr" else "osdsync10")
     wb = by_name[".rodata.chr_work_base"]
     data = bytearray.fromhex(wb[2])
     old, = struct.unpack_from("<I", data, 0)
@@ -1241,22 +1617,23 @@ os_rowdone:
     .ltorg
 """
 assert OSD_K0 + OSD_H <= 38 and OSD_Y0 + OSD_H == 240
-OSD_GUARD_MICRO = "f02a08bf b1f5a07f"   # cmp r2,#0xf0 ; it eq ; cmpeq.w r1,#0x140
-OSD_GUARDS = (0x086e, 0x089c)           # layer A and layer B in chr_osd_tick
+OSD_GUARD_MICRO = "f02a08bfb1f5a07f"    # cmp r2,#0xf0 ; it eq ; cmpeq.w r1,#0x140
+OSD_GUARD_MK2 = "f02908bfb2f5a07f"      # cmp r1,#0xf0 ; it eq ; cmpeq.w r2,#0x140
 
 
-def landscape_chr(by_name):
-    """osd_sync replaced, chr_osd_tick's two size checks made 320x240."""
+def landscape_chr(by_name, mask, blob):
+    """osd_sync replaced, chr_osd_tick's two size checks (layer A, layer B)
+    made 320x240: h == 240 and w == 320."""
     tick = by_name[".text.chr_osd_tick"]
     data = bytearray.fromhex(tick[2])
-    for off in OSD_GUARDS:
-        if data[off:off + 8].hex() != OSD_GUARD_MICRO.replace(" ", ""):
-            pm.refuse("The pop-up's size check is not what the patcher expects.")
-        # cmp r1,#0xf0 ; it eq ; cmpeq.w r2,#0x140  (h == 240 and w == 320)
-        data[off:off + 8] = bytes.fromhex("f029 08bf b2f5a07f".replace(" ", ""))
+    pat = bytes.fromhex(OSD_GUARD_MICRO)
+    hits = [o for o in range(0, len(data) - 7, 2) if data[o:o + 8] == pat]
+    if len(hits) != 2:
+        pm.refuse("The pop-up's size check is not what the patcher expects.")
+    for off in hits:
+        data[off:off + 8] = bytes.fromhex(OSD_GUARD_MK2)
     tick[2] = data.hex()
-    mask = ram_shift(0x24069860)
-    code, syms = mk2_assemble("osdsync", OSD_SYNC_MK2.replace("=MASK", f"={mask:#010x}"))
+    code, syms = mk2_assemble(blob, OSD_SYNC_MK2.replace("=MASK", f"={mask:#010x}"))
     if syms.get("osd_sync") != 0:
         raise SystemExit("internal error: osd_sync must start its blob")
     by_name[".text.osd_sync"][2] = code.hex()
@@ -1277,11 +1654,12 @@ def prepare_stage3():
     pm.KEEP_GUARDS = tuple(
         (va, GUARD_BYTES_MK2.get(old, raw), what)
         for (va, raw, what), (old, _, _) in zip(pm.KEEP_GUARDS, _MICRO_KEEP_GUARDS))
+    pm.CMP_GUARDS = CMP_GUARDS_MK2
     pm.STOCK_SIZE = STOCK_SIZE                     # "is this stock?" checks
     for name in STAGE3_FUNCS:
         transpile(name)
     stock_c_object = pm.c_object
-    pm.c_object = lambda key, path: relocated_chr(stock_c_object(key, path))
+    pm.c_object = lambda key, path, defines=(): relocated_chr(stock_c_object(key, path, defines), key)
 
 
 def apply_settings_mk2(d, rows):
@@ -1305,7 +1683,7 @@ def apply_settings_mk2(d, rows):
     vprint(f"Tools tab 4 '{TAB_NAME}' at {org:#x}: {', '.join(f'{r:#x}' for r in rows)}")
 
 
-def stage3(d, upto="full"):
+def stage3(d, upto="full", hook_e=None):
     """The 2.3.9-mod set, in the micro's own order (its main(), --v239), less
     Flip UI: the MK2 already flips its screen and touch natively.
     upto: "settings" stops after H/J/L/K, "character" after N (diagnostic
@@ -1322,13 +1700,168 @@ def stage3(d, upto="full"):
         pm.apply_cpu_meter(d, j_org, j_syms, chained=l_entries, row=False)
         if upto == "settings":
             return
-        n_org, n_syms = pm.apply_character(d, pm.CHR_FEATURE_AUTO)
+        n_org, n_syms = pm.apply_character(d, pm.CHR_FEATURE_AUTO, comp=hook_e)
         if upto == "character":
             return
         pm.apply_osd(d, n_org, n_syms, j_org, j_syms, modes=True)
         pm.apply_keep_ccs(d, j_org, j_syms)
+        if hook_e is not None:                     # 2.3.10: the micro's order, less T and R
+            pm.apply_comp_type(d, n_org, n_syms)
+            apply_saves(d, n_org, n_syms)
     finally:
         pm.assemble = saved
+
+
+# The compressor types' guards (pm.CMP_GUARDS) at their MK2 places, every
+# byte read off the MK2 image and compared with the micro's by hand: the same
+# instructions, except the global store's offset (SESSION_MGR + 0x7ed0, not
+# + 0x7fd0), the literal offsets, and the literals themselves.
+CMP_GUARDS_MK2 = (
+    (0x080ba43c, "0368644a5b6d9342", "the compressor DSP's msg-override test"),
+    (0x080ba5d0, "0d340a08", "the override slot's default (0x080a340d)"),
+    (0x080ba456, "c18b3846", "the DSP's bus: ldrh r1, [r0, #0x1e]"),
+    (0x080ba45c, "eff71cf8", "bl 0x080a9498, the descriptor"),
+    (0x080ba462, "eaf791f8", "bl 0x080a4588, the frame count"),
+    (0x080ba476, "eaf7dbf8", "bl 0x080a4630, the fetch"),
+    (0x080ba4ee, "06f23440", "the compressor's gain ramp at +0x434"),
+    (0x080ba514, "06f25440", "the limiter's gain ramp at +0x454"),
+    (0x080a2a68, "037f53b943694ff07e510122", "the ramp's state byte at +0x1c"),
+    (0x080a2940, "2de9f84fb3f10009", "the ramp's apply"),
+    (0x0807f80e, "47f6d068", "handler B's global store: SessionMgr + 0x7ed0"),
+    (0x0807f84a, "4246cc49cd48", "handler B's settings.tml arguments"),
+    (0x0807fb80, "34710c08", "... the file name"),
+    (0x0807fb84, "b8380224", "... the manager (0x240238b8)"),
+    (0x080c7134, "73657474696e67732e746d6c00", "\"settings.tml\""),
+)
+
+
+# --- S: the master bus kept across power-off (2.3.10's b24-b25, cc13) ------------
+# The micro does this inside hook T, beside the themes; the MK2 has no themes
+# (its own palette), so S is T without them: the eight hidden integer rows
+# (CHRSAVE_IDS: the Character's Amount/Tone/Type rows, the compressor types'
+# controls and auto makeup, seven bits a value) registered and given global-
+# store entries, so settings.tml carries them, and the boot apply-all post of
+# any id in CHRSAVE_SPAN handed to the C (chr_post) instead of the engine.
+# Writing them back is the C's UI tick (chr_osd_tick): SetParam on the global
+# store, then the Settings screen's own settings.tml write a moment later.
+SAVE_SITES = (                       # (micro site, entry): head insertions, as T's
+    (0x0806abbc, "sreg"),            # the uiflip registration
+    (0x08089efe, "sstore"),          # the global store's entries
+    (0x0807c5be, "spost"),           # the Settings apply-all post (boot)
+)
+
+
+def build_save_hook(org, nexts, chr_fn):
+    ids, names, dflt = pm.CHRSAVE_IDS, pm.CHRSAVE_NAMES, pm.CHRSAVE_DEFAULTS
+    lo, hi = pm.CHRSAVE_SPAN
+    src = f"""
+.syntax unified
+.thumb
+.section .text
+.global _sS
+.thumb_func
+_sS:
+sreg:                               /* r0 = registry */
+    push    {{r0, r1, r2, r3, r4, r12, lr}}
+    sub     sp, #12
+{"".join(f'''    ldr     r0, [sp, #12]           /* {names[k][1]}: an integer like BPM, on no row */
+    movw    r1, #0x{ids[k]:x}
+    movs    r2, #1
+    adr.w   r3, sclabel{k}
+    movs    r4, #0
+    str     r4, [sp]
+    ldr     r4, =0x{pm.CHRSAVE_MAX:x}
+    str     r4, [sp, #4]
+    adr.w   r4, scxml{k}
+    str     r4, [sp, #8]
+sreg_c{k}:
+    .short  0, 0                    /* integer registrar */
+''' for k in range(len(ids)))}    add     sp, #12
+    pop     {{r0, r1, r2, r3, r4, r12, lr}}
+sreg_next:
+    .short  0, 0
+
+sstore:                             /* r0 = the global store */
+    push    {{r0, r1, r2, r3, r12, lr}}
+{"".join(f'''    ldr     r0, [sp]                /* {names[k][1]} */
+    movw    r1, #0x{ids[k]:x}
+    ldr     r2, =0x{dflt[k]:x}
+sstore_c{k}:
+    .short  0, 0                    /* AddParam */
+''' for k in range(len(ids)))}    pop     {{r0, r1, r2, r3, r12, lr}}
+sstore_next:
+    .short  0, 0
+
+spost:                              /* PostSetParam(r0 mgr, r1 key, r2 id, r3 value): boot's apply-all */
+    subw    r12, r2, #0x{lo:x}
+    cmp     r12, #{hi - lo}
+    bls     schr
+spost_next:
+    .short  0, 0
+schr:                               /* the master bus's saved rows, to the C */
+    push    {{r0, r1, r2, r3, r12, lr}}
+    mrs     r1, apsr
+    vmrs    r12, fpscr
+    push    {{r1, r12}}
+    vpush   {{s0-s15}}
+    mov     r0, r2
+    mov     r1, r3
+schr_call:
+    .short  0, 0                    /* bl chr_post(id, value): 1 ours, 0 not */
+    str     r0, [sp, #88]           /* into the saved r12 (scratch at a call) */
+    vpop    {{s0-s15}}
+    pop     {{r1, r2}}
+    msr     apsr_nzcvq, r1
+    vmsr    fpscr, r2
+    pop     {{r0, r1, r2, r3, r12, lr}}
+    cmp     r12, #0
+    beq     spost_next              /* not ours: on to the engine */
+    bx      lr
+    .balign 4
+    .ltorg
+{"".join(f'''    .balign 4
+sclabel{k}:
+    .asciz  "{names[k][0]}"
+    .balign 4
+scxml{k}:
+    .asciz  "{names[k][1]}"
+''' for k in range(len(ids)))}    .balign 4
+"""
+    code, syms = mk2_assemble("hookS", src)
+    code = bytearray(code)
+    links = [("sreg_next", nexts["sreg"], False), ("sstore_next", nexts["sstore"], False),
+             ("spost_next", nexts["spost"], False), ("schr_call", chr_fn, True)]
+    links += [(f"sreg_c{k}", code_map(0x08069ed4), True) for k in range(len(ids))]
+    links += [(f"sstore_c{k}", code_map(0x0808951e), True) for k in range(len(ids))]
+    for sym, target, call in links:
+        off = syms[sym]
+        code[off:off + 4] = pm.enc_b_bl(org + off, target, call)
+    return bytes(code), syms
+
+
+def apply_saves(d, n_org, n_syms):
+    """Guard S's facts, append S, take each site at the head of its chain."""
+    pm._guard(d, code_map(0x08069e4e), "b3f5e87f", "parameter registry limit")
+    pm._guard(d, code_map(0x08089e08), "4021", "global settings capacity")
+    if pm.branch_target(d, code_map(0x0807d3ec)) != code_map(0x0808c154):
+        pm.refuse("The Settings screen's settings.tml write is not where the saves expect it.")
+    if word(d, 0x0807fb80) != code_map(0x080c5e64) or word(d, 0x0807fb84) != pm.PC_MANAGER:
+        pm.refuse("The settings.tml write's arguments are not what the saves expect.")
+    guard_cstr(d, code_map(0x080c5e64), "settings.tml", "the settings file's name")
+    for i in pm.CHRSAVE_IDS:
+        if not pm.CHRSAVE_SPAN[0] <= i <= pm.CHRSAVE_SPAN[1]:
+            raise SystemExit("internal error: a saved row outside the span S hands on")
+    nexts = {entry: pm.branch_target(d, code_map(site)) for site, entry in SAVE_SITES}
+    org = BASE + len(d)
+    code, syms = build_save_hook(org, nexts, n_org + n_syms["c_chr_post"])
+    org2 = pm._append(d, bytearray(code))
+    assert org2 == org
+    for site, entry in SAVE_SITES:
+        at = code_map(site)
+        d[at - BASE:at - BASE + 4] = pm.enc_b_bl(at, org + syms[entry], True)
+    vprint(f"S saves {len(code)} bytes at {org:#010x}, ids "
+           + ", ".join(f"{i:#x}" for i in pm.CHRSAVE_IDS))
+    return org, syms
 
 
 UI_PRESENT_SITE = 0x0805b950            # bl 0x0804368c, every UI tick (micro 0x0805bbb4)
@@ -1474,10 +2007,11 @@ def main():
     upto = next((f.split("=", 1)[1] for f in flags if f.startswith("--upto=")), "full")
     global VERSION
     VERSION = {"2": "2.3.4-d1", "settings": "2.3.4-d2", "character": "2.3.4-d3"}.get(upto, VERSION)
-    stage2(d, gate=(upto != "full"))
+    comp = upto == "full"                          # 2.3.10's chr10 path (cc13)
+    hook_e = stage2(d, gate=(upto != "full"), comp=comp)
     if upto != "2":
         prepare_stage3()
-        stage3(d, upto)
+        stage3(d, upto, hook_e if comp else None)
     if _REGEN:
         write_frozen()
         sys.exit("  Rerun without --reassemble to build with the new blobs.")
@@ -1492,7 +2026,9 @@ def main():
                  "Keep CCs: OFF/ON             TOOLS > Settings",
                  "ProgChange: OFF/ON/NEW ONLY  TOOLS > Settings",
                  "Clk Loss: INTERNAL/HOLD      TOOLS > Settings",
-                 "Preset BPM, HOLD capture     TOOLS > Settings"):
+                 "Preset BPM, HOLD capture     TOOLS > Settings",
+                 "Compressor type, ch 1        CC 47 / 48",
+                 "Character and compressor     kept across power-off"):
         print(f"     ok   {what}")
 
     write_string(d, ATTRIB_VA, VER_VA, ATTRIB_STOCK, ATTRIB_NEW)
