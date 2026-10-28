@@ -78,7 +78,7 @@ import patch_micro as pm                # noqa: E402  the hook generators
 BASE = 0x08040000
 STOCK_SHA = "35ab7995ad0eca8484f3b28bc76389f10b2037dbb21a4a394e950d9329073e86"
 STOCK_SIZE = 674896
-VERSION = "2.3.4-cc13"                  # 10 characters: see pm.VER_DISPLAY_MAX
+VERSION = "2.3.4-cc14"                  # 10 characters: see pm.VER_DISPLAY_MAX
 
 # CCs left out of this build. 2026-10-27, cc1 on hardware: CC 89 (Loop
 # Crossfade) on a Sample pad gave sudden full-scale distorted output at any
@@ -1888,6 +1888,29 @@ def unhook_drawing(d, l_org, l_syms):
     vprint(f"UI tick: {site:#x} -> ltick {tick:#x} -> stock present {UI_PRESENT_FN:#x}")
 
 
+# The version string (VER_VA) has four readers: the splash (0x0806ef5c, with
+# the attribution), the Home menu's corner label (0x080869b0, beside the
+# Pads/Keys/FX/Mix/Presets/Tools/EQ names), the Tools screen's version value
+# (0x0807b194: snprintf "%s" into a 0x40 buffer), and 0x08094770. cc14, asked
+# for on hardware: Home shows nothing (its label gets ""), and Tools shows
+# the patch's own short name -- the full "2.3.4-ccNN" came out as "2.3.4" there.
+HOME_VER_LIT = 0x080869b0
+TOOLS_VER_LIT = 0x0807b194
+
+
+def version_labels(d):
+    for lit, what in ((HOME_VER_LIT, "Home menu"), (TOOLS_VER_LIT, "Tools screen")):
+        if word(d, lit) != VER_VA:
+            pm.refuse(f"The {what}'s version label is not where expected.")
+    if d[TABS_EMPTY - BASE] != 0:
+        pm.refuse("The empty string the Home label would show is not empty.")
+    struct.pack_into("<I", d, HOME_VER_LIT - BASE, TABS_EMPTY)
+    short = VERSION.split("-")[-1]                   # "cc14"
+    org = pm._append(d, bytearray(f"mod {short}".encode() + b"\0"))
+    struct.pack_into("<I", d, TOOLS_VER_LIT - BASE, org)
+    vprint(f"version: Home label empty, Tools 'mod {short}' at {org:#x}")
+
+
 def check_no_micro_anywhere(d):
     """No micro address in anything appended: as a word, at any alignment, or
     as a movw/movt pair. Covers every hook of every stage."""
@@ -2036,6 +2059,7 @@ def main():
         pm.refuse(f"{VERSION!r} is longer than the splash shows.")
     write_string(d, VER_VA, PTR_TABLE_VA, VER_STOCK, VERSION)
     print("     ok   Splash screen, so nobody blames 1010music for my work")
+    version_labels(d)
 
     if len(d) % 4:
         pm.refuse(f"The patched image is {len(d):,} bytes, not a multiple of 4.")
