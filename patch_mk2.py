@@ -82,7 +82,7 @@ import patch_micro as pm                # noqa: E402  the hook generators
 BASE = 0x08040000
 STOCK_SHA = "35ab7995ad0eca8484f3b28bc76389f10b2037dbb21a4a394e950d9329073e86"
 STOCK_SIZE = 674896
-VERSION = "2.3.4-cc21"                  # 10 characters: see pm.VER_DISPLAY_MAX
+VERSION = "2.3.4-cc22"                  # 10 characters: see pm.VER_DISPLAY_MAX
 
 # CCs left out of this build. 2026-10-27, cc1 on hardware: CC 89 (Loop
 # Crossfade) on a Sample pad gave sudden full-scale distorted output at any
@@ -1061,18 +1061,18 @@ FROZEN_MK2 = {
         "ffe62eff2a6a7affffe62efffff6ffffffe62eff6f16b8fffff6ffff00000000aa0000ff000000ffffffffff550000ff"
         "aaaa00ff000000ffaaaa00ff000000ff55ffffffaaaa00ffaaaa00ff0000aaff000000ff000000ffffffffffffff55ff"
         "ffff55ffaaaa00ff0000aaff55ffffff0000aaffaaaaaaffffff55ff55ffffffaa0000ff555500ffaaaa00ff0055aaff"
-        "aaaa00ffffffffffaaaa00ff550000ffffffffff00000000aa0000ff000000ffffffffffaaaa00ff55ffffff000000ff"
+        "aaaa00ffffffffffaaaa00ff55ffffffffffffff00000000aa0000ff000000ffffffffffaaaa00ff55ffffff000000ff"
         "55ffffff000000ff55ffffff55ffffffaaaa00ff0000aaff000000ff000000ffffffffffffff55ffffff55ffaaaa00ff"
         "0000aaff55ffffff0000aaffaaaaaaffffff55ff55ffffffaa0000ff555500ff55ffffff0055aaff55ffffffffffffff"
-        "55ffffffaaaa00ffffffffff00000000550000ff000000ffffffffffaa0000ffaaaa00ff000000ffaaaa00ff000000ff"
+        "55ffffffaa0000ffffffffff00000000550000ff000000ffffffffffaa0000ffaaaa00ff000000ffaaaa00ff000000ff"
         "55ffffffaaaa00ffaaaa00ff0000aaff000000ff000000ffffffffffaa0000ffffff55ffaaaa00ff0000aaff55ffffff"
-        "0000aaffaaaaaaffffff55ff55ffffff550000ff555500ffaaaa00ff0055aaffaaaa00ffffffffffaaaa00ffaa0000ff"
+        "0000aaffaaaaaaffffff55ff55ffffff550000ff555500ffaaaa00ff0055aaffaaaa00ffffffffffaaaa00ff55ffffff"
         "ffffffff00000000550000ff000000ffffffffffaa0000ffaaaa00ff000000ffaaaa00ff000000ff55ffffffaaaa00ff"
         "aaaa00ff0000aaff000000ff000000ffffffffffaa0000ffffff55ffaaaa00ff0000aaff55ffffff0000aaffaaaaaaff"
-        "ffff55ff55ffffff550000ff555500ffaaaa00ff0055aaffaaaa00ffffffffffaaaa00ffaa0000ffffffffff00000000"
-        "550000ff0000ffffffffffff8080ffff0000ffff000000ff0080ffff0080ffff55ffffff00ffffff0080ffff0000ffff"
-        "00ffffff000000ffff00ffff000000ffffff55ffffff00ff00ff00ff55ffffffff00ffffaaaaaaffffff55ff55ffffff"
-        "808080ff555500ff00ff00ff0055aaffffff00ff00ff00ffff00ffffff8080ffffff00ff000000000000000000000000"
+        "ffff55ff55ffffff550000ff555500ffaaaa00ff0055aaffaaaa00ffffffffffaaaa00ff55ffffffffffffff00000000"
+        "550000ff0000ffffffffffffaa0000ffff80ffff000000ff0080ffff004080ffffff00ff00ffffffff8080ff0000aaff"
+        "ff00ffff000000ffffffffffaa0000ffffff55ffaaaa00ff0000aaff00ff00ff0000aaffaaaaaaffffff55ff808080ff"
+        "550000ff555500ffaaaa00ff0055aaffaaaa00ffffffffffaaaa00ffff80c0ffffffffff000000000000000000000000"
         "0000000000000000000000000000000000000000000000000000000000000000000000005468656d653a00007468656d"
         "650000bf53544f434b0000bf414d4245520000bf53544147450000bf434f4e54524153540000bf0050484f5350484f52"
         "0000bf0053594e5448574156450000bf4e4f52544f4e0000564f4c4b4f5600005041434d414e00004d49444e49474854"
@@ -1776,18 +1776,17 @@ _NORTON = {"background": "000000", "black": "000000", "panel": "0000AA", "grey1"
 _VOLKOV = dict(_NORTON, **{"selection": "00AAAA", "accent": "FFFF55"})
 _MIDNIGHT = dict(_NORTON, **{"cell": "000055", "panel": "000055", "selection": "0000AA", "grey1": "0000AA"})
 _PACMAN = dict(_MIDNIGHT)            # cc21: dividers bright blue too, as asked; the rest to follow a DIAG photo
-_DIAG = dict(_NORTON, **{"cell": "000055", "panel": "808080", "selection": "0000AA", "grey1": "000000"})
-# The diagnostic: Pacman, but every colour a theme file cannot split -- the
-# entries that share one theme colour -- each its own, so a photo says which
-# entry draws what (the loop frame, the white keys, ...).
-THEME_SPLIT = {2: "FF0000", 8: "FF8000", 13: "FFFF00",          # background
-               15: "FF00FF", 30: "00FF00", 33: "00FFFF",        # text-bright
-               4: "FF8080", 32: "8080FF",                       # selection
-               5: "FF0000", 7: "FF8000", 10: "FFFF00", 27: "00FF00", 29: "00FFFF", 31: "FF00FF",  # accent
-               12: "FF0000", 19: "00FF00", 21: "FF00FF",        # red-dark
-               11: "FF8000", 18: "00FFFF"}                      # green
-BUILTIN_THEMES = (("NORTON", _NORTON, {}), ("VOLKOV", _VOLKOV, {}),
-                  ("PACMAN", _PACMAN, {}), ("MIDNIGHT", _MIDNIGHT, {}),
+_DIAG = dict(_PACMAN)
+# The diagnostic (cc22): Pacman, with each entry still in question its own
+# colour -- the ones a hardware photo of cc18's DIAG could not tell apart
+# (cc18's split reused red, orange and yellow across families).
+THEME_SPLIT = {2: "FF0000", 5: "FF80FF", 12: "AA0000",          # red, pink, dark red
+               7: "FF8000", 8: "804000", 11: "8080FF",          # orange, brown, periwinkle
+               10: "FFFF00", 13: "FF00FF", 20: "00FF00",        # yellow, magenta, green
+               9: "00FFFF", 24: "808080", 32: "C080FF"}         # cyan, grey, lavender
+LOOP_FRAME = 32                      # the sample view's loop frame (DIAG photo, 2026-10-30)
+BUILTIN_THEMES = (("NORTON", _NORTON, {LOOP_FRAME: "FFFF55"}), ("VOLKOV", _VOLKOV, {LOOP_FRAME: "0000AA"}),
+                  ("PACMAN", _PACMAN, {LOOP_FRAME: "FFFF55"}), ("MIDNIGHT", _MIDNIGHT, {LOOP_FRAME: "FFFF55"}),
                   ("DIAG", _DIAG, THEME_SPLIT))
 THM_TAB_HEAD = "000000003b4c5aff0c1216ff"      # Amber's first three entries, as 2.3.10 has them
 # cc17b: the new themes come IN ADDITION to 2.3.10's five. The C knows seven
@@ -1893,12 +1892,18 @@ def theme_table_to_ram(by_name):
     code = bytearray.fromhex(tick[2])
     if code[744:746] != b"\x07\x2f":
         pm.refuse("The pop-up colours' theme check is not what cc21 expects.")
-    code[744:746] = b"\x02\x2f"
+    code[744:746] = b"\x00\x2f"            # cc22: #0, every role (box and text too, below)
+    # cc22: the pop-up too -- `cmp r7, #2` kept roles 0-1 (box, text) stock
+    # in every theme; #0 hands them over. The box takes the cells' colour
+    # (entry 1), the text the text's (3).
+    if code[754:756] != b"\x02\x2f":
+        pm.refuse("The pop-up's own colour check is not what cc22 expects.")
+    code[754:756] = b"\x00\x2f"
     tick[2] = code.hex()
     ent = by_name[".rodata.tho_entry"]
     if ent[2] != "02030b14060f0211050b0e0f06":
         pm.refuse("The pop-up colours' palette entries are not what cc21 expects.")
-    ent[2] = "02030b140c0f0211050b0e0f06"
+    ent[2] = "01030b140c0f0211050b0e0f06"
 
 
 def prepare_stage3():
