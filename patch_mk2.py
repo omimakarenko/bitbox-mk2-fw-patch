@@ -82,7 +82,7 @@ import patch_micro as pm                # noqa: E402  the hook generators
 BASE = 0x08040000
 STOCK_SHA = "35ab7995ad0eca8484f3b28bc76389f10b2037dbb21a4a394e950d9329073e86"
 STOCK_SIZE = 674896
-VERSION = "2.3.4-cc23"                  # 10 characters: see pm.VER_DISPLAY_MAX
+VERSION = "2.3.4-cc24"                  # 10 characters: see pm.VER_DISPLAY_MAX
 
 # CCs left out of this build. 2026-10-27, cc1 on hardware: CC 89 (Loop
 # Crossfade) on a Sample pad gave sudden full-scale distorted output at any
@@ -1026,58 +1026,59 @@ FROZEN_MK2 = {
         "20353a00636d7076616c73350000bf00"
         , {'_sS': 0, 'schr': 402, 'schr_call': 426, 'sclabel0': 476, 'sclabel1': 500, 'sclabel2': 520, 'sclabel3': 540, 'sclabel4': 560, 'sclabel5': 580, 'sclabel6': 600, 'sclabel7': 620, 'scxml0': 488, 'scxml1': 512, 'scxml2': 532, 'scxml3': 548, 'scxml4': 568, 'scxml5': 588, 'scxml6': 608, 'scxml7': 628, 'spost': 388, 'spost_next': 398, 'sreg': 0, 'sreg_c0': 34, 'sreg_c1': 66, 'sreg_c2': 98, 'sreg_c3': 130, 'sreg_c4': 162, 'sreg_c5': 194, 'sreg_c6': 226, 'sreg_c7': 258, 'sreg_next': 268, 'sstore': 272, 'sstore_c0': 286, 'sstore_c1': 298, 'sstore_c2': 312, 'sstore_c3': 324, 'sstore_c4': 336, 'sstore_c5': 348, 'sstore_c6': 362, 'sstore_c7': 376, 'sstore_next': 384}),
     'mk2_hookT': (
-        "2de91f5083b040f283110ff6e8020ff6b4030c2400940ff6e404019400000000039840f28d1101220ff2a42300240094"
-        "6ff0704401940ff2a424029400000000039840f28e1101220ff29c23002400946ff0704401940ff29c24029400000000"
-        "039840f28f1101220ff29023002400946ff0704401940ff29024029400000000039840f2911101220ff2842300240094"
-        "6ff0704401940ff28024029400000000039840f2921101220ff27823002400946ff0704401940ff27424029400000000"
-        "039840f2931101220ff26c23002400946ff0704401940ff26824029400000000039840f2951101220ff2602300240094"
-        "6ff0704401940ff25c24029400000000039840f2961101220ff25423002400946ff0704401940ff25024029400000000"
-        "03b0bde81f50000000002de90f5040f28311002200000000009840f28d114ff0000200000000009840f28e115b4a0000"
-        "0000009840f28f114ff0000200000000009840f29111564a00000000009840f29211544a00000000009840f29311524a"
+        "2de91f5083b040f283110ff628120ff6f4030c2400940ff62414019400000000039840f28d1101220ff2b42300240094"
+        "6ff0704401940ff2b424029400000000039840f28e1101220ff2ac23002400946ff0704401940ff2ac24029400000000"
+        "039840f28f1101220ff2a023002400946ff0704401940ff2a024029400000000039840f2911101220ff2942300240094"
+        "6ff0704401940ff29024029400000000039840f2921101220ff28823002400946ff0704401940ff28424029400000000"
+        "039840f2931101220ff27c23002400946ff0704401940ff27824029400000000039840f2951101220ff2702300240094"
+        "6ff0704401940ff26c24029400000000039840f2961101220ff26423002400946ff0704401940ff26024029400000000"
+        "03b0bde81f50000000002de90f5040f28311002200000000009840f28d114ff0000200000000009840f28e115e4a0000"
+        "0000009840f28f114ff0000200000000009840f29111594a00000000009840f29211574a00000000009840f29311554a"
         "00000000009840f295114ff0400200000000009840f296114ff07f0200000000bde80f500000000040f2831c62450cd0"
-        "a2f28d1cbcf1120f36d90000000040f2831c624501d0000000002de90f50eff30081f1ee102a06b42ded100a18460c28"
-        "28bf0020a8b10b2812d0411e882201fb02f10ff280121144344a222351f804cb42f804cb013bf9d1bff34f8f012000e0"
-        "062000000000bdec100a06bc81f30088e1ee102abde80f902de90f50eff30081f1ee10ca2de902102ded100a10461946"
-        "000000001690bdec100a06bc81f30088e1ee102abde80f50bcf1000fadd070472de90f50eff30082f1ee103a0cb42ded"
-        "100a002100000000bdec100a0cbc82f30088e1ee103abde80f50000000002de90f50eff30082f1ee103a0cb42ded100a"
-        "012100000000bdec100a0cbc82f30088e1ee103abde80f500000000040201008a40ce60f40001000c0ff1f00800a0724"
-        "43687220416d6f756e743a00636872616d6f756e740000bf43687220546f6e653a0000bf636872746f6e650043687220"
-        "547970653a0000bf6368727479706500436f6d7020313a00636d7076616c73310000bf00436f6d7020323a00636d7076"
-        "616c73320000bf00436f6d7020333a00636d7076616c73330000bf00436f6d7020343a00636d7076616c73340000bf00"
-        "436f6d7020353a00636d7076616c73350000bf00000000003b4c5aff0c1216ffe0f3ffff1c40a8ff00b0ffff1f3bffff"
-        "00b0ffff0c1216ff475b6bff00b0ffff2bc79cff1c32b8ff0c1216ff000000ffecf8ffff2e3b46ff506677ff2bc79cff"
-        "1c32b8ff66e0ffff1c32b8ff8ca5b8ff7ad2ffff3d8affff1a242cff00527aff00b0ffff1e6a7aff00b0ffffecf8ffff"
-        "00b0ffff1c40a8ffecf8ffff000000001e2256ff05060effc4cff0ff1a23c8ff3d9affff142affff3d9affff05060eff"
-        "242a6aff3d9affff3fa9d9ff1a24b0ff05060eff000000ffcfdaf8ff191c46ff2a3076ff3fa9d9ff1a24b0ff5ac1ffff"
-        "1a24b0ff6c7ad2ff5c7affff7a4ad0ff0d0f24ff18209aff3d9affff204c6bff3d9affffcfdaf8ff3d9affff1a23c8ff"
-        "cfdaf8ff000000003a3a3aff0e0e0effffffffffd65f1fff00b0ffff007affff00b0ffff0e0e0eff707070ff00b0ffff"
-        "ff9b3dff0056b8ff0e0e0eff000000ffffffffff303030ff7e7e7effff9b3dff0056b8ff4de1ffff0056b8ffc4c4c4ff"
-        "ffd09affd8b0ffff2a2a2aff00567aff00b0ffff256c7aff00b0ffffffffffff00b0ffffd65f1fffffffffff00000000"
-        "304827ff0a1107ffe2ffd8ff367a1cff3dc4ffff3a4affff3dc4ffff0a1107ff39552eff3dc4ffff50ff9aff2e3ab3ff"
-        "0a1107ff000000ffeeffe8ff25381eff416135ff50ff9aff2e3ab3ff5afff5ff2e3ab3ff82a872ffc8ff7aff3affc2ff"
-        "182413ff125a7aff3dc4ffff1e7a6eff3dc4ffffeeffe8ff3dc4ffff367a1cffeeffe8ff0000000061394dff190d13ff"
-        "fff0ffff6f16b8ffffe62eff3b3bffffffe62eff190d13ff6f4359ffffe62effb0ff3dff3a2ab8ff190d13ff000000ff"
-        "fff6ffff4f2d3dff7b4c64ffb0ff3dff3a2ab8ff5ce4ffff3a2ab8ffc298aaffff85aeffe08affff351d29ff7a6e0eff"
-        "ffe62eff2a6a7affffe62efffff6ffffffe62eff6f16b8fffff6ffff00000000aa0000ff000000ffffffffff550000ff"
-        "aaaa00ff000000ffaaaa00ff000000ff55ffffffaaaa00ffaaaa00ff0000aaff000000ff000000ffffffffffffff55ff"
-        "ffff55ffaaaa00ff0000aaff55ffffff0000aaffaaaaaaffffff55ff55ffffffaa0000ff555500ffaaaa00ff0055aaff"
-        "aaaa00ffffffffffaaaa00ff55ffffffffffffff00000000aa0000ff000000ffffffffffaaaa00ff55ffffff000000ff"
-        "55ffffff000000ffffffffff55ffffffaaaa00ff0000aaff000000ff000000ffffffffffffff55ffffff55ffaaaa00ff"
-        "0000aaff55ffffff0000aaffaaaaaaffffff55ff55ffffffaa0000ff555500ff55ffffff0055aaff55ffffffffffffff"
-        "55ffffffaa0000ffffffffff00000000550000ff000000ffffffffffaa0000ffaaaa00ff000000ffaaaa00ff000000ff"
-        "55ffffff55ffffffaa0000ff0000aaff000000ff000000ffffffffffaa0000ffffff55ffaaaa00ff0000aaff55ffffff"
-        "0000aaffaaaaaaffffff55ff55ffffff550000ff555500ffaaaa00ff0055aaffaaaa00ffffffffffaaaa00ff55ffffff"
-        "ffffffff00000000550000ff000000ffffffffffaa0000ffaaaa00ff000000ffaaaa00ff000000ff55ffffffaaaa00ff"
-        "aa0000ff0000aaff000000ff000000ffffffffffaa0000ffffff55ffaaaa00ff0000aaff55ffffff0000aaffaaaaaaff"
-        "ffff55ff55ffffff550000ff555500ffaaaa00ff0055aaffaaaa00ffffffffffaaaa00ff55ffffffffffffff00000000"
-        "550000ff0000ffffffffffffaa0000ffff80ffff000000ff0080ffff004080ffffff00ff00ffffffff8080ff0000aaff"
-        "ff00ffff000000ffffffffffaa0000ffffff55ffaaaa00ff0000aaff00ff00ff0000aaffaaaaaaffffff55ff808080ff"
-        "550000ff555500ffaaaa00ff0055aaffaaaa00ffffffffffaaaa00ffff80c0ffffffffff000000000000000000000000"
-        "0000000000000000000000000000000000000000000000000000000000000000000000005468656d653a00007468656d"
-        "650000bf53544f434b0000bf414d4245520000bf53544147450000bf434f4e54524153540000bf0050484f5350484f52"
-        "0000bf0053594e5448574156450000bf4e4f52544f4e0000564f4c4b4f5600005041434d414e00004d49444e49474854"
-        "0000bf00444941470000bf00435553544f4d0000"
-        , {'_sT': 0, 'tchr': 552, 'tchr_call': 576, 'tclabel0': 720, 'tclabel1': 744, 'tclabel2': 764, 'tclabel3': 784, 'tclabel4': 804, 'tclabel5': 824, 'tclabel6': 844, 'tclabel7': 864, 'tcxml0': 732, 'tcxml1': 756, 'tcxml2': 776, 'tcxml3': 792, 'tcxml4': 812, 'tcxml5': 832, 'tcxml6': 852, 'tcxml7': 872, 'tedit': 446, 'tedit_next': 454, 'tlabel': 2292, 'tload': 608, 'tload_call': 628, 'tload_next': 650, 'tm_copy': 508, 'tm_custom': 528, 'tm_go': 530, 'tmine': 458, 'tpal': 884, 'tpost': 424, 'tpost_call': 530, 'tpost_next': 442, 'treg': 0, 'treg_c0': 60, 'treg_c1': 92, 'treg_c2': 124, 'treg_c3': 156, 'treg_c4': 188, 'treg_c5': 220, 'treg_c6': 252, 'treg_c7': 284, 'treg_call': 28, 'treg_next': 294, 'tsave': 654, 'tsave_call': 674, 'tsave_next': 696, 'tstore': 298, 'tstore_c0': 322, 'tstore_c1': 334, 'tstore_c2': 348, 'tstore_c3': 360, 'tstore_c4': 372, 'tstore_c5': 384, 'tstore_c6': 398, 'tstore_c7': 412, 'tstore_call': 308, 'tstore_next': 420, 'tv0': 2308, 'tv1': 2316, 'tv10': 2404, 'tv11': 2412, 'tv2': 2324, 'tv3': 2332, 'tv4': 2344, 'tv5': 2356, 'tv6': 2368, 'tv7': 2376, 'tv8': 2384, 'tv9': 2392, 'tvalues': 2244, 'txml': 2300}),
+        "a2f28d1cbcf1120f3cd90000000040f2831c624501d0000000002de90f50eff30081f1ee102a06b42ded100a18460c28"
+        "28bf00200ff29c1151f820103a4a1160a8b10b2812d0411e882201fb02f10ff2b4121144354a222351f804cb42f804cb"
+        "013bf9d1bff34f8f012000e0062000000000bdec100a06bc81f30088e1ee102abde80f902de90f50eff30081f1ee10ca"
+        "2de902102ded100a10461946000000001690bdec100a06bc81f30088e1ee102abde80f50bcf1000fa7d070472de90f50"
+        "eff30082f1ee103a0cb42ded100a002100000000bdec100a0cbc82f30088e1ee103abde80f50000000002de90f50eff3"
+        "0082f1ee103a0cb42ded100a012100000000bdec100a0cbc82f30088e1ee103abde80f500000000040201008a40ce60f"
+        "40001000c0ff1f002c100050800a072443687220416d6f756e743a00636872616d6f756e740000bf43687220546f6e65"
+        "3a0000bf636872746f6e650043687220547970653a0000bf6368727479706500436f6d7020313a00636d7076616c7331"
+        "0000bf00436f6d7020323a00636d7076616c73320000bf00436f6d7020333a00636d7076616c73330000bf00436f6d70"
+        "20343a00636d7076616c73340000bf00436f6d7020353a00636d7076616c73350000bf00000000000000000000000000"
+        "0000000000000000000000000000000000000000aa000000aa00000000ff000000000000000000003b4c5aff0c1216ff"
+        "e0f3ffff1c40a8ff00b0ffff1f3bffff00b0ffff0c1216ff475b6bff00b0ffff2bc79cff1c32b8ff0c1216ff000000ff"
+        "ecf8ffff2e3b46ff506677ff2bc79cff1c32b8ff66e0ffff1c32b8ff8ca5b8ff7ad2ffff3d8affff1a242cff00527aff"
+        "00b0ffff1e6a7aff00b0ffffecf8ffff00b0ffff1c40a8ffecf8ffff000000001e2256ff05060effc4cff0ff1a23c8ff"
+        "3d9affff142affff3d9affff05060eff242a6aff3d9affff3fa9d9ff1a24b0ff05060eff000000ffcfdaf8ff191c46ff"
+        "2a3076ff3fa9d9ff1a24b0ff5ac1ffff1a24b0ff6c7ad2ff5c7affff7a4ad0ff0d0f24ff18209aff3d9affff204c6bff"
+        "3d9affffcfdaf8ff3d9affff1a23c8ffcfdaf8ff000000003a3a3aff0e0e0effffffffffd65f1fff00b0ffff007affff"
+        "00b0ffff0e0e0eff707070ff00b0ffffff9b3dff0056b8ff0e0e0eff000000ffffffffff303030ff7e7e7effff9b3dff"
+        "0056b8ff4de1ffff0056b8ffc4c4c4ffffd09affd8b0ffff2a2a2aff00567aff00b0ffff256c7aff00b0ffffffffffff"
+        "00b0ffffd65f1fffffffffff00000000304827ff0a1107ffe2ffd8ff367a1cff3dc4ffff3a4affff3dc4ffff0a1107ff"
+        "39552eff3dc4ffff50ff9aff2e3ab3ff0a1107ff000000ffeeffe8ff25381eff416135ff50ff9aff2e3ab3ff5afff5ff"
+        "2e3ab3ff82a872ffc8ff7aff3affc2ff182413ff125a7aff3dc4ffff1e7a6eff3dc4ffffeeffe8ff3dc4ffff367a1cff"
+        "eeffe8ff0000000061394dff190d13fffff0ffff6f16b8ffffe62eff3b3bffffffe62eff190d13ff6f4359ffffe62eff"
+        "b0ff3dff3a2ab8ff190d13ff000000fffff6ffff4f2d3dff7b4c64ffb0ff3dff3a2ab8ff5ce4ffff3a2ab8ffc298aaff"
+        "ff85aeffe08affff351d29ff7a6e0effffe62eff2a6a7affffe62efffff6ffffffe62eff6f16b8fffff6ffff00000000"
+        "aa0000ff000000ffffffffff550000ffaaaa00ff000000ffaaaa00ff000000ff55ffffffaaaa00ffaaaa00ff0000aaff"
+        "000000ff000000ffffffffffffff55ffffff55ffaaaa00ff0000aaff55ffffff0000aaffaaaaaaffffff55ff55ffffff"
+        "aa0000ff555500ffaaaa00ff0055aaffaaaa00ffffffffffaaaa00ff55ffffffffffffff00000000aa0000ff000000ff"
+        "ffffffffaaaa00ff55ffffff000000ff55ffffff000000ffffffffff55ffffffaaaa00ff0000aaff000000ff000000ff"
+        "ffffffffffff55ffffff55ffaaaa00ff0000aaff55ffffff0000aaffaaaaaaffffff55ff55ffffffaa0000ff555500ff"
+        "55ffffff0055aaff55ffffffffffffff55ffffffaa0000ffffffffff00000000550000ff000000ffffffffffaa0000ff"
+        "aaaa00ff000000ffaaaa00ff000000ff55ffffff55ffffffaa0000ff0000aaff000000ff000000ffffffffffaa0000ff"
+        "ffff55ffaaaa00ff0000aaff55ffffff0000aaffaaaaaaffffff55ff55ffffff550000ff555500ffaaaa00ff0055aaff"
+        "aaaa00ffffffffffaaaa00ff55ffffffffffffff00000000550000ff000000ffffffffffaa0000ffaaaa00ff000000ff"
+        "aaaa00ff000000ff55ffffffaaaa00ffaa0000ff0000aaff000000ff000000ffffffffffaa0000ffffff55ffaaaa00ff"
+        "0000aaff55ffffff0000aaffaaaaaaffffff55ff55ffffff550000ff555500ffaaaa00ff0055aaffaaaa00ffffffffff"
+        "aaaa00ff55ffffffffffffff00000000550000ff0000ffffffffffffaa0000ffff80ffff000000ff0080ffff004080ff"
+        "ffff00ff00ffffffff8080ff0000aaffff00ffff000000ffffffffffaa0000ffffff55ffaaaa00ff0000aaff00ff00ff"
+        "0000aaffaaaaaaffffff55ff808080ff550000ff555500ffaaaa00ff0055aaffaaaa00ffffffffffaaaa00ffff80c0ff"
+        "ffffffff0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        "000000005468656d653a00007468656d650000bf53544f434b0000bf414d4245520000bf53544147450000bf434f4e54"
+        "524153540000bf0050484f5350484f520000bf0053594e5448574156450000bf4e4f52544f4e0000564f4c4b4f560000"
+        "5041434d414e00004d49444e494748540000bf00444941470000bf00435553544f4d0000"
+        , {'_sT': 0, 'tchr': 564, 'tchr_call': 588, 'tclabel0': 736, 'tclabel1': 760, 'tclabel2': 780, 'tclabel3': 800, 'tclabel4': 820, 'tclabel5': 840, 'tclabel6': 860, 'tclabel7': 880, 'tcxml0': 748, 'tcxml1': 772, 'tcxml2': 792, 'tcxml3': 808, 'tcxml4': 828, 'tcxml5': 848, 'tcxml6': 868, 'tcxml7': 888, 'tedit': 446, 'tedit_next': 454, 'tground': 900, 'tlabel': 2356, 'tload': 620, 'tload_call': 640, 'tload_next': 662, 'tm_copy': 520, 'tm_custom': 540, 'tm_go': 542, 'tmine': 458, 'tpal': 948, 'tpost': 424, 'tpost_call': 542, 'tpost_next': 442, 'treg': 0, 'treg_c0': 60, 'treg_c1': 92, 'treg_c2': 124, 'treg_c3': 156, 'treg_c4': 188, 'treg_c5': 220, 'treg_c6': 252, 'treg_c7': 284, 'treg_call': 28, 'treg_next': 294, 'tsave': 666, 'tsave_call': 686, 'tsave_next': 708, 'tstore': 298, 'tstore_c0': 322, 'tstore_c1': 334, 'tstore_c2': 348, 'tstore_c3': 360, 'tstore_c4': 372, 'tstore_c5': 384, 'tstore_c6': 398, 'tstore_c7': 412, 'tstore_call': 308, 'tstore_next': 420, 'tv0': 2372, 'tv1': 2380, 'tv10': 2468, 'tv11': 2476, 'tv2': 2388, 'tv3': 2396, 'tv4': 2408, 'tv5': 2420, 'tv6': 2432, 'tv7': 2440, 'tv8': 2448, 'tv9': 2456, 'tvalues': 2308, 'txml': 2364}),
     'mk2_osdsync': (
         "2de9f04f8a4607465ff00008dff8a8b03c6800f00af87c6800f007f8b8f1000f01d0bff34f8fbde8f08f00b5dff88cc0"
         "002505f1ce064ff4207006fb00f6264405f1020000f01f015fea50195fea8909c646002248f64203b2f10b00b0f5957f"
@@ -1834,12 +1835,24 @@ def _theme_palettes():
 
 THEME_PALETTES = _theme_palettes()                       # 10 x 34 words
 THEME_COUNT = 1 + len(THEME_PALETTES) // 34 + 1          # Stock, the tables, Custom
+# cc24: the gaps between cells are no palette entry at all: nothing is drawn
+# there and entry 0 is clear, so the LTDC's background colour shows (BCCR,
+# 0x5000102c, RGB888; stock initialises it black at 0x08042dc4). Hook T sets
+# it with the theme, per Theme row value (Stock, five tables, Norton, Volkov,
+# Pacman, Midnight, Diag, Custom).
+LTDC_BCCR = 0x5000102c
+THEME_GROUND = (0, 0, 0, 0, 0, 0, 0, 0, 0x0000aa, 0x0000aa, 0x00ff00, 0)
+assert len(THEME_GROUND) == THEME_COUNT
 THEME_MAP_MICRO = """    mov     r0, r3
 tpost_call:"""
 THEME_MAP_MK2 = f"""    mov     r0, r3                  /* cc17: the row's value -> the C's */
     cmp     r0, #{THEME_COUNT}
     it      hs
     movhs   r0, #0
+    adr.w   r1, tground             /* cc24: the screen's ground, LTDC BCCR */
+    ldr     r1, [r1, r0, lsl #2]
+    ldr     r2, =0x{LTDC_BCCR:08x}
+    str     r1, [r2]
     cbz     r0, tm_go               /* Stock */
     cmp     r0, #{THEME_COUNT - 1}
     beq     tm_custom
@@ -1864,7 +1877,9 @@ tm_go:
 tpost_call:"""
 THEME_TVALUES_MICRO = """    .balign 4
 tvalues:"""
-THEME_TVALUES_MK2 = ("    .balign 4\ntpal:\n"
+THEME_TVALUES_MK2 = ("    .balign 4\ntground:\n"
+                     + "    .word   " + ", ".join(f"0x{g:08x}" for g in THEME_GROUND) + "\n"
+                     + "    .balign 4\ntpal:\n"
                      + "".join("    .word   " + ", ".join(f"0x{w:08x}" for w in THEME_PALETTES[i:i + 6]) + "\n"
                                for i in range(0, len(THEME_PALETTES), 6))
                      + "    .balign 4\ntvalues:")

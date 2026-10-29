@@ -353,6 +353,7 @@ uiobj=0x24050000; h.allow(uiobj,uiobj+0x1000); h.mu.mem_write(uiobj,b"\0"*0x1000
 h.mu.mem_write(0x24000dc8,struct.pack("<I",uiobj))
 h.allow(0x24000000,0x24000088)                  # the palette, 34 entries, and nothing past it
 h.mu.mem_map(0x52001000,0x1000); h.mu.mem_write(0x52001000,b"\0"*0x1000)   # DMA2D, idle
+h.mu.mem_map(0x50001000,0x1000); h.allow(0x5000102c,0x50001030)   # cc24: LTDC BCCR, the ground
 h.mu.mem_write(0x24004328,struct.pack("<I",0x52001000))   # the display object's DMA2D handle (+0xa8)
 pal0=bytes(h.mu.mem_read(0x24000000,0x88))
 h.allow(0x24070a80,0x24070a80+136)              # cc18: the chosen palette, copied by hook T
@@ -370,5 +371,5 @@ for val,name in ((1,"Amber"),(6,"Norton"),(8,"Pacman"),(10,"Diag"),(0,"Stock")):
         if e2!=DRAW_RET or h.badw: print("   THEME TICK FAIL",name,t,e2,h.badw[:3])
     pal=bytes(h.mu.mem_read(0x24000000,0x88)); tho=bytes(h.mu.mem_read(0x2406dae0,10))
     print(f"12. Theme {name}: post end {hex(end) if isinstance(end,int) else end} (stock post {'not ' if '0x8094de4' not in posted else ''}called), "
-          f"palette entry 1/3/9 = {pal[4:8].hex()} {pal[12:16].hex()} {pal[36:40].hex()}, CLUT calls {sorted(set(c for c in calls if c in ('0x804a9c4','0x804a614','0x804a64a')))}, THO {tho.hex()}")
+          f"palette entry 1/3/9 = {pal[4:8].hex()} {pal[12:16].hex()} {pal[36:40].hex()}, CLUT calls {sorted(set(c for c in calls if c in ('0x804a9c4','0x804a614','0x804a64a')))}, THO {tho.hex()}, ground {h.mu.mem_read(0x5000102c,4)[::-1].hex()}")
 print("    palette back to Stock:", bytes(h.mu.mem_read(0x24000000,0x88))==pal0 or "(differs: zero-init RAM vs Stock image)")
