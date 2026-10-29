@@ -82,7 +82,7 @@ import patch_micro as pm                # noqa: E402  the hook generators
 BASE = 0x08040000
 STOCK_SHA = "35ab7995ad0eca8484f3b28bc76389f10b2037dbb21a4a394e950d9329073e86"
 STOCK_SIZE = 674896
-VERSION = "2.3.4-cc22"                  # 10 characters: see pm.VER_DISPLAY_MAX
+VERSION = "2.3.4-cc23"                  # 10 characters: see pm.VER_DISPLAY_MAX
 
 # CCs left out of this build. 2026-10-27, cc1 on hardware: CC 89 (Loop
 # Crossfade) on a Sample pad gave sudden full-scale distorted output at any
@@ -1062,13 +1062,13 @@ FROZEN_MK2 = {
         "aaaa00ff000000ffaaaa00ff000000ff55ffffffaaaa00ffaaaa00ff0000aaff000000ff000000ffffffffffffff55ff"
         "ffff55ffaaaa00ff0000aaff55ffffff0000aaffaaaaaaffffff55ff55ffffffaa0000ff555500ffaaaa00ff0055aaff"
         "aaaa00ffffffffffaaaa00ff55ffffffffffffff00000000aa0000ff000000ffffffffffaaaa00ff55ffffff000000ff"
-        "55ffffff000000ff55ffffff55ffffffaaaa00ff0000aaff000000ff000000ffffffffffffff55ffffff55ffaaaa00ff"
+        "55ffffff000000ffffffffff55ffffffaaaa00ff0000aaff000000ff000000ffffffffffffff55ffffff55ffaaaa00ff"
         "0000aaff55ffffff0000aaffaaaaaaffffff55ff55ffffffaa0000ff555500ff55ffffff0055aaff55ffffffffffffff"
         "55ffffffaa0000ffffffffff00000000550000ff000000ffffffffffaa0000ffaaaa00ff000000ffaaaa00ff000000ff"
-        "55ffffffaaaa00ffaaaa00ff0000aaff000000ff000000ffffffffffaa0000ffffff55ffaaaa00ff0000aaff55ffffff"
+        "55ffffff55ffffffaa0000ff0000aaff000000ff000000ffffffffffaa0000ffffff55ffaaaa00ff0000aaff55ffffff"
         "0000aaffaaaaaaffffff55ff55ffffff550000ff555500ffaaaa00ff0055aaffaaaa00ffffffffffaaaa00ff55ffffff"
         "ffffffff00000000550000ff000000ffffffffffaa0000ffaaaa00ff000000ffaaaa00ff000000ff55ffffffaaaa00ff"
-        "aaaa00ff0000aaff000000ff000000ffffffffffaa0000ffffff55ffaaaa00ff0000aaff55ffffff0000aaffaaaaaaff"
+        "aa0000ff0000aaff000000ff000000ffffffffffaa0000ffffff55ffaaaa00ff0000aaff55ffffff0000aaffaaaaaaff"
         "ffff55ff55ffffff550000ff555500ffaaaa00ff0055aaffaaaa00ffffffffffaaaa00ff55ffffffffffffff00000000"
         "550000ff0000ffffffffffffaa0000ffff80ffff000000ff0080ffff004080ffffff00ff00ffffffff8080ff0000aaff"
         "ff00ffff000000ffffffffffaa0000ffffff55ffaaaa00ff0000aaff00ff00ff0000aaffaaaaaaffffff55ff808080ff"
@@ -1784,9 +1784,15 @@ THEME_SPLIT = {2: "FF0000", 5: "FF80FF", 12: "AA0000",          # red, pink, dar
                7: "FF8000", 8: "804000", 11: "8080FF",          # orange, brown, periwinkle
                10: "FFFF00", 13: "FF00FF", 20: "00FF00",        # yellow, magenta, green
                9: "00FFFF", 24: "808080", 32: "C080FF"}         # cyan, grey, lavender
-LOOP_FRAME = 32                      # the sample view's loop frame (DIAG photo, 2026-10-30)
-BUILTIN_THEMES = (("NORTON", _NORTON, {LOOP_FRAME: "FFFF55"}), ("VOLKOV", _VOLKOV, {LOOP_FRAME: "0000AA"}),
-                  ("PACMAN", _PACMAN, {LOOP_FRAME: "FFFF55"}), ("MIDNIGHT", _MIDNIGHT, {LOOP_FRAME: "FFFF55"}),
+# Single entries, from DIAG photos (2026-10-30): 32 the loop frame, the
+# selected tab and the mixer's level bars; 9 the loop's Str/Len text; 10 the
+# waveform and a modulation slot in use; 11 the mixer's unmuted pads (and,
+# until cc23, the CPU bar -- moved to 18 so the two can differ).
+LOOP_FRAME, LOOP_TEXT, MOD_USED, MIXER_PAD = 32, 9, 10, 11
+BUILTIN_THEMES = (("NORTON", _NORTON, {LOOP_FRAME: "FFFF55"}),
+                  ("VOLKOV", _VOLKOV, {LOOP_FRAME: "0000AA", LOOP_TEXT: "FFFFFF"}),
+                  ("PACMAN", _PACMAN, {LOOP_FRAME: "FFFF55", MOD_USED: "FFFF55", MIXER_PAD: "0000AA"}),
+                  ("MIDNIGHT", _MIDNIGHT, {LOOP_FRAME: "FFFF55", MIXER_PAD: "0000AA"}),
                   ("DIAG", _DIAG, THEME_SPLIT))
 THM_TAB_HEAD = "000000003b4c5aff0c1216ff"      # Amber's first three entries, as 2.3.10 has them
 # cc17b: the new themes come IN ADDITION to 2.3.10's five. The C knows seven
@@ -1903,7 +1909,7 @@ def theme_table_to_ram(by_name):
     ent = by_name[".rodata.tho_entry"]
     if ent[2] != "02030b14060f0211050b0e0f06":
         pm.refuse("The pop-up colours' palette entries are not what cc21 expects.")
-    ent[2] = "01030b140c0f0211050b0e0f06"
+    ent[2] = "010312140c0f0211050b0e0f06"         # cc23: the bar from 18, not 11 (the mixer's pads)
 
 
 def prepare_stage3():
