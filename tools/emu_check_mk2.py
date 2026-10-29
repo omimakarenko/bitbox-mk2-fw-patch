@@ -355,7 +355,8 @@ h.allow(0x24000000,0x24000088)                  # the palette, 34 entries, and n
 h.mu.mem_map(0x52001000,0x1000); h.mu.mem_write(0x52001000,b"\0"*0x1000)   # DMA2D, idle
 h.mu.mem_write(0x24004328,struct.pack("<I",0x52001000))   # the display object's DMA2D handle (+0xa8)
 pal0=bytes(h.mu.mem_read(0x24000000,0x88))
-for val,name in ((1,"Norton"),(3,"Pacman"),(5,"Diag"),(0,"Stock")):
+h.allow(0x24070a80,0x24070a80+136)              # cc18: the chosen palette, copied by hook T
+for val,name in ((1,"Amber"),(6,"Norton"),(8,"Pacman"),(10,"Diag"),(0,"Stock")):
     regs={r:0x1000+i for i,r in enumerate(REGS)}; regs[UC_ARM_REG_R0]=0x24023cb8; regs[UC_ARM_REG_R1]=0x400; regs[UC_ARM_REG_R2]=THEME_ID; regs[UC_ARM_REG_R3]=val
     h.mu.mem_write(sp,struct.pack("<II",0,0))
     end=h.run(bl_target(0x0807f91e),regs,sp=sp,lr=0x0807f923)       # the live edit, as the Settings row posts it
