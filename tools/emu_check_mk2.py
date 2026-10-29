@@ -66,6 +66,7 @@ def bl_target(at):
     if S: off-=1<<25
     return at+4+off
 h=H(img,END,WIN)
+h.allow(0x24070b40,0x24070b80)     # cc25: the wave folder's state
 # ---- 1. MIDI chain at the post call
 head=bl_target(POST_SITE); print("post call ->",hex(head))
 sp=0x2001f000
@@ -373,3 +374,39 @@ for val,name in ((1,"Amber"),(6,"Norton"),(8,"Pacman"),(10,"Diag"),(0,"Stock")):
     print(f"12. Theme {name}: post end {hex(end) if isinstance(end,int) else end} (stock post {'not ' if '0x8094de4' not in posted else ''}called), "
           f"palette entry 1/3/9 = {pal[4:8].hex()} {pal[12:16].hex()} {pal[36:40].hex()}, CLUT calls {sorted(set(c for c in calls if c in ('0x804a9c4','0x804a614','0x804a64a')))}, THO {tho.hex()}, ground {h.mu.mem_read(0x5000102c,4)[::-1].hex()}")
 print("    palette back to Stock:", bytes(h.mu.mem_read(0x24000000,0x88))==pal0 or "(differs: zero-init RAM vs Stock image)")
+
+# ---- 13. cc25: the wave folder -- CC 70-75 on ch 1, then the master bus.
+# Each block runs twice on the same input: through the folder's head (the
+# site) and straight into the hook it chained to; the difference is the folder.
+import math
+def cc(n,v,chan=0):
+    fr=bytearray(0x18); fr[0]=7; struct.pack_into("<III",fr,8,chan,n,v<<7); h.mu.mem_write(sp+0x40,bytes(fr))
+    regs={r:0x1000+i for i,r in enumerate(REGS)}; regs[UC_ARM_REG_R0]=0x24011110; regs[UC_ARM_REG_R1]=sp+0x40
+    return h.run(bl_target(POST_SITE),regs,sp=sp,lr=RET|1)
+FHEAD=bl_target(CHR_SITE); FNEXT=bl_target(FHEAD+2)      # fblock: push {r0, lr}; bl next
+def one(entry,sig):
+    L=buf+0x100; R=L+FR*4
+    h.mu.mem_write(buf,struct.pack("<IIII",FR,0,L,R)+bytes([0,1,0,0]))
+    h.mu.mem_write(L,struct.pack(f"<{FR}f",*sig)); h.mu.mem_write(R,struct.pack(f"<{FR}f",*sig))
+    regs={r:0x1000+i for i,r in enumerate(REGS)}; regs[UC_ARM_REG_R0]=buf
+    end=h.run(entry,regs,sp=sp,lr=0x0809817f)
+    out=struct.unpack(f"<{FR}f",h.mu.mem_read(L,FR*4))
+    ok= end==0x0809817e and not h.badw and all(math.isfinite(x) for x in out) and all(h.mu.reg_read(r)==regs[r] for r in CS)
+    return ok,out,end
+def bus_run(blocks=12):
+    oks=0; peak=0; d=0; st=bytes(h.mu.mem_read(0x24070b40,0x40))
+    for b in range(blocks):
+        sig=[0.6*math.sin(i*0.3+b) for i in range(FR)]
+        h.mu.mem_write(0x24070b40,st); ok2,ref,_=one(FNEXT,sig)          # the chain without the folder
+        h.mu.mem_write(0x24070b40,st); ok1,out,end=one(FHEAD,sig)
+        st=bytes(h.mu.mem_read(0x24070b40,0x40))
+        oks+=ok1; peak=max(peak,max(abs(x) for x in out)); d=max(d,max(abs(a-b) for a,b in zip(out,ref)))
+    return f"{oks}/{blocks} ok, peak {peak:.3f}, folder changed it by {d:.3f}"
+for n,v in ((70,0),(14,0),(15,0),(16,0),(17,0),(22,16),(23,16),(24,16),(25,16)): cc(n,v)   # Character: set 0 (no f64), off
+print("13. fold head",hex(FHEAD),"-> next",hex(FNEXT))
+print("13. folder off:                  ", bus_run())
+for settings,name in ((((70,127),(71,40),(72,0)),"triangle, amount max, point 40"),(((72,40),),"sine"),(((72,80),),"top only"),(((72,110),),"wrap"),
+                      (((73,100),(74,64),(75,30)),"bias, half mix, quieter"),(((70,0),),"amount back to 0"),((),"... 12 blocks later"),((),"... and later")):
+    for n,v in settings: cc(n,v)
+    print(f"13. {name:30} state {h.mu.mem_read(0x24070b40,10).hex()}: ", bus_run())
+cc(70,50,chan=3); print("13. ch 4 CC 70 ignored:", h.mu.mem_read(0x24070b44,1).hex()=="00")
