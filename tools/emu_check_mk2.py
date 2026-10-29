@@ -10,8 +10,12 @@ hands out:
   7. the UI tick (pop-up and CPU bar)     8. pad CCs through hooks A and B
   9. the saved master bus: boot posts to the C, then SetParam and the
      settings.tml write from the UI tick   10. compressor types (CC 47) on the DSP call
-Known limit: Unicorn's M7 has no double-precision FPU, so one Character
-effect set stops at a vmov.f64 (the MK2 hardware has one: stock uses it 533x)."""
+Known limits: Unicorn's M7 has no double-precision FPU, so one Character
+effect set stops at a vmov.f64 (the MK2 hardware has one: stock uses it 533x).
+And Unicorn mis-tracks an IT block across some translation-block boundaries:
+a conditional branch right after one can fault as "invalid instruction" at an
+address that depends on where the C object lands (cc16: clip_cc's bne.w at a
+1 KB boundary; the same object moved by 32 bytes runs every clip CC clean)."""
 import struct, sys, random
 from unicorn import *
 from unicorn.arm_const import *
@@ -342,3 +346,28 @@ for site in (0x0807e2f4,0x080822ac):
     regs={r:0x1000+i for i,r in enumerate(REGS)}; regs[UC_ARM_REG_R0]=0x24011110
     end=h.run(bl_target(site),regs,sp=sp,lr=(site+4)|1)
     print(f"11d. load finish {site:#x}: end {hex(end) if isinstance(end,int) else end}, stock calls {[c[0] for c in h.calls]}, badw {h.badw[:2]}")
+
+# ---- 12. 2.3.10: themes -- the Theme row's post, then the UI tick applies the palette
+THEME_ID=0x183
+uiobj=0x24050000; h.allow(uiobj,uiobj+0x1000); h.mu.mem_write(uiobj,b"\0"*0x1000)
+h.mu.mem_write(0x24000dc8,struct.pack("<I",uiobj))
+h.allow(0x24000000,0x24000088)                  # the palette, 34 entries, and nothing past it
+h.mu.mem_map(0x52001000,0x1000); h.mu.mem_write(0x52001000,b"\0"*0x1000)   # DMA2D, idle
+h.mu.mem_write(0x24004328,struct.pack("<I",0x52001000))   # the display object's DMA2D handle (+0xa8)
+pal0=bytes(h.mu.mem_read(0x24000000,0x88))
+for val,name in ((1,"Amber"),(5,"Synthwave"),(0,"Stock")):
+    regs={r:0x1000+i for i,r in enumerate(REGS)}; regs[UC_ARM_REG_R0]=0x24023cb8; regs[UC_ARM_REG_R1]=0x400; regs[UC_ARM_REG_R2]=THEME_ID; regs[UC_ARM_REG_R3]=val
+    h.mu.mem_write(sp,struct.pack("<II",0,0))
+    end=h.run(bl_target(0x0807f91e),regs,sp=sp,lr=0x0807f923)       # the live edit, as the Settings row posts it
+    posted=[c[0] for c in h.calls]
+    calls=[]
+    for t in range(3):
+        h.mu.mem_write(0xE0001004,struct.pack("<I",(3_000_000_000+t*240_000_000)&0xffffffff))
+        regs={r:0x1000+i for i,r in enumerate(REGS)}; regs[UC_ARM_REG_R0]=disp
+        e2=h.run(bl_target(DRAW),regs,sp=sp,lr=DRAW_RET|1)
+        calls+=[c[0] for c in h.calls]
+        if e2!=DRAW_RET or h.badw: print("   THEME TICK FAIL",name,t,e2,h.badw[:3])
+    pal=bytes(h.mu.mem_read(0x24000000,0x88)); tho=bytes(h.mu.mem_read(0x2406dae0,10))
+    print(f"12. Theme {name}: post end {hex(end) if isinstance(end,int) else end} (stock post {'not ' if '0x8094de4' not in posted else ''}called), "
+          f"palette entry 1/3/9 = {pal[4:8].hex()} {pal[12:16].hex()} {pal[36:40].hex()}, CLUT calls {sorted(set(c for c in calls if c in ('0x804a9c4','0x804a614','0x804a64a')))}, THO {tho.hex()}")
+print("    palette back to Stock:", bytes(h.mu.mem_read(0x24000000,0x88))==pal0 or "(differs: zero-init RAM vs Stock image)")
