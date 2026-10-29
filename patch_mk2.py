@@ -82,7 +82,7 @@ import patch_micro as pm                # noqa: E402  the hook generators
 BASE = 0x08040000
 STOCK_SHA = "35ab7995ad0eca8484f3b28bc76389f10b2037dbb21a4a394e950d9329073e86"
 STOCK_SIZE = 674896
-VERSION = "2.3.4-cc20"                  # 10 characters: see pm.VER_DISPLAY_MAX
+VERSION = "2.3.4-cc21"                  # 10 characters: see pm.VER_DISPLAY_MAX
 
 # CCs left out of this build. 2026-10-27, cc1 on hardware: CC 89 (Loop
 # Crossfade) on a Sample pad gave sudden full-scale distorted output at any
@@ -1065,14 +1065,14 @@ FROZEN_MK2 = {
         "55ffffff000000ff55ffffff55ffffffaaaa00ff0000aaff000000ff000000ffffffffffffff55ffffff55ffaaaa00ff"
         "0000aaff55ffffff0000aaffaaaaaaffffff55ff55ffffffaa0000ff555500ff55ffffff0055aaff55ffffffffffffff"
         "55ffffffaaaa00ffffffffff00000000550000ff000000ffffffffffaa0000ffaaaa00ff000000ffaaaa00ff000000ff"
-        "55ffffffaaaa00ffaaaa00ff0000aaff000000ff000000ffffffffff000000ffffff55ffaaaa00ff0000aaff55ffffff"
+        "55ffffffaaaa00ffaaaa00ff0000aaff000000ff000000ffffffffffaa0000ffffff55ffaaaa00ff0000aaff55ffffff"
         "0000aaffaaaaaaffffff55ff55ffffff550000ff555500ffaaaa00ff0055aaffaaaa00ffffffffffaaaa00ffaa0000ff"
         "ffffffff00000000550000ff000000ffffffffffaa0000ffaaaa00ff000000ffaaaa00ff000000ff55ffffffaaaa00ff"
         "aaaa00ff0000aaff000000ff000000ffffffffffaa0000ffffff55ffaaaa00ff0000aaff55ffffff0000aaffaaaaaaff"
         "ffff55ff55ffffff550000ff555500ffaaaa00ff0055aaffaaaa00ffffffffffaaaa00ffaa0000ffffffffff00000000"
         "550000ff0000ffffffffffff8080ffff0000ffff000000ff0080ffff0080ffff55ffffff00ffffff0080ffff0000ffff"
         "00ffffff000000ffff00ffff000000ffffff55ffffff00ff00ff00ff55ffffffff00ffffaaaaaaffffff55ff55ffffff"
-        "550000ff555500ff00ff00ff0055aaffffff00ff00ff00ffff00ffffff8080ffffff00ff000000000000000000000000"
+        "808080ff555500ff00ff00ff0055aaffffff00ff00ff00ffff00ffffff8080ffffff00ff000000000000000000000000"
         "0000000000000000000000000000000000000000000000000000000000000000000000005468656d653a00007468656d"
         "650000bf53544f434b0000bf414d4245520000bf53544147450000bf434f4e54524153540000bf0050484f5350484f52"
         "0000bf0053594e5448574156450000bf4e4f52544f4e0000564f4c4b4f5600005041434d414e00004d49444e49474854"
@@ -1774,8 +1774,9 @@ _NORTON = {"background": "000000", "black": "000000", "panel": "0000AA", "grey1"
            "accent-dark": "005555", "red": "000000", "red-dark": "AA0000", "green": "00AAAA",
            "yellow": "FFFF55", "yellow-dark": "AA5500", "teal": "55FFFF", "purple": "FFFF55"}
 _VOLKOV = dict(_NORTON, **{"selection": "00AAAA", "accent": "FFFF55"})
-_PACMAN = dict(_NORTON, **{"cell": "000055", "panel": "000055", "selection": "0000AA", "grey1": "000000"})
-_MIDNIGHT = dict(_PACMAN, **{"grey1": "0000AA"})
+_MIDNIGHT = dict(_NORTON, **{"cell": "000055", "panel": "000055", "selection": "0000AA", "grey1": "0000AA"})
+_PACMAN = dict(_MIDNIGHT)            # cc21: dividers bright blue too, as asked; the rest to follow a DIAG photo
+_DIAG = dict(_NORTON, **{"cell": "000055", "panel": "808080", "selection": "0000AA", "grey1": "000000"})
 # The diagnostic: Pacman, but every colour a theme file cannot split -- the
 # entries that share one theme colour -- each its own, so a photo says which
 # entry draws what (the loop frame, the white keys, ...).
@@ -1787,7 +1788,7 @@ THEME_SPLIT = {2: "FF0000", 8: "FF8000", 13: "FFFF00",          # background
                11: "FF8000", 18: "00FFFF"}                      # green
 BUILTIN_THEMES = (("NORTON", _NORTON, {}), ("VOLKOV", _VOLKOV, {}),
                   ("PACMAN", _PACMAN, {}), ("MIDNIGHT", _MIDNIGHT, {}),
-                  ("DIAG", _PACMAN, THEME_SPLIT))
+                  ("DIAG", _DIAG, THEME_SPLIT))
 THM_TAB_HEAD = "000000003b4c5aff0c1216ff"      # Amber's first three entries, as 2.3.10 has them
 # cc17b: the new themes come IN ADDITION to 2.3.10's five. The C knows seven
 # values (Stock, five table rows, Custom = 6) in a dozen compares; rather than
@@ -1883,6 +1884,21 @@ def theme_table_to_ram(by_name):
                 n += 1
     if n != 6:     # thm_post's palette, chr_osd_tick's palette and its pop-up colours
         pm.refuse(f"The themes' table is referenced {n} times, not the 6 cc18 expects.")
+    # cc21: the CPU bar follows every theme, not only Custom. chr_osd_tick keeps
+    # stock's colours for THO roles 2-6 (bar, 70%, 90%, peak, ground) unless
+    # the theme is Custom: `cmp r7, #7` decides; #2 hands those roles to the
+    # palette for the tables too. And >90% takes red-dark (entry 12), as the
+    # built-in themes paint red (entry 6) black.
+    tick = by_name[".text.chr_osd_tick"]
+    code = bytearray.fromhex(tick[2])
+    if code[744:746] != b"\x07\x2f":
+        pm.refuse("The pop-up colours' theme check is not what cc21 expects.")
+    code[744:746] = b"\x02\x2f"
+    tick[2] = code.hex()
+    ent = by_name[".rodata.tho_entry"]
+    if ent[2] != "02030b14060f0211050b0e0f06":
+        pm.refuse("The pop-up colours' palette entries are not what cc21 expects.")
+    ent[2] = "02030b140c0f0211050b0e0f06"
 
 
 def prepare_stage3():
