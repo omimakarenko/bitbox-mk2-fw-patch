@@ -82,7 +82,7 @@ import patch_micro as pm                # noqa: E402  the hook generators
 BASE = 0x08040000
 STOCK_SHA = "35ab7995ad0eca8484f3b28bc76389f10b2037dbb21a4a394e950d9329073e86"
 STOCK_SIZE = 674896
-VERSION = "2.3.4-cc19"                  # 10 characters: see pm.VER_DISPLAY_MAX
+VERSION = "2.3.4-cc20"                  # 10 characters: see pm.VER_DISPLAY_MAX
 
 # CCs left out of this build. 2026-10-27, cc1 on hardware: CC 89 (Loop
 # Crossfade) on a Sample pad gave sudden full-scale distorted output at any
@@ -2350,10 +2350,13 @@ def font_tables(path, size):
         f = ImageFont.truetype(path, size)
     except OSError as e:
         pm.refuse(f"Could not read the font {path}", str(e))
-    # Baseline: capitals from row 0, as stock's; 5 rows left for descenders.
+    # Baseline: capitals centred on stock's (rows 0-13), then nudged up until
+    # the deepest descender still fits the 16-row box.
     t = Image.new("1", (64, 64)); ImageDraw.Draw(t).text((0, 40), "H", font=f, fill=1, anchor="ls")
-    top = t.getbbox()[1]
-    base = 40 - top
+    top, bot = t.getbbox()[1], t.getbbox()[3]
+    base = 40 - top + max(0, (14 - (bot - top)) // 2)
+    t = Image.new("1", (64, 64)); ImageDraw.Draw(t).text((0, 40), "gjpqy", font=f, fill=1, anchor="ls")
+    base -= max(0, t.getbbox()[3] - 40 + base - 16)
     space = max(2, round(f.getlength(" ")))
     entries, cols = [], []
     for c in range(256):
