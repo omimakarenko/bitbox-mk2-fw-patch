@@ -82,7 +82,7 @@ import patch_micro as pm                # noqa: E402  the hook generators
 BASE = 0x08040000
 STOCK_SHA = "35ab7995ad0eca8484f3b28bc76389f10b2037dbb21a4a394e950d9329073e86"
 STOCK_SIZE = 674896
-VERSION = "2.3.4-cc16"                  # 10 characters: see pm.VER_DISPLAY_MAX
+VERSION = "2.3.4-cc17"                  # 10 characters: see pm.VER_DISPLAY_MAX
 
 # CCs left out of this build. 2026-10-27, cc1 on hardware: CC 89 (Loop
 # Crossfade) on a Sample pad gave sudden full-scale distorted output at any
@@ -1036,9 +1036,9 @@ FROZEN_MK2 = {
         "6368727479706500436f6d7020313a00636d7076616c73310000bf00436f6d7020323a00636d7076616c73320000bf00"
         "436f6d7020333a00636d7076616c73330000bf00436f6d7020343a00636d7076616c73340000bf00436f6d7020353a00"
         "636d7076616c73350000bf00000000000000000000000000000000000000000000000000000000005468656d653a0000"
-        "7468656d650000bf53544f434b0000bf414d4245520000bf53544147450000bf434f4e54524153540000bf0050484f53"
-        "50484f520000bf0053594e5448574156450000bf435553544f4d0000"
-        , {'_sT': 0, 'tchr': 500, 'tchr_call': 524, 'tclabel0': 664, 'tclabel1': 688, 'tclabel2': 708, 'tclabel3': 728, 'tclabel4': 748, 'tclabel5': 768, 'tclabel6': 788, 'tclabel7': 808, 'tcxml0': 676, 'tcxml1': 700, 'tcxml2': 720, 'tcxml3': 736, 'tcxml4': 756, 'tcxml5': 776, 'tcxml6': 796, 'tcxml7': 816, 'tedit': 446, 'tedit_next': 454, 'tlabel': 856, 'tload': 556, 'tload_call': 576, 'tload_next': 598, 'tmine': 458, 'tpost': 424, 'tpost_call': 478, 'tpost_next': 442, 'treg': 0, 'treg_c0': 60, 'treg_c1': 92, 'treg_c2': 124, 'treg_c3': 156, 'treg_c4': 188, 'treg_c5': 220, 'treg_c6': 252, 'treg_c7': 284, 'treg_call': 28, 'treg_next': 294, 'tsave': 602, 'tsave_call': 622, 'tsave_next': 644, 'tstore': 298, 'tstore_c0': 322, 'tstore_c1': 334, 'tstore_c2': 348, 'tstore_c3': 360, 'tstore_c4': 372, 'tstore_c5': 384, 'tstore_c6': 398, 'tstore_c7': 412, 'tstore_call': 308, 'tstore_next': 420, 'tv0': 872, 'tv1': 880, 'tv2': 888, 'tv3': 896, 'tv4': 908, 'tv5': 920, 'tv6': 932, 'tvalues': 828, 'txml': 864}),
+        "7468656d650000bf53544f434b0000bf4e4f52544f4e0000564f4c4b4f5600005041434d414e00004d49444e49474854"
+        "0000bf00444941470000bf00435553544f4d0000"
+        , {'_sT': 0, 'tchr': 500, 'tchr_call': 524, 'tclabel0': 664, 'tclabel1': 688, 'tclabel2': 708, 'tclabel3': 728, 'tclabel4': 748, 'tclabel5': 768, 'tclabel6': 788, 'tclabel7': 808, 'tcxml0': 676, 'tcxml1': 700, 'tcxml2': 720, 'tcxml3': 736, 'tcxml4': 756, 'tcxml5': 776, 'tcxml6': 796, 'tcxml7': 816, 'tedit': 446, 'tedit_next': 454, 'tlabel': 856, 'tload': 556, 'tload_call': 576, 'tload_next': 598, 'tmine': 458, 'tpost': 424, 'tpost_call': 478, 'tpost_next': 442, 'treg': 0, 'treg_c0': 60, 'treg_c1': 92, 'treg_c2': 124, 'treg_c3': 156, 'treg_c4': 188, 'treg_c5': 220, 'treg_c6': 252, 'treg_c7': 284, 'treg_call': 28, 'treg_next': 294, 'tsave': 602, 'tsave_call': 622, 'tsave_next': 644, 'tstore': 298, 'tstore_c0': 322, 'tstore_c1': 334, 'tstore_c2': 348, 'tstore_c3': 360, 'tstore_c4': 372, 'tstore_c5': 384, 'tstore_c6': 398, 'tstore_c7': 412, 'tstore_call': 308, 'tstore_next': 420, 'tv0': 872, 'tv1': 880, 'tv2': 888, 'tv3': 896, 'tv4': 904, 'tv5': 916, 'tv6': 924, 'tvalues': 828, 'txml': 864}),
     'mk2_osdsync': (
         "2de9f04f8a4607465ff00008dff8a8b03c6800f00af87c6800f007f8b8f1000f01d0bff34f8fbde8f08f00b5dff88cc0"
         "002505f1ce064ff4207006fb00f6264405f1020000f01f015fea50195fea8909c646002248f64203b2f10b00b0f5957f"
@@ -1548,6 +1548,7 @@ def relocated_chr(obj, key="chr"):
     elif key == "chr10":
         table = [(sec, lo, hi, old, chr10_value(old)) for sec, lo, hi, old in CHR10_RELOC]
         mask = ram_shift(0x24069418) + 0x490      # chr10's osd_sync: base + 0x490
+        builtin_themes_chr(by_name)
     else:
         raise SystemExit(f"internal error: no MK2 relocation for C object {key!r}")
     for sec, lo, hi, old, new in table:
@@ -1716,6 +1717,62 @@ def landscape_chr(by_name, mask, blob):
     by_name[".text.osd_sync"][2] = code.hex()
 
 
+# Built-in themes for the MK2 (cc17), in place of 2.3.10's Amber, Stage,
+# Contrast, Phosphor and Synthwave (still there as theme.tml files for
+# Custom). A built-in theme is a whole palette, 34 entries, in chr10's
+# .rodata.thm_tab (5 x 34 words, B G R A); thm_fam says which theme-file
+# colour each entry takes in Custom, so a palette is built from the same 20
+# colours a theme.tml names -- and, unlike a file, any single entry can be
+# set on its own (THEME_ENTRY_SET). Colours by the MK2 map worked out on
+# hardware with two diagnostic themes (2026-10-29): grey1 the lines between
+# cells, background the waveform's ground, green the selected Settings row.
+THEME_ROLES = ("background", "black", "panel", "grey1", "cell", "grey3", "grey4", "grey5",
+               "text", "text-bright", "selection", "accent", "accent-dark", "red",
+               "red-dark", "green", "yellow", "yellow-dark", "teal", "purple")
+_NORTON = {"background": "000000", "black": "000000", "panel": "0000AA", "grey1": "55FFFF",
+           "cell": "0000AA", "grey3": "FFFF55", "grey4": "55FFFF", "grey5": "AAAAAA",
+           "text": "FFFFFF", "text-bright": "FFFFFF", "selection": "000055", "accent": "00AAAA",
+           "accent-dark": "005555", "red": "000000", "red-dark": "AA0000", "green": "00AAAA",
+           "yellow": "FFFF55", "yellow-dark": "AA5500", "teal": "55FFFF", "purple": "FFFF55"}
+_VOLKOV = dict(_NORTON, **{"selection": "00AAAA", "accent": "FFFF55"})
+_PACMAN = dict(_NORTON, **{"cell": "000055", "panel": "000055", "selection": "0000AA", "grey1": "000000"})
+_MIDNIGHT = dict(_PACMAN, **{"grey1": "0000AA"})
+# The diagnostic: Pacman, but every colour a theme file cannot split -- the
+# entries that share one theme colour -- each its own, so a photo says which
+# entry draws what (the loop frame, the white keys, ...).
+THEME_SPLIT = {2: "FF0000", 8: "FF8000", 13: "FFFF00",          # background
+               15: "FF00FF", 30: "00FF00", 33: "00FFFF",        # text-bright
+               4: "FF8080", 32: "8080FF",                       # selection
+               5: "FF0000", 7: "FF8000", 10: "FFFF00", 27: "00FF00", 29: "00FFFF", 31: "FF00FF",  # accent
+               12: "FF0000", 19: "00FF00", 21: "FF00FF",        # red-dark
+               11: "FF8000", 18: "00FFFF"}                      # green
+BUILTIN_THEMES = (("NORTON", _NORTON, {}), ("VOLKOV", _VOLKOV, {}),
+                  ("PACMAN", _PACMAN, {}), ("MIDNIGHT", _MIDNIGHT, {}),
+                  ("DIAG", _PACMAN, THEME_SPLIT))
+THM_TAB_HEAD = "000000003b4c5aff0c1216ff"      # Amber's first three entries, as 2.3.10 has them
+
+
+def theme_palette(fam, colours, entry_set):
+    words = []
+    for i in range(34):
+        if i == 0:
+            words.append(0)                  # entry 0 stays clear: the screen's own ground
+            continue
+        h = entry_set.get(i) or colours[THEME_ROLES[fam[i]]]
+        r, g, b = (int(h[j:j + 2], 16) for j in (0, 2, 4))
+        words.append(0xff000000 | r << 16 | g << 8 | b)
+    return struct.pack("<34I", *words)
+
+
+def builtin_themes_chr(by_name):
+    tab = by_name[".rodata.thm_tab"]
+    fam = bytes.fromhex(by_name[".rodata.thm_fam"][2])
+    data = bytes.fromhex(tab[2])
+    if len(data) != 5 * 34 * 4 or data[:12].hex() != THM_TAB_HEAD or len(fam) != 34:
+        pm.refuse("The themes' palette table is not what the patcher expects.")
+    tab[2] = b"".join(theme_palette(fam, c, e) for _, c, e in BUILTIN_THEMES).hex()
+
+
 def prepare_stage3():
     """Point patch_micro's stage-3 constants and functions at the MK2."""
     for name in STAGE3_GLOBALS:
@@ -1736,6 +1793,8 @@ def prepare_stage3():
     pm.THEME_CALLS = THEME_CALLS_MK2
     pm.DISPLAY_OBJ_LIT_VA = DISPLAY_OBJ_LIT_MK2
     pm.THEME_ROW_VA = SETTINGS_VA + 16 * THEME_TAB
+    pm.THEME_VALUES = ("STOCK",) + tuple(n for n, _, _ in BUILTIN_THEMES) + ("CUSTOM",)
+    assert len(pm.THEME_VALUES) == 7                # the C knows 7: Stock, five tables, Custom
     pm.STOCK_SIZE = STOCK_SIZE                     # "is this stock?" checks
     for name in STAGE3_FUNCS:
         transpile(name)
