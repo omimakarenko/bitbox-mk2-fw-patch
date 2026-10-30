@@ -66,7 +66,7 @@ def bl_target(at):
     if S: off-=1<<25
     return at+4+off
 h=H(img,END,WIN)
-h.allow(0x24070b40,0x24070bc0)     # cc25: the wave folder's state
+h.allow(0x24070b40,0x24070cc0)     # cc25: the wave folder's state
 # ---- 1. MIDI chain at the post call
 head=bl_target(POST_SITE); print("post call ->",hex(head))
 sp=0x2001f000
@@ -408,5 +408,10 @@ print("13. folder off:                  ", bus_run())
 for settings,name in ((((70,127),(71,87),(72,0)),"soft, amount max, point 87"),(((72,100),),"top only"),(((76,40),),"top only, low-pass 40"),(((76,127),(72,0),(71,0)),"soft, point 0, open"),
                       (((73,100),(74,64),(75,30)),"bias, half mix, quieter"),(((77,0),),"auto level off"),(((77,127),),"auto level back on"),(((70,0),),"amount back to 0"),((),"... 12 blocks later"),((),"... and later")):
     for n,v in settings: cc(n,v)
-    print(f"13. {name:30} state {h.mu.mem_read(0x24070b40,10).hex()}: ", bus_run())
-cc(70,50,chan=3); print("13. ch 4 CC 70 ignored:", h.mu.mem_read(0x24070b44,1).hex()=="00")
+    print(f"13. {name:30} state {h.mu.mem_read(0x24070b40+4+69,9).hex()}: ", bus_run())
+cc(70,50,chan=3); print("13. ch 4 CC 70 ignored:", h.mu.mem_read(0x24070b44+70,1).hex()=="00")
+for settings,name in ((((69,127),(70,100),(71,100)),"bass keep max, deep fold"),(((69,0),),"bass keep off"),(((70,0),),"folder off"),
+                      (((33,20),),"pulse filter: LP 20"),(((34,110),),"... resonance 110"),(((35,127),),"... pulse +"),(((35,0),),"... pulse -"),
+                      (((33,100),(35,64)),"HP 100"),(((35,127),(37,100)),"HP 100, soft pulse"),(((33,64),(35,64)),"open, no pulse"),((),"... later")):
+    for n,v in settings: cc(n,v)
+    print(f"13. {name:30} {h.mu.mem_read(0x24070b44+33,7).hex()}: ", bus_run())
