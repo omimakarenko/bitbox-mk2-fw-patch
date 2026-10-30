@@ -1180,6 +1180,10 @@ FROZEN_MK2 = {
         "0000bf0053594e5448574156450000bf4e4f52544f4e0000564f4c4b4f5600005041434d414e00004d49444e49474854"
         "0000bf00444941470000bf00435553544f4d0000"
         , {'_sT': 0, 'tchr': 564, 'tchr_call': 588, 'tclabel0': 736, 'tclabel1': 760, 'tclabel2': 780, 'tclabel3': 800, 'tclabel4': 820, 'tclabel5': 840, 'tclabel6': 860, 'tclabel7': 880, 'tcxml0': 748, 'tcxml1': 772, 'tcxml2': 792, 'tcxml3': 808, 'tcxml4': 828, 'tcxml5': 848, 'tcxml6': 868, 'tcxml7': 888, 'tedit': 446, 'tedit_next': 454, 'tground': 900, 'tlabel': 2436, 'tload': 620, 'tload_call': 640, 'tload_next': 662, 'tm_copy': 520, 'tm_custom': 540, 'tm_go': 542, 'tmine': 458, 'tpal': 948, 'tpost': 424, 'tpost_call': 542, 'tpost_next': 442, 'treg': 0, 'treg_c0': 60, 'treg_c1': 92, 'treg_c2': 124, 'treg_c3': 156, 'treg_c4': 188, 'treg_c5': 220, 'treg_c6': 252, 'treg_c7': 284, 'treg_call': 28, 'treg_next': 294, 'tsave': 666, 'tsave_call': 686, 'tsave_next': 708, 'tstore': 298, 'tstore_c0': 322, 'tstore_c1': 334, 'tstore_c2': 348, 'tstore_c3': 360, 'tstore_c4': 372, 'tstore_c5': 384, 'tstore_c6': 398, 'tstore_c7': 412, 'tstore_call': 308, 'tstore_next': 420, 'tv0': 2452, 'tv1': 2460, 'tv10': 2548, 'tv11': 2556, 'tv2': 2468, 'tv3': 2476, 'tv4': 2488, 'tv5': 2500, 'tv6': 2512, 'tv7': 2520, 'tv8': 2528, 'tv9': 2536, 'tvalues': 2388, 'txml': 2444}),
+    'mk2_names': (
+        "072218a910a8dff828c0e04700238df84730072d09dd072218a9073108a8dff810c0e04700238df82730000000000000"
+        "eddf0b08"
+        , {'nsplit': 0}),
     'mk2_osdsync': (
         "2de9f04f8a4607465ff00008dff8a8b03c6800f00af87c6800f007f8b8f1000f01d0bff34f8fbde8f08f00b5dff88cc0"
         "002505f1ce064ff4207006fb00f6264405f1020000f01f015fea50195fea8909c646002248f64203b2f10b00b0f5957f"
@@ -2143,6 +2147,7 @@ def stage3(d, upto="full", hook_e=None):
             theme_tab(d)
             apply_clip_modes(d, n_org, n_syms)
             apply_fold(d)                          # cc25: the wave folder
+            apply_pad_names(d)                     # cc29: 7 characters a line
     finally:
         pm.assemble = saved
 
@@ -2725,6 +2730,72 @@ def apply_fold(d):
     vprint(f"F wave folder at {org:#x}, {len(code) + len(ccode)} bytes, ram {FOLD_RAM:#x}")
 
 
+# --- pad names on 7 characters a line (cc29) ---------------------------------
+# A pad's name is split for its cell by 0x0805d8cc (set-name: strip the
+# extension, then two lines): the last space or underscore within the first
+# 4 characters splits it, else the first one past them, else 4 + 4; each line
+# at most 4. The constants are immediates: cmp #3 (twice), the 4s of the split
+# path. The no-separator path (0x0805d9b6) copies from sp+0x64, which a 16-bit
+# add cannot reach at +7, so it branches to NAME_SRC instead. The one-line
+# labels (0x0805da98, 0x0805db66: the mixer's) get 7 too.
+NAME_CHARS = 7
+NAME_PATCH = (                       # (va, stock hex, new hex)
+    (0x0805d988, "032c", "062c"),               # cmp r4, #3 -> #6: a space
+    (0x0805d9aa, "032c", "062c"),               # ... an underscore
+    (0x0805d9e0, "042ca8bf0427", "072ca8bf0727"),   # line 1: min(split, 7)
+    (0x0805d9fe, "042da8bf0425", "072da8bf0725"),   # line 2: min(rest, 7)
+    (0x0805daa8, "0422", "0722"),               # one-line label: 7
+    (0x0805dab0, "8df82440", "8df82740"),       # ... its terminator
+    (0x0805db74, "0422", "0722"),
+    (0x0805db7c, "8df80450", "8df80750"),
+)
+NAME_SITE, NAME_RET = 0x0805d9b6, 0x0805da1a
+NAME_SRC = """
+.syntax unified
+.thumb
+.text
+.global nsplit
+.thumb_func
+nsplit:                             /* no separator: 7 + 7, in the caller's frame */
+    movs    r2, #7
+    add     r1, sp, #0x60
+    add     r0, sp, #0x40
+    ldr     r12, =0x080bdfed        /* strncpy */
+    blx     r12
+    movs    r3, #0
+    strb.w  r3, [sp, #0x47]
+    cmp     r5, #7
+    ble     1f
+    movs    r2, #7
+    add     r1, sp, #0x60
+    adds    r1, #7
+    add     r0, sp, #0x20
+    ldr     r12, =0x080bdfed
+    blx     r12
+    movs    r3, #0
+    strb.w  r3, [sp, #0x27]
+1:
+    .short  0, 0                    /* b.w 0x0805da1a */
+.ltorg
+"""
+
+
+def apply_pad_names(d):
+    for va, old, new in NAME_PATCH:
+        guard_bytes(d, va, old, "the pad name split")
+    guard_bytes(d, NAME_SITE, "042218a9", "the pad name split's 4 + 4")
+    guard_bytes(d, 0x080bdfec, bytes(d[0x080bdfec - BASE:0x080bdfec - BASE + 4]).hex(), "strncpy")
+    for va, old, new in NAME_PATCH:
+        d[va - BASE:va - BASE + len(new) // 2] = bytes.fromhex(new)
+    code, syms = mk2_assemble("names", NAME_SRC)
+    code = bytearray(code)
+    ret = code.index(b"\0\0\0\0", syms["nsplit"] + 40)
+    org = pm._append(d, code)
+    d[org + ret - BASE:org + ret + 4 - BASE] = pm.enc_b_bl(org + ret, NAME_RET, False)
+    d[NAME_SITE - BASE:NAME_SITE - BASE + 4] = pm.enc_b_bl(NAME_SITE, org + syms["nsplit"], False)
+    vprint(f"pad names: {NAME_CHARS} a line, the no-separator split at {org:#x}")
+
+
 # --- UI font: --font=FILE.otf[:SIZE] -----------------------------------------
 # Stock text is one 6x8 bitmap font (0x080c0784; descriptor in .data, RAM
 # 0x240000cc = {ptr, w 6, h 8}) behind a handful of functions at 0x08061680:
@@ -3101,7 +3172,8 @@ def main():
                  "Hold buttons, per pad        CC 78, 102, 104, 105, 107, 118, 119",
                  "Theme, and your own          TOOLS > Theme",
                  "Wave folder, ch 1            CC 69-77",
-                 "Pulse filter, ch 1           CC 33-39"):
+                 "Pulse filter, ch 1           CC 33-39",
+                 "Pad names, 7 characters a line"):
         print(f"     ok   {what}")
 
     write_string(d, ATTRIB_VA, VER_VA, ATTRIB_STOCK, ATTRIB_NEW)
