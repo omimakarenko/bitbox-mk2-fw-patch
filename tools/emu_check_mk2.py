@@ -393,7 +393,7 @@ def one(entry,sig):
     out=struct.unpack(f"<{FR}f",h.mu.mem_read(L,FR*4))
     ok= end==0x0809817e and not h.badw and all(math.isfinite(x) for x in out) and all(h.mu.reg_read(r)==regs[r] for r in CS)
     return ok,out,end
-def bus_run(blocks=12):
+def bus_run(blocks=24):
     oks=0; peak=0; d=0; st=bytes(h.mu.mem_read(0x24070b40,0x40))
     for b in range(blocks):
         sig=[0.6*math.sin(i*0.3+b) for i in range(FR)]
@@ -406,7 +406,7 @@ for n,v in ((70,0),(14,0),(15,0),(16,0),(17,0),(22,16),(23,16),(24,16),(25,16)):
 print("13. fold head",hex(FHEAD),"-> next",hex(FNEXT))
 print("13. folder off:                  ", bus_run())
 for settings,name in ((((70,127),(71,87),(72,0)),"soft, amount max, point 87"),(((72,100),),"top only"),(((76,40),),"top only, low-pass 40"),(((76,127),(72,0),(71,0)),"soft, point 0, open"),
-                      (((73,100),(74,64),(75,30)),"bias, half mix, quieter"),(((70,0),),"amount back to 0"),((),"... 12 blocks later"),((),"... and later")):
+                      (((73,100),(74,64),(75,30)),"bias, half mix, quieter"),(((77,0),),"auto level off"),(((77,127),),"auto level back on"),(((70,0),),"amount back to 0"),((),"... 12 blocks later"),((),"... and later")):
     for n,v in settings: cc(n,v)
     print(f"13. {name:30} state {h.mu.mem_read(0x24070b40,10).hex()}: ", bus_run())
 cc(70,50,chan=3); print("13. ch 4 CC 70 ignored:", h.mu.mem_read(0x24070b44,1).hex()=="00")

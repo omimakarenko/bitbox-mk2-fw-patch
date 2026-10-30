@@ -82,7 +82,7 @@ import patch_micro as pm                # noqa: E402  the hook generators
 BASE = 0x08040000
 STOCK_SHA = "35ab7995ad0eca8484f3b28bc76389f10b2037dbb21a4a394e950d9329073e86"
 STOCK_SIZE = 674896
-VERSION = "2.3.4-cc27"                  # 10 characters: see pm.VER_DISPLAY_MAX
+VERSION = "2.3.4-cc28"                  # 10 characters: see pm.VER_DISPLAY_MAX
 
 # CCs left out of this build. 2026-10-27, cc1 on hardware: CC 89 (Loop
 # Crossfade) on a Sample pad gave sudden full-scale distorted output at any
@@ -754,45 +754,55 @@ STAGE3_GLOBALS = (
 FROZEN_MK2 = {
     'mk2_fold': (
         "01b5000000002de90f50eff30080f1ee101a03b42ded100a18980ff2540c4cf0010ce047bdec100a03bc80f30088e1ee"
-        "101abde80f5001b000bd2de90f50eff3008003b41a9838b91b994639062903d81c9ad209044b5a5403bc80f30088bde8"
+        "101abde80f5001b000bd2de90f50eff3008003b41a9838b91b994639072903d81c9ad209044b5a5403bc80f30088bde8"
         "0f50000000000000440b072400bf00bf"
         , {'fblock': 0, 'fblock_next': 2, 'fcode': 112, 'fm_out': 88, 'fmidi': 58, 'fmidi_next': 98}),
     'mk2_foldc': (
-        "f0b503af2de9000f81b02ded108b84b040f6603144f64642c2f20741c3f2442251f8203c934225d04ff0804341f81c3c"
-        "44f27f0321f8183c7f2301f1040c01f8163c4ff07e5343f23335002641e9053341e9036341f8043cc3f693750e608ce8"
-        "6800c1e90466c1e90666c1e908668e6241f8202c027c002a40f0f980d0f804c0bcf1000f08bfd0f800c0acf2011212f5"
-        "807fc0f0ec8011f8169cb7ee000a90f811e011f81c5c11f81b3c11f81a2c11f8196c11f8188c11f817acb9f1000f11d0"
-        "0393a9f101030124b9f1310f04eb131303f0030b09d200239fede71abbf1000f6dd1afe09fede51ab1e0b0ee002acdf8"
-        "088023f003049fede01a4ff020089fede03a4b46cde9006a04ee103ab0ee405aa3f1100aa3f12006b0ee406a07ee106a"
-        "b8eec44aa8f110064e45a3f13006b8eec77af0ee400a04ee035a04ee10aaa3f1400347ee030ab0ee407ab8eec44a04ee"
-        "036ab0ee424a88bfb0ee454a21ee041ab0ee424a05ee106ac84588bfb0ee464a21ee041a08f11006b0ee424ab8eec55a"
-        "4e4508f1200688bfb0ee604a21ee041ab0ee424a05ee037a4e4588bfb0ee474a21ee041a043c08f14008add1a8f12003"
-        "ddf80880dde9006abbf1000f42d0a9eb03049fedaf3a02ee104ab0ee404a03f11004a145b8eec22a02ee034ab0ee002a"
-        "b0ee425a38bfb0ee445a21ee051abbf1010f27d0a9eb0404b0ee405a04ee104a03f12004a145b8eec44a04ee035ab0ee"
-        "424a38bfb0ee454a21ee041abbf1020f10d0a9eb0404b0ee405a04ee104a30334b45b8eec44a04ee035a88bfb0ee452a"
-        "21ee021a9fedf32a039b21ee021ad1ed001a9db99fedf02af4ee421af1ee10fa0cd500200860c1e90700c1e9090004b0"
-        "bdec108b01b0bde8000ff0bd02ee105a9feded3a0f2ddfedee3a9fedef4ac3f17f03b8ee422a9fede25adfedec4a06ee"
-        "106adfede15af0ee007a22ee037a9fede33a88bfb0ee407ab4ee431ad1ed022af1ee10fab8ee466adfedd46a33fe011a"
-        "11ed048a91ed01aab0ee409a01249fede2ba31ee621a41ee232a9fedd61ac1ed022a22eea23a03ee014a01ee103aa1f1"
-        "0c03b8eec11a61ee050a9fedc61a43ee044a20ee814a9fedc51a36ee016a40ee845ab0ee404a02ee264af0ee400a02ee"
-        "108a43ee240a9fedbe3a06ee90aa26ee036a00f10808f8ee424ab5ee002ab1eee53a0020f8ee666ab4ee652a80ee033a"
-        "f1ee10fa64ee854a9fedb25a77fe837a11ed053a66ee856a34ee435a22eea04a75eec85a05ee233a9fedb15a74ee050a"
-        "11ed035a05eea38a51ed025a36ee456a74eee54a01ed053a77eeca7a06ee235a11ed016a44eea35a01ed048a76eec64a"
-        "77ee616a04ee209a07eea3aadfeda27a46eea31af9ee006a04eea36affee004ac0ee080adfed9b3a83ec035a80ee097a"
-        "c1ed001a68ee0a2a81ed01aa65eea11afeee005a9fed958a9fed959a9fed95aa1fe0f0ee689af0ee4faa05f10c0005f1"
-        "140305f11c06c0ed009a05f12400c3ed00aa86ed00ca80ed00da7046bef1000f18bf012020424ff001004ff000043ff4"
-        "0eaf58f82060002eefd001eb8005bcf1000fd5ed038a95ed05fa95ed07ca95ed09daced060461de000002042a7922b3b"
-        "0000803df0ee4b9af0ee4baab0ee4bcab0ee4bdab0ee4bfaf0ee4e8a013856ee0f8ab0ee6afa01eea8eaf0ee698aa6ec"
-        "01eab2d096ed00eaf0ee459a43ee0e9a60eea99af4ee639af1ee10fa04ddf0ee639a3f2a08d94ae0b4ee691af1ee10fa"
-        "71fe299a402a2dd279ee809af0ee49ca69ee829afdeee9aaf8eeeaaa7aeea4baf4ee69aaf1ee10fa7bfeaaaaf0ee48ba"
-        "79eeea9a79eea59af1ee69aaf5ee409af1ee10fa48bff0ee6a9af0ee40aa49eea6aa6aeeaa9a49eea7ba49eeebca6aee"
-        "ac9a35e0f5ee409af1ee10fa0fdaf1ee69aaf5ee409af0ee69baf1ee10fa48bff0ee6aba7bee80aac9eeaa9a20e079ee"
-        "809a69ee829afdeee9aaf8eeeaaa7aeea4baf4ee69aaf1ee10fa7bfeaaaa79eeea9a79eea5aaf1ee6a9af5ee40aaf1ee"
-        "10fa48bff0ee69aaf0ee409a4aeea69a62eea99ab9f17e0f79eee8aa4fee0aaa14d83aeecdfaf0ee4c8a44ee0f8ab0ee"
-        "4dfa67ee288a04ee28fa78eea88a38eeccca7fee0fba3beecdda01e0b0ee6afab4ee4ffaf1ee10fa7cbfb4ee4ccaf1ee"
-        "10fabff53fafb4ee4ddaf1ee10fafff543af37e71f4289386f12033a87c3613d0402013c3333733fcdcc4c3d000080c2"
-        "0000003c0000803c0000803d3333933f9a99193ed00d5d3d8888083eabaaaa3ef304b53f00008042a1c4a2bde15d253f"
-        "da0fc93f52b87e3f00000000"
+        "f0b503af2de9000f81b02ded108b84b040f6603844f64641c2f20748c3f2443158f8202c8a4226d04ff0804248f81c2c"
+        "44f27f0243f23336c7f67f7248f8182c4ff07e52002348e9052248e9033248f8042cc3f69376c8e90032c8e90c32c8e9"
+        "0433c8e90263c8e90a33c8e90833c8e9063348f8201c017c002940f0ff80d0f804b0bbf1000f08bfd0f800b0abf20111"
+        "11f5807fc0f0f280417c4ff0010e0391b7ee000a00294ff0010118bf4ff0020e18f816ac18f81c5c18f81b3c18f81a2c"
+        "18f819cc18f8189c18f8176cbaf1000f0fd00293aaf10103baf1310f01eb131101f0030308d200219fede71a002b68d1"
+        "a8e09fede61aaae0b0ee002a21f00301cde900699fede01a4ff020099fede03a544604ee104ab0ee405aa4f11006b0ee"
+        "406af0ee400ab8eec44a04ee035a04ee106aa4f1200607ee106aa9f11006b8eec44a5645a4f13006a4f14004b8eec77a"
+        "04ee036ab0ee424a88bfb0ee454a21ee041ab0ee424a05ee106ad14588bfb0ee464a21ee041a09f11006b0ee424a47ee"
+        "030ab8eec55a564588bfb0ee604a21ee041ab0ee407a09f12006b0ee424a05ee037a564588bfb0ee474a21ee041a0439"
+        "09f14009add1a9f12001dde90069002b40d0aaeb01049fedb23a02ee104ab0ee404a01f11004a245b8eec22a02ee034a"
+        "b0ee002ab0ee425a38bfb0ee445a21ee051a012b26d0aaeb0404b0ee405a04ee104a01f12004a245b8eec44a04ee035a"
+        "b0ee424a38bfb0ee454a21ee041a022b10d0aaeb0403b0ee405a04ee103a30315145b8eec44a04ee035a88bfb0ee452a"
+        "21ee021a9fed932a029b21ee021ad8ed002ad5b99fed902af4ee422af1ee10fa13d50020c8f80000c8e90700c8e90900"
+        "c8e90b004ff07e50c8f8340004b0bdec108b01b0bde8000ff0bd02ee105a0f2d9fed825ac3f17f019fed816a07ee10ca"
+        "b8ee423a9fed7a2adfed7e4af0ee007adfed7d5ab8ee477a63ee020a9fed7b2a88bff0ee400ab4ee421ad8ed023af1ee"
+        "10fadfed776a18ed048a32fe011a98ed01aab0ee409a9fed73ba9fed73ca31ee632a9fed721a9fed72da9fed72ea42ee"
+        "013a9fed712ac8ed023a23eea34a04ee025a02ee101ab8eec22a62ee061a9fed6b2a44ee054a21ee825a9fed692a37ee"
+        "027a41ee855ab0ee405a03ee265af0ee401a03ee109a44ee241a9fed624a06ee906a27ee047a00f10809f8ee434ab5ee"
+        "003ab1eee54a0026f8ee666ab4ee653a80ee044af1ee10fa64ee864a9fed566a77fe847a18ed054a66ee866a35ee446a"
+        "23eea15a75eec85a06ee014a9fed4f6a75ee061a18ed036a05ee818a58ed025a37ee467a74eee54a08ed054a77eeca7a"
+        "07ee016a18ed017a44ee815a08ed048a76eec74a70eee26a05ee219a08ed036a07ee81aa48ed025a46ee812adfed3c7a"
+        "04ee817adfed3b4ac0ee081af0ee646a88ed01aac0ee090ac8ed002a68ee0a3abfee008a65eea22abeee009ab9ee00aa"
+        "f0ee645a08ed017a18f8151c029117e0f0ee6bcaf0ee6ada05f10c0105f1140305f11c04c1ed00da05f12401c3ed00ca"
+        "84ed00fac1ed008a0136764500f0108159f826100029f7d008eb8605bbf1000fd5ed03aad5ed05ba95ed07fad5ed098a"
+        "d6d05b464ce000bf00002042a7922b3b0000803d1f4289386f12033a8888083e0402013cabaaaa3ecdcc4c3d3333933f"
+        "87c3613da1c4a2bde15d253f9a99193eda0fc93f52b87e3fd00d5d3d3333733f000080c20000003c0000803cf304b53f"
+        "0000804200000000f0ee64cab0ee64faf0ee648af0ee64daf0ee64aaf0ee69ba49eea95a57ee2abaf0ee6daa013b42ee"
+        "ab9af0ee6cba49eea96ae1ec019a8bd0d1ed009af0ee46ca44ee29ca61eeaccaf4ee67caf1ee10fa04ddf0ee67ca3f2a"
+        "08d94ae0b4ee6c2af1ee10fa72fe2cca402a2dd27cee80caf0ee4dfa6cee83cafdeeecdaf8eeedda7dee88eaf4ee6cda"
+        "f1ee10fa7efeaddaf0ee4cea7ceeedca7cee89caf1ee6cdaf5ee40caf1ee10fa48bff0ee6dcaf0ee40da4cee8ada6dee"
+        "adca4cee8bea4ceeeefa6deeafca35e0f5ee40caf1ee10fa0fdaf1ee6cdaf5ee40caf0ee6ceaf1ee10fa48bff0ee6dea"
+        "7eee80dacceeadca20e07cee80ca6cee83cafdeeecdaf8eeedda7dee88eaf4ee6cdaf1ee10fa7efeadda7ceeedca7cee"
+        "89daf1ee6dcaf5ee40daf1ee10fa48bff0ee6cdaf0ee40ca4dee8aca63eeacdabaf17e0f7deeeaca4bee8eca14d87cee"
+        "e8aaf0ee4fba45ee2abaf0ee68aa60eeabba45ee2baa7beeabba3beecffa7aeeaaea7eeee88a01e0f0ee6caaf4ee6aaa"
+        "f1ee10fa7cbfb4ee4ffaf1ee10fabff53baff4ee688af1ee10fafff53faf33e70398b6ee003a00289fed6a4a18bf0120"
+        "0bfa00f198ed0b5a02ee101a98ed0c6a0298b8ee422a80ee022a22ee257a22ee262ab4ee457af1ee10fab4ee462a73fe"
+        "040af1ee10fa37ee457a73fe041a3f2832ee462a07ee205a02ee216a98ed0d2a88ed0b5a88ed0c6a2dd9b0ee427a9fed"
+        "520ab4ee405af1ee10fa2addb0ee427a9fed4e0ab4ee406af1ee10fa21dd85ee060ab1eec01ab0ee040ab4ee401af1ee"
+        "10fa0adcb0ee410a9fed455ab4ee451af1ee10fa01d5b0ee450ab4ee402af1ee10fa33fe041a30ee420ab0ee427a00ee"
+        "017a01ee10ba37ee420a0bf4fe71abf1010c0bf003024b42b8ee411a002688ed0d7a80ee010a03e0013676453ff47ead"
+        "59f82650002d18bfbbf1000ff4d0bcf1030f04d20021b0ee421a72bbece7b0ee421aa5f11001002430ee013a91ed044a"
+        "21ee041a91ed064a91ed055a81ed041a30ee036a01f1100023ee053a91ed075a81ed053a043c30ee067aa34226ee041a"
+        "81ed061a30ee071a27ee053a81ed073a0146d9d16142002abed005eb8101012a91ed003a21ee033a81ed003ab4d030ee"
+        "011a91ed013a022a21ee033a81ed013aaad030ee011a91ed023a21ee031a81ed021aa1e78fc2f53c95bfd6335f708930"
+        "cdcc4c3e"
         , {'fold_block': 0}),
     'mk2_font': (
         "45a2002110f8013b2bb152f82330c3f307431944f6e7084670472de9f04f8ab0029203930022049220e02de9f04f8ab0"
@@ -2304,7 +2314,8 @@ def version_labels(d):
 # FOLD_RAM, initialised by the C on its first block (magic "FOLD").
 #   CC 70 amount (0 = off)  71 fold point (0 = the bend at full scale, the
 #   softest; cc27)  72 character (0-63 soft sine fold, 64-127 top only; cc27)
-#   76 a low-pass on the folded side before the mix (127 = open; cc27)  73 bias
+#   76 a low-pass on the folded side before the mix (127 = open; cc27)
+#   77 auto level, >= 64 on (the default; cc28)  73 bias
 #   (64 = none)  74 mix  75 the folded side's level (64 = unity). The amount
 #   also fades the folder in over 0-16, so turning it to 0 never clicks.
 FOLD_RAM = 0x24070b40
@@ -2313,13 +2324,14 @@ FOLD_C = r"""/* Wave folder on the master bus, ch 1 CC 70-76. State at a fixed R
 typedef unsigned int u32;
 typedef unsigned char u8;
 #define FOLD_RAM 0x24070b40u
-#define MAGIC 0x32444c46u           /* "FLD2" */
+#define MAGIC 0x33444c46u           /* "FLD3" */
 typedef struct {
     u32 magic;
-    u8 cc[8];                       /* 70 amount, 71 fold point, 72 character, 73 bias, 74 mix, 75 level, 76 low-pass */
+    u8 cc[8];                       /* 70 amount, 71 fold point, 72 character, 73 bias, 74 mix, 75 level, 76 low-pass, 77 auto level */
     float g, t, bias, mix, out, eng, mk, lp;   /* smoothed */
     float dcx[2], dcy[2];
     float s1[2], s2[2];             /* the low-pass's two integrators, per channel */
+    float pin, pout, ag;            /* auto level: smoothed powers in and out, the gain */
 } fold_t;
 
 static inline float ffloor(float v) { int i = (int)v; float f = (float)i; return f > v ? f - 1.0f : f; }
@@ -2347,9 +2359,10 @@ void fold_block(int *bus)
 {
     fold_t *s = (fold_t *)FOLD_RAM;
     if (s->magic != MAGIC) {
-        s->cc[0] = 0; s->cc[1] = 0; s->cc[2] = 0; s->cc[3] = 64; s->cc[4] = 127; s->cc[5] = 64; s->cc[6] = 127;
+        s->cc[0] = 0; s->cc[1] = 0; s->cc[2] = 0; s->cc[3] = 64; s->cc[4] = 127; s->cc[5] = 64; s->cc[6] = 127; s->cc[7] = 127;
         s->g = 1.0f; s->t = 1.0f; s->bias = 0.0f; s->mix = 1.0f; s->out = 1.0f; s->eng = 0.0f; s->mk = 1.0f;
         s->lp = 1.15f;
+        s->pin = s->pout = 0.0f; s->ag = 1.0f;
         s->dcx[0] = s->dcx[1] = s->dcy[0] = s->dcy[1] = 0.0f;
         s->s1[0] = s->s1[1] = s->s2[0] = s->s2[1] = 0.0f;
         s->magic = MAGIC;
@@ -2382,6 +2395,7 @@ void fold_block(int *bus)
     if (s->cc[0] == 0 && s->eng < 0.0005f) {      /* off, and faded out */
         s->eng = 0.0f;
         s->s1[0] = s->s1[1] = s->s2[0] = s->s2[1] = 0.0f;
+        s->ag = 1.0f; s->pin = s->pout = 0.0f;
         return;
     }
     float mk = t < 0.25f ? 2.0f : 1.0f / __builtin_sqrtf(t);
@@ -2394,6 +2408,8 @@ void fold_block(int *bus)
     float inv = 1.0f / T;
     float gg = tan_(s->lp), R2 = 1.41421356f;     /* Butterworth: 12 dB/oct, no peak */
     float a1 = 1.0f / (1.0f + gg * (gg + R2));
+    int autolev = s->cc[7] >= 64;
+    float pin = 0.0f, pout = 0.0f;
     for (int c = 0; c < chans; c++) {
         float *p = (float *)bus[2 + c];
         if (!p) continue;
@@ -2410,9 +2426,36 @@ void fold_block(int *bus)
                 y = v2;
             }
             if (!(y == y) || !(i1 == i1) || !(i2 == i2)) { y = 0.0f; x1 = y1 = i1 = i2 = 0.0f; }
-            p[i] = x + M * (y * O - x);
+            float o = x + M * (y * O - x);
+            pin += x * x; pout += o * o;             /* the power before the auto gain */
+            p[i] = o;
         }
         s->dcx[c] = x1; s->dcy[c] = y1; s->s1[c] = i1; s->s2[c] = i2;
+    }
+    /* auto level (CC 77 >= 64, the default): the output's power follows the
+       input's. Powers are followed fast upward and slowly down (~100 ms), so
+       a sudden louder fold is caught in the same block; the gain falls at
+       once and rises slowly, is held through silence, and is ramped across
+       the block in a second pass */
+    float inv_n = 1.0f / (float)(n * (u32)chans);
+    pin *= inv_n; pout *= inv_n;
+    s->pin += (pin > s->pin ? 0.5f : 0.03f) * (pin - s->pin);
+    s->pout += (pout > s->pout ? 0.5f : 0.03f) * (pout - s->pout);
+    float ag0 = s->ag, ag1 = ag0;
+    if (!autolev) {
+        ag1 = ag0 + 0.15f * (1.0f - ag0);
+    } else if (s->pin > 1e-7f && s->pout > 1e-9f) {
+        float tg = __builtin_sqrtf(s->pin / s->pout);
+        if (tg > 2.5f) tg = 2.5f; else if (tg < 0.2f) tg = 0.2f;
+        ag1 = ag0 + (tg < ag0 ? 0.5f : 0.03f) * (tg - ag0);
+    }
+    s->ag = ag1;
+    float agd = (ag1 - ag0) / (float)n;
+    for (int c = 0; c < chans; c++) {
+        float *p = (float *)bus[2 + c];
+        if (!p) continue;
+        float ag = ag0;
+        for (u32 i = 0; i < n; i++) { p[i] *= ag; ag += agd; }
     }
 }
 """
@@ -2452,7 +2495,7 @@ fmidi:
     cbnz    r0, fm_out
     ldr     r1, [sp, #0x6c]         /* CC */
     subs    r1, #70
-    cmp     r1, #6
+    cmp     r1, #7
     bhi     fm_out
     ldr     r2, [sp, #0x70]         /* value << 7 */
     lsrs    r2, r2, #7
@@ -2909,7 +2952,7 @@ def main():
                  "Live Flip modes, per pad     CC 117",
                  "Hold buttons, per pad        CC 78, 102, 104, 105, 107, 118, 119",
                  "Theme, and your own          TOOLS > Theme",
-                 "Wave folder, ch 1            CC 70-76"):
+                 "Wave folder, ch 1            CC 70-77"):
         print(f"     ok   {what}")
 
     write_string(d, ATTRIB_VA, VER_VA, ATTRIB_STOCK, ATTRIB_NEW)
