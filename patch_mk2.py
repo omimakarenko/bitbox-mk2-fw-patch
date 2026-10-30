@@ -82,7 +82,7 @@ import patch_micro as pm                # noqa: E402  the hook generators
 BASE = 0x08040000
 STOCK_SHA = "35ab7995ad0eca8484f3b28bc76389f10b2037dbb21a4a394e950d9329073e86"
 STOCK_SIZE = 674896
-VERSION = "2.3.4-cc31"                  # 10 characters: see pm.VER_DISPLAY_MAX
+VERSION = "2.3.4-cc32"                  # 10 characters: see pm.VER_DISPLAY_MAX
 
 # CCs left out of this build. 2026-10-27, cc1 on hardware: CC 89 (Loop
 # Crossfade) on a Sample pad gave sudden full-scale distorted output at any
@@ -753,103 +753,133 @@ STAGE3_GLOBALS = (
 # BEGIN FROZEN_MK2
 FROZEN_MK2 = {
     'mk2_fold': (
-        "01b5000000002de90f50eff30080f1ee101a03b42ded100a18980ff2540c4cf0010ce047bdec100a03bc80f30088e1ee"
-        "101abde80f5001b000bd2de90f50eff3008003b41a9830b91b997f2903d81c9ad209044b5a5403bc80f30088bde80f50"
-        "00000000440b072400bf00bf00bf00bf"
-        , {'fblock': 0, 'fblock_next': 2, 'fcode': 112, 'fm_out': 86, 'fmidi': 58, 'fmidi_next': 96}),
+        "01b5000000002de90f50eff30080f1ee101a03b42ded100a1898dff848c0e047bdec100a03bc80f30088e1ee101abde8"
+        "0f5001b000bd2de90f50eff3008003b41a9830b91b997f2903d81c9ad209044b5a5403bc80f30088bde80f5000000000"
+        "440b07240000000000bf00bf00bf00bf"
+        , {'fblock': 0, 'fblock_next': 2, 'fc_block': 100, 'fcode': 112, 'fm_out': 82, 'fmidi': 54, 'fmidi_next': 92}),
     'mk2_foldc': (
-        "f0b503af2de9000f81b02ded108b84b040f6443b44f65301c2f2074bc3f250515bf8042c8a4262d0002200230beb0306"
-        "4bf803204033802bc6e90122c6e90322c6e90522c6e90722c6e90922c6e90b227263b263f263e9d144f200030022c4f2"
-        "7f038bf84520abf846200bf59a76cbf8483047f67f73abf84c3040238bf821304ff48043abf8223042f64003c7f67f73"
-        "cbf824300bf1800343f8042bb3420bd243f8042bb3423cbf43f8042bb34203d243f8042bb342efd343f233334ff07e52"
-        "c3f69373cbf8d020cbe9262300234bf8041cc4f2c823cbf8a430cbe92022cbe923224ff08043cbe93f23cbe94222017c"
-        "11bbd0f80490b9f1000f08bfd0f80090a9f2011111f5807f16d390f811c00221bcf1000f08bf01210191d0e902100028"
-        "039018bf0120002902911ebfbcfa8cf1490950ea010006d104b0bdec108b01b0bde8000ff0bd9bf84c009fede51adfed"
-        "e52a9bf8466000ee100adfede34adfede33a9bf84750dfede21a9bf84830b8ee400ab0ee614a9bf849409bf84a809bf8"
-        "4ba020ee010abdeec01ab8eec12a11ee102a30ee423ab0ee620ab0ee632a012a03ee240a03ee002ab7ee000a03ee024a"
-        "b0ee402a03ee042a0adb12f00301ddf804e008d032ee022a012906d1511e0de0ddf804e019e0114608e032ee022a0229"
-        "01d1911e02e032ee022ad11e042a0cd3013932ee021a043911f1020f31ee011a31ee011a31ee012af3d39fedba9a9bed"
-        "251ab6bb9fedb83ab4ee431af1ee10fa2fd50020cbf894004ff07e51cbe93200cbe93410cbe93a00cbe93800cbe93600"
-        "cbe93000cbe92e00cbf8f800cbe93c009bf8211000209bf82320422988bf012040003e2938bf0120422ac0f02f83413a"
-        "9feda22a01ee102ab8eec11a21ee026a32e39fed9f3a0f2e22ee032a03ee106a9fed9caac5f17f0107ee101adfed9a1a"
-        "b8ee434a9fed993a22ee035a9fed982ab8eec77adfed972a24ee023a9fed962a88bfb0ee403ab4ee425adfed944af1ee"
-        "10fa64ee093af0ee405a32fe056a9fed902ab4ee452a9bed275af1ee10fa27ee097a9bf8451032fe066adfed8aaaf0ee"
-        "6aba36ee456a06ee0a5a06ee105ab8ee466a8bed275a26ee096a65ee050a26ee036a40eea12adfed801a67ee211a23ee"
-        "866af0ee643af0ee404a47ee213a9fed7b7ab1eec66adfed7a1a00eea27af0ee002a44ee214a9fed774adfed771a46ee"
-        "041a04ee104ab1eee36ab8ee444a40ee875a9fed727af5ee000a80ee066a34ee074a07ee10aaf4ee630adfed6d0ab8ee"
-        "477a64ee200a9fed6b4af1ee10fa67ee046a9bed214a33eec47a03ee908a72fe867adbed202a34eee26af8ee633a07ee"
-        "0a4a46ee0a2a9bed236a23ee897adbed223a70eee30a65ee255a9fed5b5a77ee464a07ee101a40ee8a3acbed202a8bed"
-        "214ab8ee478a9bed287a04ee8a6af0ee470adbed244acbed223a58ee090a76eee46a33ee418a9bed263a77eec37a8bed"
-        "236a46ee8a4a75ee856a9bed295a71eec51a00ee8a7af0ee400a08ee0a1acbed244a07ee8a3a45eea60a01ee8a5a8bed"
-        "287a8bed251ab4ee427a9fed3c2af1ee10fa8bed263a8bed295a1cddf0ee6abadbed3d1adfed366af4ee661af1ee10fa"
-        "11dddbed3e6ac6eea11a70ee611af1eee16af5ee401af1ee10fadfed221a27ee267a77fe21ba80ee04baf9ee00ca80ee"
-        "20cab0ee6aaa21ee06dab0ee6a8a25ee02eaf0ee6a8a24ee03faf0ee6a7a4ff0000a0df10808dfed1f9a9fed1f6a76e0"
-        "0768803d4458633d3c951d3cf0fd753e1872313f0402013c6f12033a0821843b000020429a99193ed00d5d3d1f428938"
-        "0000803d8888083e3333933fcdcc4c3d6f12833a000000003333733fabaaaa3e87c3613d00003e4300007042000080c2"
-        "0000003c0000803cf304b53f1f42093977cc2b320000804252b87e3fa1c4a2bde15d253fda0fc93f8fc2f53c2108823b"
-        "6f12033af0ee47faf0ee45dab0ee613ab0ee6e4a05f1a80105f1b00405f1b80605f1c00281ed004a05f1d40184ed003a"
-        "05f1dc0486ed009a05f1e406c2ed000a05f1ec020af1010ac1ed006af245c4ed00fa86ed001ac2ed00da00f01f810beb"
-        "8a05b9f1000fd5ed2aead5ed2c1a95ed2e9ad5ed300ad5ed356a95ed377a95ed391a95ed3b5abdd058f82a604c462be0"
-        "b0ee6a9af0ee6a0af0ee6a6af0ee6afab0ee6a1af0ee6adab0ee6a3ab0ee6a4af0ee6a1af0ee42ea02ee02aa54eea1ea"
-        "f0ee431a47ee078ab0ee6f7a45ee057ab0ee6d5a013c0dee2e2af0ee44ea02ee028aa6ec012a95d096ed002ab0ee633a"
-        "02ee823a2bee033ab4ee693af1ee10fa04ddb0ee693a3f2b0ad954e01fed514ab4ee434af1ee10fa34fe033a402b35d2"
-        "33ee003ab5ee004affee00da5fed51fa23ee043abdeec34ab8eec44a74ee2ddab4ee434af1ee10fa3dfe844a5fed58da"
-        "33ee443abeee004a33ee043ab1ee434ab5ee403af1ee10fa48bfb0ee443ab0ee404a03ee2c4a24ee043a43ee2fda5fed"
-        "63fa43ee6dfa24ee2f3a3be0b5ee403af1ee10fa0fdab1ee434ab5ee403af0ee43daf1ee10fa48bff0ee44da3dee804a"
-        "83ee043a26e033ee003ab5ee004affee00da23ee043abdeec34ab8eec44a74ee2ddab4ee434af1ee10fa3dfe844a33ee"
-        "443abeee004a33ee044ab1ee443ab5ee404af1ee10fa48bfb0ee434ab0ee403a04ee2c3a32ee664a7e284eee046a2fee"
-        "034a34ee6e3a01ee863a76eec7da0eee2d7af0ee431a4bee871a13d871eee01af0ee49da45eea1daf0ee601a6cee2dda"
-        "45eead1a7deeadda3deec99a71eea1ea7eeee00a73ee41daf4ee611af1ee10fa0eee2d1a71ee45da0eee2d5abff510af"
-        "b4ee499af1ee10fa7cbff4ee600af1ee10fabff505aff0ee47faf0ee45dab4ee455af1ee10fafff50daff9e6bcf1000f"
-        "5fedbe4a18bf4ff0010c09fa0cf09bed3d6a01ee100ab0ee463a9bed322adbed3e0af0ee601a9bed335ab8ee411a1fed"
-        "b64a80ee011a11ee283a21ee0a7a61ee082a51ee271ab4ee427af1ee10fa03ee246ab6ee003af4ee452a37ee427a33fe"
-        "041af1ee10fa72eec52a8bed3d6a73fe043a41eea40a07ee012a9bed341a02eea35acbed3e0a8bed322a8bed335a9bf8"
-        "4d0040287bd230ee412ab0ee416a1fedeb3a1fedf09a02ee036a5fedf31a5fedf72a5fedf63adfedbd4aa4e03f3a1fed"
-        "d92a01ee102a1feded6ab8eec11a21ee021a38bfb0ee416a1fedf27aa1f14302b5ee406af0ee470ad3b2f1ee10fa18bf"
-        "f0ee400afb2b38bff0ee400af5ee400af1ee10fa15d19bed441a1fedeb2ab4ee421af1ee10fa0cd50020cbe94400cbf8"
-        "3001cbe94a00cbe94800cbe94600fff7fbbb002800f0d480022840f0e08001ee102a9fed942ab8eec11a21ee021abdee"
-        "c12ab8eec23a12ee101a31ee433ab0ee401a012943ee242a43ee223a43ee231a03ee211ac0f20a8111f0030200f0e480"
-        "31ee011a012a40f0e3804a1eefe09fed826ab4ee462ab0ee416af1ee10fa9fed7f9adfed7f1adfed7f2adfed7f3adfed"
-        "7f4a28dd9fed7e6ab4ee465ab0ee416af1ee10fa1fdd82ee052ab0ee045a9fed796ab1eec22ab4ee452af1ee10fab4ee"
-        "426a35fe025af1ee10fa36fe052ab0ee416ab4ee421af1ee10fa32ee412a33fe043a02ee036a03ee109a36ee412a09f4"
-        "fe7109f0030049420022b8ee433a8bed346a82ee032a03e0013272453ff408acb9f1000ff8d0b9f1040f58f8223004d2"
-        "0026b0ee413a70bbeee7b0ee413aa3f11005002632ee034a95ed045a23ee053a95ed065a95ed056a85ed043a32ee047a"
-        "05f1100424ee064a95ed076a85ed054a043e72ee070ab14227ee053a85ed063a32ee203a20ee864a85ed074a2546d9d1"
-        "76420028c0d003eb8603012893ed004a23ee044a83ed004ab6d032ee033a93ed014a022823ee044a83ed014aacd032ee"
-        "033a93ed024a23ee043a83ed023aa3e7b6ee001a9bed3f2ab3ee043ab4ee412a9fed311af1ee10fa31fe031a8ae001ee"
-        "101a9fed2e2ab8ee411a21ee021abdeec12ab8eec23a12ee101a31ee433ab0ee401a012943ee242a43ee223a43ee231a"
-        "03ee211a6adb11f0030207d031ee011a012a0bd14a1e52e00a4610e00a464ee031ee011a022a07d18a1e08e031ee011a"
-        "022a41d18a1e42e031ee011aca1e04290cd3511e31ee011a043911f1020f31ee011a31ee011a31ee011af3d3b3ee042a"
-        "3ee000bf9a99193e95bfd6330402013c1872313f4458633df0fd753e3c951d3c5f708930cdcc4c3e00a08c467fb9133e"
-        "000020421f4289389a99993f6f12033a8888083eabaaaa3e0ad7233dd00d5d3d000080c2cdcc4c3c31ee011aca1e0429"
-        "0cd3511e31ee011a043911f1020f31ee011a31ee011a31ee011af3d31fed142a21ee021a1fed152a9bf8221021ee021a"
-        "1fed172a1fed173a9bf826201fed184ab5ee008ab4ee421a1fed1a5af1ee10fab4ee413a5fed1c4a32fe012af1ee10fa"
-        "33fe021a1fed1f3a022821ee012a02ee034a03ee101a9bf82410b8ee433a02ee045ab0ee404a03ee494ab0ee403a02ee"
-        "053a05ee101a34ee042a9bf82510b8ee455a44ee024a1fed2e2a75ee021a02ee101a9bf82710b8ee424a02ee102a02ee"
-        "901ab8ee425a9bed3f2af0ee426af8ee625a51ee036adbed422af0ee627a9bed433a9bed401a55ee097ab0ee435a74ee"
-        "c14a15ee895a64ee093a9bed414a76ee445ab0ee426a04ee881adbed444a06ee886a5fed486a70eee40a05ee884adfed"
-        "f65a47ee882a8bed401a05ee083a8bed3f6a40ee884a00ee909a63eea55a8bed414a36ee425acbed422af8ee600a8bed"
-        "433acbed444a0ad058b9f6ee007a0020b4ee676af1ee10fa48bf012002e0012000e0002085ee205af0ee400a43eea50a"
-        "b5ee404af0ee443a21eea66af1ee446a0ff2683ef1ee10fa62eea41a09f4ff7348bff0ee663a70ee632a4ff000080ef1"
-        "04064feac971009127e0f0ee473af0ee474af0ee475af0ee476af0ee477ab0ee489a13ee279a01ee898a81ed008a02f5"
-        "8a7102f58e7502f5927402f59672c1ed006a08f101080199c5ed005a8845c4ed004ac2ed003a3ff497a90beb8802b9f1"
-        "000fd2ed456ad2ed475ad2ed494ad2ed4b3adcd002a9b9f1010f51f828a06bd1f0ee427a0021009d002dd0d031ee278a"
-        "0aeb8101b0ee409ab0ee66ba0028754607ee889a91ed008a38ee65aa07ee8aba80ee099a29ee0baab0ee659a07ee8a9a"
-        "f0ee487a41ee4a7a77eec97a09fe27baf1ee4b7ab5ee40bab0ee4bcaf1ee10fa48bfb0ee67ca7cee647ab4ee64caf1ee"
-        "10fac8bf354695ed00ca47ee8c4a66ee247ab4ee67baf1ee647af1ee10fa74fea77a77eee37a40eea73a64ee237a42ee"
-        "8b7af4ee677af1ee10fabff56eaf3aee0aaa7aee666af4ee666af1ee10fabff564af39ee099a79ee655af4ee655af1ee"
-        "10fafff564af58e7f0ee427a0af1040c002119e0f0ee473af0ee474af0ee475af0ee476ab0ee47aab0ee498a75ee277a"
-        "13ee0a8a02318b4201ee889a8ced009a0cf1080c3ff477af31ee278ab0ee409ab0ee66ba0028744607ee889a1ced018a"
-        "38ee65aa07ee8abab0ee48aa80ee099a29ee0bbab0ee659a07ee8b9a01ee4baa3aee49aa09fe0acab1ee4caab5ee40ca"
-        "b0ee4cdaf1ee10fa48bfb0ee4ada3dee64aab4ee64daf1ee10fac8bf344694ed00da4aee0d4a26ee24aab4ee4acab1ee"
-        "64aaf1ee10fa34fe8aaa3aee63aa40ee8a3a24ee23aa02ee8caab4ee4aaaf1ee10fa11d63bee0bba7bee666af4ee666a"
-        "f1ee10fa08d639ee099a79ee655af4ee655af1ee10fa09d7f0ee473af0ee474af0ee475af0ee476ab0ee47aa75ee277a"
-        "b0ee40bab0ee66da0028744631ee279a07ee89ba9ced009a39ee65ca07ee8cda80ee0bba2bee0dcab0ee65bab0ee49da"
-        "07ee8cba01ee4cda3dee4bda0bfe0ddab1ee4deab5ee40dab0ee4dfaf1ee10fa48bfb0ee4efa3fee64eab4ee64faf1ee"
-        "10fac8bf344694ed00fa4eee0f4a26ee24eab4ee4edab1ee64eaf1ee10fa34fe8eea3eee63ea40ee8e3ab0ee48ea13ee"
-        "0aea24ee23aa02ee8daa01ee8e8a0ced018ab4ee4aaaf1ee10fabff523af3cee0c8a78ee666af4ee666af1ee10fabff5"
-        "19af3bee0b8a78ee655af4ee655af1ee10fafff519af0de7ec5178bfa69bc43a0ad7a33c"
-        , {'shape_block': 0}),
+        "f0b503af4df8048d40f6a0464ff20d08c2f20746c5f617280d46044656f80c2c424500f0808043f64d314ff40060c0f6"
+        "04018847002800f0af8000210022831881508032b2f5006f5967c3e90111c3e90311c3e90511c3e90711c3e90911c3e9"
+        "0b11c3e90d11c3e90f11c3e91111c3e91311c3e91511c3e91711c3e91911c3e91b119967d967dad146f8180c00f58060"
+        "002146f8140c46e9081140f2011026f8100cc6e90011c6e90211c6e90411c6e90611c6e90811c6e90a11c6e90c11c6e9"
+        "0e11c6e91011c6e91211c6e91411c6e91611c6e91811c6e91a11c6e91c11c6e91e11c6e92011c6e92211c6e92411c6e9"
+        "2611c6e92811c6e92a11c6e92c11c6e92e11c6e93011c6e93211c6e93411c6e93611c6e93811c6e93a11c6e93c11c6e9"
+        "3e1146f80c8c7f2d9fed1d1a28bf7f2500ee105a311d4ff0ff306ff01f02b8ee400a20ee010a04e01846013201f10801"
+        "15d251f8045c02f12003a5420dd0b0f1ff3ff2dc002defd091ed001ab5ee401af1ee10fa08bf1846e7e7184608e0b5ee"
+        "400af1ee10fa07dd002805d446f8304006ebc00080ed010a5df8048bf0bd00bf0402013c80b56f4600f008f80020b5ee"
+        "400af1ee10fac8bf012080bd40f6a0414ff20d03c2f20741c5f617239fed600a51f80c2c9a4240f0b98051f8202c002a"
+        "00f0b4800a6882426fd08a6882426ed00a6982426dd08a6982426cd00a6a82426bd08a6a82426ad00a6b824269d08a6b"
+        "824268d00a6c824267d08a6c824266d00a6d824265d08a6d824264d00a6e824263d08a6e824262d00a6f824261d08a6f"
+        "824260d0d1f8802082425ed0d1f8882082425cd0d1f8902082425ad0d1f89820824258d0d1f8a020824256d0d1f8a820"
+        "824254d0d1f8b020824252d0d1f8b820824250d0d1f8c02082424ed0d1f8c82082424cd0d1f8d02082424ad0d1f8d820"
+        "824248d0d1f8e020824246d0d1f8e820824244d0d1f8f020824242d0d1f8f820824218bf70471f203ce000203ae00120"
+        "38e0022036e0032034e0042032e0052030e006202ee007202ce008202ae0092028e00a2026e00b2024e00c2022e00d20"
+        "20e00e201ee00f201ce010201ae0112018e0122016e0132014e0142012e0152010e016200ee017200ce018200ae01920"
+        "08e01a2006e01b2004e01c2002e01d2000e01e2001ebc00090ed010a704700bf00000000f0b503af4df804bd2ded028b"
+        "14460d46fff72affb5ee400af1ee10fa19d944f2957640f68040c0f60a06c2f207402146b0ee408ab047b7ee000ab4ee"
+        "408af1ee10fa04d530ee480a28462146b047012000e00020bdec028b5df804bbf0bdf0b503af2de9000f85b040f64436"
+        "44f65301c2f20746c3f2505156f8042c8a425dd000220023f518f2504033802bc5e90122c5e90322c5e90522c5e90722"
+        "c5e90922c5e90b226a63aa63ea63ebd144f200030022c4f27f0386f84520a6f8462006f59a75b36447f67f73a6f84c30"
+        "402386f821304ff48043738442f64003c7f67f73736206f1800343f8042bab420bd243f8042bab423cbf43f8042bab42"
+        "03d243f8042bab42efd343f233334ff07e52c3f69373c6f8d020c6e92623002346f8041cc4f2c823c6f8a430c6e92022"
+        "c6e923224ff08043c6e93f23c6e94222017c09bbd0f80480b8f1000f08bfd0f80080a8f2011111f5807f15d3417c4ff0"
+        "020b002908bf4ff0010bd0e902200028049018bf0120002a03921ebfb1fa81f1490950ea010003d105b0bde8000ff0bd"
+        "40f691404ff20d02c2f20740c5f61722d0f80310914240f0b08096f84c11002940f0a380d6f84011002918bf414540f0"
+        "9c8096f8443090f800e0d6e951123f2b01910292cdf800e013d94ff0020901acbef1000f204608bf4ff0010949464246"
+        "00f09cf820464946424600f0f7fcddf800e008f4fe70a8f1010c08f003014242002302e001335b456fd0704601acbef1"
+        "000f18bf184654f8209003a8bcf1030f50f823a002d20025a1bbebe76446a9f1100eaaf1100c00259eed040a9ced041a"
+        "30ee010a0cf110008ced040a9ced050a9eed051a043d31ee000aaa428ced050a9ced060a9eed061a31ee000a9ced071a"
+        "8ced060a9eed070a0ef1100e30ee010a8ced070a8446d7d16d42ddf800e0a4460029b7d009eb850401290aeb850094ed"
+        "000a90ed001a30ee010a80ed000aa9d0681c022909eb80040aeb800094ed000a90ed001a30ee010a80ed000a9ad0a81c"
+        "09eb80050aeb800095ed000a90ed001a30ee010a80ed000a8ce70020c6f84001012086f84c01c6f83c8196f844003f28"
+        "3ff63aaf03ae59463046424600f006f830465946424600f061fc2de7f0b503af2de9000f81b02ded108b40f689339fed"
+        "e01ac2f207439feddf4a93f807905e7893f802c093f803a000ee109a93f804b093f805809c79b8ee400a20ee010abdee"
+        "c02ab8eec21a12ee105a30ee413a9fedd20a9fedd21a012d03ee001a9fedd00a03ee010a03ee004ab7ee000ab0ee401a"
+        "03ee041a28db15f0030307d031ee011a012b07d16b1e042d11d21de02b46042d0dd219e031ee011a022b03d1ab1e042d"
+        "05d211e031ee011aeb1e042d0cd3013b31ee011a043b13f1020f31ee011a31ee011a31ee011af3d340f6384ec2f2074e"
+        "1eed188af6b99fedb32ab4ee428af1ee10fa17d500204ef8600c4ff07e514ee90b004ee909104ef8040c4ee903004ee9"
+        "05004ee907004ee90d004ee90f00cee90000b8e3ccf17f0305ee10ca02ee103adfeda12a0f2e04ee904ab8ee455adfed"
+        "9f0ab8eec23a9fed9e2adfed9e5af0ee007a25ee025a23ee024a03ee106ab8ee437a03ee10ba64ee201a40f6893bc2f2"
+        "074bb8ee436a9fed943a27ee033a88bfb0ee403a76ee222a9bf8003025ee036a05ee108a67ee023a1eed1a9a1eed14aa"
+        "f8ee450a63ee863ab0ee406ab8ee645adfed864a07ee256ab0ee647a04ee217a9fed834af1eee31adfed823a21ee044a"
+        "9fed811adfed814a60ee820a01eea31a03ee903adfed7e1a62eea42a64ee211a1eed154af8ee633af0ee445af1eec74a"
+        "70eec90a53ee825adfed763af4ee631af1ee10fac0ee244a33fea12adfed723af4ee613adfed711af1ee10fa65ee211a"
+        "b5ee005a73fe826a1eed1c2a31ee4a1ab4ee475a1eed1d5af1ee10fa37ee427a36ee456a77fea44adfed657a07ee272a"
+        "1eed197a06ee275a1eed1b6a71eec71a72eec62a00eea79a0eed1c2a73ee480a1eed173a01eea77a0eed1d5a74eec31a"
+        "5eed164a02eea76a0eed1a9a76eee42a05eea74a0eed197a00eea78adfed510a01eea73af0ee601a42eea74a0eed1b6a"
+        "01ee27aa0eed154a0eed188ab4ee634a0eed173af1ee10fa4eed164a0eed14aa1cdd9eed001adfed441ab4ee611af0ee"
+        "601af1ee10fa11dddeed011a81ee811a30ee411af1eec11ab5ee401af1ee10fa9fed381a24ee214a74fe011af0ee606a"
+        "f0ee602af0ee603a0129c0f2c38124eea41a9fed324adfed320ac0ee025a9fed2dea29ee088a41ee040a9fed2e4ab9ee"
+        "00faf0ee4e3af0ee4e2af0ee4e6a4ff000089fed29cadfed29ba01ee204af0ee400a41ee040a9fed261ab0ee404a64ee"
+        "a04af0ee4e0a34ee811a04ee814a9fed211a2aee019a22ee03aac0ee047a68e00768803d1872313f3c951d3c4458633d"
+        "f0fd753e6f12033a000080c23333733f0402013c87c3613d0000803dcdcc4c3d0000204200003e43000070420000003c"
+        "1f4289383333933f6f12833a0000803c9a99193e0000000077cc2b32d00d5d3d8888083eabaaaa3e0000804252b87e3f"
+        "f304b53f1f420939b0ee43dab0ee412ab0ee44baf0ee6a9aacf14c03acf14405acf13c04acf13406c3ed009aacf12003"
+        "85ed00baacf11805c4ed00daacf11004c6ed00eaacf1080608f10108c3ed00fa884585ed00dac4ed00ca86ed002a00f0"
+        "21810eeb880c002a5ced13aa1ced114a5ced0fda5ced0dea1ced021a5ced04ca1ced063a5ced08fabed050f828501346"
+        "2be0f0ee4edaf0ee4eeaf0ee4efab0ee4edaf0ee4ecab0ee4e2ab0ee4ebaf0ee4e9ab0ee4e4af0ee68aa48eea83a57ee"
+        "04aab0ee4b4a43ee036ab0ee4d3a41ee010ab0ee421a013b48ee2a8af0ee69aa48eea82ae5ec018a96d0d5ed008ab0ee"
+        "462a05ee282a25ee822ab4ee4c2af1ee10fa05ddb0ee4c2abaf13f0f0bd955e09fede1bab4ee42baf1ee10fa3bfe022a"
+        "baf1400f35d232ee002ab5ee00babfee00dadfeddb9a22ee0b2abdeec2bab8eecbba3bee0ddab4ee42baf1ee10fa3dfe"
+        "0bba9fedd4da32ee4b2abeee00ba32ee0b2ab1ee42bab5ee402af1ee10fa48bfb0ee4b2ab0ee40ba02ee0fba2bee0b2a"
+        "02ee29dadfedc89a42ee4d9a2bee292a3be0b5ee402af1ee10fa0fdab1ee42bab5ee402ab0ee42daf1ee10fa48bfb0ee"
+        "4bda3dee00ba82ee0b2a26e032ee002ab5ee00babfee00da22ee0b2abdeec2bab8eecbba3bee0ddab4ee42baf1ee10fa"
+        "3dfe0bba32ee4b2abeee00ba32ee0bbab1ee4b2ab5ee40baf1ee10fa48bfb0ee42bab0ee402a0bee0f2a38eeefbab9f1"
+        "7e0f6aee029a49ee0bfa39eeeaba04ee2bba3feec32ab0ee4b4a09ee023a01ee834a13d834ee6e2ab0ee6d4a04ee824a"
+        "27ee842ab0ee6e4a04ee824a32ee022a72ee6dda34ee04da7dee6eea3bee6c2ab4ee444af1ee10fa49ee02ca3ceec12a"
+        "09ee021abff50daff4ee6ddaf1ee10fa7cbff4ee6eeaf1ee10fabff502afb0ee43dab0ee412ab4ee411af1ee10fafff5"
+        "0aaff6e602fb01f39eed006ab0ee462adfed784a01ee103a9eed017a1eed0b5a1eed0a4a9fed793ab8ee411a80ee011a"
+        "11ee262a61ee231af0ee473a61ee222a51ee203af4ee451af1ee10fa02ee246ab6ee002af4ee442a71eec50a32fe031a"
+        "f1ee10fa72eec42a8eed006a72fe031a03eea47a00ee815a1eed091a02eea14a8eed017a0eed0b5a0eed0a4a9bf80830"
+        "402b08d230ee412ab0ee410a9fed573a02ee030a31e09fed5a0ab4ee405ab0ee410af1ee10fa28dd9fed560ab4ee404a"
+        "b0ee410af1ee10fa1fdd85ee040ab0ee044a9fed515ab1eec00ab4ee440af1ee10fab4ee405a34fe004af1ee10fa35fe"
+        "040ab4ee401af1ee10fa32fe032a30ee413ab0ee410a03ee020a01290eed090a69db02ee102a30ee410a02f0030c22f0"
+        "03064ff00008b8ee422a80ee020a03e008f10108884556d0002af9d0042a50f828e003d2b0ee412a00232ae0b0ee412a"
+        "aef11004002330ee023a94ed044a22ee042a94ed064a94ed055a84ed042a30ee036a04f1100523ee053a94ed075a84ed"
+        "053a043330ee067a9e4226ee042a84ed062a30ee072a27ee053a84ed073a2c46d9d1bcf1000fc3d00eeb8303bcf1010f"
+        "93ed003a22ee033a83ed003ab8d030ee022a93ed013abcf1020f22ee033a83ed013aadd030ee022a93ed023a22ee032a"
+        "83ed022aa4e7bdec108b01b0bde8000ff0bd00bfcdcc4c3d000080c29a99193ea1c4a2bde15d253fda0fc93f8fc2f53c"
+        "95bfd6335f708930cdcc4c3ef0b503af2de9000f81b02ded108b84b040f665360023c2f207463578b478422d88bf0123"
+        "5b003e2d38bf0123422ccde902010ad3a4f141009fedde1a00ee100ab8eec00a20ee016a0ee0b4f13f009fedda1a00ee"
+        "100a9fedd96ab8eec00a20ee010a38bfb0ee406a9fedd41aa5f14304b5ee406ab0ee417ae0b2b7ee000af1ee10fa18bf"
+        "b0ee407afb2840f6544c38bfb0ee407ab5ee407ac2f2074cf1ee10fa14d19ced002a9fedc63ab4ee432af1ee10fa0bd5"
+        "0021cce90011ccf82010cce90611cce90411cce902113ae373b3022b3bd102ee104a9fedbb3a9fedbb5ab8eec22a22ee"
+        "032abdeec23ab8eec34a13ee105a32ee444a9fedb52a012d04ee025a9fedb32a04ee052a9fedb25a04ee025ab0ee402a"
+        "04ee052a66db15f0030441d032ee022a012c41d16c1e4ee0b6ee002a1ced053ab3ee044ab4ee423a9feda62af1ee10fa"
+        "32fe042a67e002ee105a9feda33a9fed9d5ab8ee422a22ee032abdeec23ab8eec34a13ee105a32ee444a9fed972a012d"
+        "04ee025a9fed952a04ee052a9fed945a04ee025ab0ee402a04ee052a3fdb15f0030407d032ee022a012c0bd16c1e27e0"
+        "2c4610e02c4623e032ee022a022c07d1ac1e08e032ee022a022c16d1ac1e17e032ee022aec1e042d0cd3651e32ee022a"
+        "043d15f1020f32ee022a32ee022a32ee022af3d3b3ee043a13e032ee022aec1e042d0cd3651e32ee022a043d15f1020f"
+        "32ee022a32ee022a32ee022af3d39fed733a22ee032a9fed723a757822ee032a9fed703a9fed654af0ee401a9fed6e5a"
+        "f5ee006ab4ee432adfed6c0af1ee10fab4ee424adfed6a2a33fe023af1ee10fa34fe033a9fed674a022b23ee032a02ee"
+        "045a04ee105a7579b8ee444a44ee601ab0ee404a42ee052a31eea15a02ee224adfed5d2a02ee105ab57941ee852a01ee"
+        "905af578b8ee425a1ced052af0ee424a3679f8ee613a5ced021a53ee044a1ced043a1ced014af0ee615a72eec32af0ee"
+        "447a55ee205a1ced035a53eea07af0ee423a36ee456a02eea63adced002a44eea63a06ee265a37ee626a45eea61a0ced"
+        "043a07eea64a4ced053a46ee262a0ced035a4ced021a0ced014acced002a0ad05bb9b6ee006a0023f4ee463af1ee10fa"
+        "48bf012302e0012300e0002303980128c0f2058207ee102a33eec26a03ee905adfed2e4ab5ee405a61eea21ab8ee477a"
+        "0ff20048f8ee633a22f0010ef1ee10fa86ee076a07ee106a4ff0000908f104064feac270b8ee477a67ee205adfedf40a"
+        "33eea47adfedf13a65eea04af0ee400a27ee237af1ee453a45eea40af0ee454a48bff0ee634a70ee642a019050e000bf"
+        "0821843b2108823b000000006f12033a9a99193e4458633d3c951d3cf0fd753e1872313f00a08c467fb9133e00002042"
+        "1f4289389a99993f8888083e0402013cabaaaa3ed00d5d3d0ad7233d000080c2f0ee413af0ee414af0ee415af0ee416a"
+        "f0ee417ab0ee489a14ee279a01ee898a84ed008a0bf104050bf10c040bf114000bf11c01c5ed006a09f10109c4ed005a"
+        "c0ed004a03988145c1ed003a00f077810ceb890b002adbed016adbed035adbed054adbed073addd002986146012a50f8"
+        "29a06cd1f0ee427a002401988c460028d0d033ee278a0aeb8404b0ee409ab0ee66ba002b454607ee889a94ed008a38ee"
+        "65aa07ee8aba80ee099a29ee0baab0ee659a07ee8a9af0ee487a43ee4a7a77eec97a09fe27baf1ee4b7ab5ee40bab0ee"
+        "4bcaf1ee10fa48bfb0ee67ca7cee647ab4ee64caf1ee10fac8bf354695ed00ca47ee8c4a67ee247ab4ee67baf1ee647a"
+        "f1ee10fa74fea77a77eee37a40eea73a65ee237a42ee8b7af4ee677af1ee10fabff56eaf3aee0aaa7aee666af4ee666a"
+        "f1ee10fabff564af39ee099a79ee655af4ee655af1ee10fafff564af58e7f0ee427a0af1040c002419e0f0ee413af0ee"
+        "414af0ee415af0ee416ab0ee41aab0ee498a76ee277a14ee0a8a0234a64501ee889a8ced009a0cf1080c3ff476af33ee"
+        "278ab0ee409ab0ee66ba002b404607ee889a1ced018a38ee65aa07ee8abab0ee48aa80ee099a29ee0bbab0ee659a07ee"
+        "8b9a03ee4baa3aee49aa09fe0acab1ee4caab5ee40cab0ee4cdaf1ee10fa48bfb0ee4ada3dee64aab4ee64daf1ee10fa"
+        "c8bf304690ed00da4aee0d4a27ee24aab4ee4acab1ee64aaf1ee10fa34fe8aaa3aee63aa40ee8a3a25ee23aa02ee8caa"
+        "b4ee4aaaf1ee10fa11d63bee0bba7bee666af4ee666af1ee10fa08d639ee099a79ee655af4ee655af1ee10fa09d7f0ee"
+        "413af0ee414af0ee415af0ee416ab0ee41aa76ee277ab0ee40bab0ee66da002b404633ee279a07ee89ba9ced009a39ee"
+        "65ca07ee8cda80ee0bba2bee0dcab0ee65bab0ee49da07ee8cba03ee4cda3dee4bda0bfe0ddab1ee4deab5ee40dab0ee"
+        "4dfaf1ee10fa48bfb0ee4efa3fee64eab4ee64faf1ee10fac8bf304690ed00fa4eee0f4a27ee24eab4ee4edab1ee64ea"
+        "f1ee10fa34fe8eea3eee63ea40ee8e3ab0ee48ea14ee0aea25ee23aa02ee8daa01ee8e8a0ced018ab4ee4aaaf1ee10fa"
+        "bff523af3cee0c8a78ee666af4ee666af1ee10fabff519af3bee0b8a78ee655af4ee655af1ee10fafff519af0de704b0"
+        "bdec108b01b0bde8000ff0bdcdcc4c3cec5178bfa69bc43a0ad7a33c"
+        , {'folder': 1660, 'padfx_mix': 852, 'padfx_on': 420, 'padfx_set': 0, 'padw': 444, 'pulse': 3900, 'shape_block': 946}),
     'mk2_font': (
         "45a2002110f8013b2bb152f82330c3f307431944f6e7084670472de9f04f8ab0029203930022049220e02de9f04f8ab0"
         "04460d460293139b0393049206a8dff8d0c0e0470698296888420dd107986968884209d10898a968884205d10998e968"
@@ -1197,6 +1227,12 @@ FROZEN_MK2 = {
         "ded3c64508d026f01f0006f52072ccf8000020309042fad30135222dbfd300bda8b2062418ae0624e0da0624314f4854"
         "4288ffff68ef00e0"
         , {'os_bit': 156, 'os_clean': 206, 'os_done': 82, 'os_go': 58, 'os_have': 48, 'os_layer': 86, 'os_next': 186, 'os_old': 52, 'os_put': 178, 'os_px': 128, 'os_row': 94, 'os_rowdone': 216, 'os_show': 174, 'os_stock': 46, 'osd_sync': 0}),
+    'mk2_padbus': (
+        "5e2b14d12de90f50eff3008003b42ded100a20462899c909dff874c0e047bdec100a03bc80f30088bde80f505e2b0000"
+        "00002de90f502ded100a2046dff854c0e0478446bdec100abcf1000fbde80f5003d1cdf810b00000000000000000002d"
+        "13d02de90f502ded100a204659461a9adff824c0e0478446bdec100abcf1000fbde80f5001d1000000000000000000bf"
+        "000000000000000000000000"
+        , {'pa_c_mix': 152, 'pa_c_on': 148, 'pa_c_set': 144, 'pa_mix': 94, 'pa_mix_ret': 138, 'pa_mix_stock': 134, 'pa_need': 50, 'pa_need_ret': 86, 'pa_need_send': 90, 'pa_rec': 0, 'pa_rec_next': 46}),
 }
 # END FROZEN_MK2
 
@@ -2147,6 +2183,7 @@ def stage3(d, upto="full", hook_e=None):
             apply_clip_modes(d, n_org, n_syms)
             apply_fold(d)                          # cc25: the wave folder
             apply_pad_names(d)                     # cc29: 7 characters a line
+            apply_pad_bus(d, *SHAPE_C)             # cc32: CC 94, the pads into the shapers
     finally:
         pm.assemble = saved
 
@@ -2369,6 +2406,7 @@ def version_labels(d):
 #   softest; cc27)  72 character (0-63 soft sine fold, 64-127 top only; cc27)
 #   76 a low-pass on the folded side before the mix (127 = open; cc27)
 #   77 auto level, >= 64 on (the default; cc28)  69 bass keep (cc29)  73 bias
+#   (cc32: CC 68 >= 64 moves both shapers from the master to the pad bus)
 #   (64 = none)  74 mix  75 the folded side's level (64 = unity). The amount
 #   also fades the folder in over 0-16, so turning it to 0 never clicks.
 FOLD_RAM = 0x24070b40
@@ -2600,6 +2638,67 @@ static void pulse(shape_t *s, float **ch, int chans, u32 n)
     }
 }
 
+/* ---- the pad bus (cc32): CC 94 on a pad's channel sends that pad into the
+   shapers, as a dry/wet: the pad's own output keeps 1 - w, the bus gets w.
+   The bus is a stock buffer descriptor {cap, frames, L, R, silent, stereo}
+   in SDRAM from the stock bump allocator; voices mix into it with the stock
+   mix-with-gain, as they do into the delay and reverb buses. CC 68 on ch 1
+   picks where the shapers work: < 64 the master (the pads' wet share is
+   then just returned to it), >= 64 the pad bus. */
+#define PAD_DESC 0x24070c80u
+#define PAD_TAB  0x24070ca0u
+#define PAD_N    32
+typedef struct { u32 cap, frames; float *l, *r; u8 silent, stereo, pad0, pad1; u32 ready; } desc_t;   /* stock's 20 bytes, then ours */
+typedef struct { void *voice; float w; } padw_t;
+typedef void (*mixg_t)(void *dst, void *src, float g);
+typedef void *(*alloc_t)(u32 bytes);
+#define MIXG ((mixg_t)0x080a4795u)
+#define SALLOC ((alloc_t)0x08043b4du)
+
+void padfx_set(void *voice, u32 v7)
+{
+    desc_t *d = (desc_t *)PAD_DESC;
+    padw_t *t = (padw_t *)PAD_TAB;
+    if (d->ready != 0x5a17f00du) {                   /* first use: the bus's memory, once */
+        float *m = (float *)SALLOC(2 * 256 * 4);
+        if (!m) return;
+        for (int i = 0; i < 512; i++) m[i] = 0.0f;
+        d->l = m; d->r = m + 256; d->cap = 0; d->frames = 0; d->silent = 1; d->stereo = 1;
+        for (int i = 0; i < PAD_N; i++) { t[i].voice = 0; t[i].w = 0.0f; }
+        d->ready = 0x5a17f00du;
+    }
+    float w = (float)(v7 > 127 ? 127 : v7) * (1.0f / 127.0f);
+    int fr = -1;
+    for (int i = 0; i < PAD_N; i++) {
+        if (t[i].voice == voice) { t[i].w = w; return; }
+        if (fr < 0 && (t[i].voice == 0 || t[i].w == 0.0f)) fr = i;
+    }
+    if (fr >= 0 && w > 0.0f) { t[fr].voice = voice; t[fr].w = w; }
+}
+
+static float padw(void *voice)
+{
+    desc_t *d = (desc_t *)PAD_DESC;
+    if (d->ready != 0x5a17f00du || d->cap == 0) return 0.0f;
+    padw_t *t = (padw_t *)PAD_TAB;
+    for (int i = 0; i < PAD_N; i++) if (t[i].voice == voice) return t[i].w;
+    return 0.0f;
+}
+
+u32 padfx_on(void *voice) { return padw(voice) > 0.0f; }
+
+/* after the sends: temp holds the pad, out is its output bus */
+u32 padfx_mix(void *voice, void *out, void *temp)
+{
+    float w = padw(voice);
+    if (w <= 0.0f) return 0;
+    MIXG((void *)PAD_DESC, temp, w);
+    if (w < 1.0f) MIXG(out, temp, 1.0f - w);
+    return 1;
+}
+
+static void bus_clear(desc_t *d) { d->frames = 0; d->silent = 1; }
+
 void shape_block(int *bus)
 {
     shape_t *s = (shape_t *)SHAPE_RAM;
@@ -2612,8 +2711,25 @@ void shape_block(int *bus)
     int chans = b8[0x11] ? 2 : 1;
     float *ch[2] = { (float *)bus[2], (float *)bus[3] };
     if (!ch[0] || (chans == 2 && !ch[1])) return;
-    folder(s, ch, chans, n);
-    pulse(s, ch, chans, n);
+    desc_t *d = (desc_t *)PAD_DESC;
+    int padbus = d->ready == 0x5a17f00du;
+    if (padbus && !d->silent && (d->frames == 0 || d->frames == n)) {
+        float *pb[2] = { d->l, d->r };
+        int pch = d->stereo ? 2 : 1;
+        if (s->cc[68] >= 64) {                /* the shapers on the pads sent to them */
+            folder(s, pb, pch, n);
+            pulse(s, pb, pch, n);
+        }
+        for (int c = 0; c < chans; c++) {     /* back into the master */
+            float *src = pb[pch == 2 ? c : 0], *p = ch[c];
+            for (u32 i = 0; i < n; i++) p[i] += src[i];
+        }
+    }
+    if (padbus) { bus_clear(d); d->cap = n; }
+    if (s->cc[68] < 64) {
+        folder(s, ch, chans, n);
+        pulse(s, ch, chans, n);
+    }
 }
 """
 FOLD_ASM = f"""
@@ -2632,8 +2748,7 @@ fblock_next:
     push    {{r0, r1}}
     vpush   {{s0-s15}}
     ldr     r0, [sp, #96]           /* 64 + 8 + 24: the saved r0, the bus */
-    adr     r12, fcode
-    orr     r12, r12, #1
+    ldr     r12, fc_block       /* shape_block, wherever the C put it (cc32) */
     blx     r12
     vpop    {{s0-s15}}
     pop     {{r0, r1}}
@@ -2664,6 +2779,9 @@ fm_out:
 fmidi_next:
     .short  0, 0                    /* b.w the next hook, as found */
 .ltorg
+    .p2align 2
+fc_block:
+    .word   0
 .p2align 4
 fcode:
 """
@@ -2720,17 +2838,139 @@ def apply_fold(d):
         pm.refuse("The CC post and the master bus call are not hooked as the folder expects.")
     code, syms = mk2_assemble("fold", FOLD_ASM)
     ccode, csyms = mk2_cblob("foldc", FOLD_C)
-    if syms["fcode"] != len(code) or len(code) % 16 or csyms.get("shape_block", 1) & ~1:
+    if syms["fcode"] != len(code) or len(code) % 16 or "shape_block" not in csyms:
         pm.refuse("The folder's code is not laid out as expected.")
     while len(d) % 16:
         d += b"\0"
+    code = bytearray(code)
+    struct.pack_into("<I", code, syms["fc_block"], (BASE + len(d) + len(code) + csyms["shape_block"]) | 1)
     org = pm._append(d, bytearray(code + ccode))
+    global SHAPE_C
+    SHAPE_C = (org + len(code), csyms)
     for lab, tgt, bl in (("fblock_next", bus_next, True), ("fmidi_next", midi_next, False)):
         va = org + syms[lab]
         d[va - BASE:va - BASE + 4] = pm.enc_b_bl(va, tgt, bl)
     d[post - BASE:post - BASE + 4] = pm.enc_b_bl(post, org + syms["fmidi"], True)
     d[bus - BASE:bus - BASE + 4] = pm.enc_b_bl(bus, org + syms["fblock"], True)
     vprint(f"F wave folder at {org:#x}, {len(code) + len(ccode)} bytes, ram {FOLD_RAM:#x}")
+
+
+# --- P2: the pad bus's sites in the class A voice (cc32) -----------------------
+# The class A process (0x080b2116): with a delay or reverb send it renders the
+# pad into a temp buffer ([sp+0x10], 0x080b35a2 sets it up), mixes the sends
+# from it (buses 10 and 11, 0x080a4794 = mix with gain) and, r5 != 0, mixes
+# it into its output bus fp (0x080b3654). Without sends [sp+0x10] is fp
+# itself. Three sites:
+#   pa_rec  the CC chain's last bne.w (0x080b336e, CC 64's): CC 94, the value
+#           at sp+0x40, is noted for the voice (r4); then on to what was there
+#   pa_need 0x080b245e (no send): a pad with a wet share takes the send path
+#   pa_mix  0x080b2508 (after the sends): the pad bus takes w, fp 1 - w
+PAD_CC = 94
+PA_REC_SITE, PA_NEED_SITE, PA_MIX_SITE = 0x080b336e, 0x080b245e, 0x080b2508
+PA_GUARDS = ((0x080b336c, "402b", "cmp r3, #0x40: CC 64, the chain's last"),
+             (0x080b2438, "d6ed007a", "vldr s15, [r6]: the delay send"),
+             (0x080b244e, "d3ed007af5ee407af1ee10fa41f0a280", "the reverb send's test, bne.w the send path"),
+             (0x080b245e, "cdf810b0", "str.w fp, [sp, #0x10]: no send, the output itself"),
+             (0x080b2508, "002d41f0a380", "cmp r5, #0; bne.w: the temp into the output"),
+             (0x080b250e, "4946", "mov r1, sb: on"),
+             (0x080a4794, "f7ee007a", "the mix with gain"),
+             (0x08043b4c, "10b510f00f0f02d0", "the SDRAM bump allocator"))
+PA_SRC = """
+.syntax unified
+.thumb
+.text
+.global pa_rec, pa_need, pa_mix
+.thumb_func
+pa_rec:
+    cmp     r3, #94
+    bne     1f
+    push    {r0, r1, r2, r3, r12, lr}
+    mrs     r0, apsr
+    push    {r0, r1}
+    vpush   {s0-s15}
+    mov     r0, r4                  /* the voice */
+    ldr     r1, [sp, #0x40 + 96]    /* the value, << 7 */
+    lsrs    r1, r1, #7
+    ldr     r12, pa_c_set
+    blx     r12
+    vpop    {s0-s15}
+    pop     {r0, r1}
+    msr     apsr_nzcvq, r0
+    pop     {r0, r1, r2, r3, r12, lr}
+    cmp     r3, #94                 /* the flags the chain had: not equal to 64 */
+1:
+pa_rec_next:
+    .short  0, 0                    /* b.w what the site led to */
+
+.thumb_func
+pa_need:
+    push    {r0, r1, r2, r3, r12, lr}
+    vpush   {s0-s15}
+    mov     r0, r4
+    ldr     r12, pa_c_on
+    blx     r12
+    mov     r12, r0
+    vpop    {s0-s15}
+    cmp     r12, #0
+    pop     {r0, r1, r2, r3, r12, lr}
+    bne     2f
+    str.w   fp, [sp, #0x10]         /* as stock */
+pa_need_ret:
+    .short  0, 0                    /* b.w 0x080b2462 */
+2:
+pa_need_send:
+    .short  0, 0                    /* b.w 0x080b35a2, the send path */
+
+.thumb_func
+pa_mix:
+    cmp     r5, #0
+    beq     3f
+    push    {r0, r1, r2, r3, r12, lr}
+    vpush   {s0-s15}
+    mov     r0, r4                  /* the voice */
+    mov     r1, fp                  /* its output */
+    ldr     r2, [sp, #0x10 + 88]    /* the temp: 24 + 64 pushed */
+    ldr     r12, pa_c_mix
+    blx     r12
+    mov     r12, r0
+    vpop    {s0-s15}
+    cmp     r12, #0
+    pop     {r0, r1, r2, r3, r12, lr}
+    bne     3f                      /* mixed: the pad bus and the output */
+pa_mix_stock:
+    .short  0, 0                    /* b.w 0x080b3654: the temp into the output, as stock */
+3:
+pa_mix_ret:
+    .short  0, 0                    /* b.w 0x080b250e */
+    .p2align 2
+pa_c_set: .word 0
+pa_c_on:  .word 0
+pa_c_mix: .word 0
+"""
+
+
+def apply_pad_bus(d, s_org, s_csyms):
+    """s_org: where shape_block's C starts (its csyms are relative to it)."""
+    for va, raw, what in PA_GUARDS:
+        guard_bytes(d, va, raw, what)
+    rec_next = pm.bne_target(d, PA_REC_SITE)
+    code, syms = mk2_assemble("padbus", PA_SRC)
+    code = bytearray(code)
+    for lab, fn in (("pa_c_set", "padfx_set"), ("pa_c_on", "padfx_on"), ("pa_c_mix", "padfx_mix")):
+        struct.pack_into("<I", code, syms[lab], (s_org + s_csyms[fn]) | 1)
+    org = pm._append(d, code)
+    def b(lab, tgt):
+        va = org + syms[lab]
+        d[va - BASE:va - BASE + 4] = pm.enc_b_bl(va, tgt, False)
+    b("pa_rec_next", rec_next)
+    b("pa_need_ret", 0x080b2462)
+    b("pa_need_send", 0x080b35a2)
+    b("pa_mix_stock", 0x080b3654)
+    b("pa_mix_ret", 0x080b250e)
+    d[PA_REC_SITE - BASE:PA_REC_SITE - BASE + 4] = pm.enc_bne_w(PA_REC_SITE, org + syms["pa_rec"])
+    d[PA_NEED_SITE - BASE:PA_NEED_SITE - BASE + 4] = pm.enc_b_bl(PA_NEED_SITE, org + syms["pa_need"], False)
+    d[PA_MIX_SITE - BASE:PA_MIX_SITE - BASE + 4] = pm.enc_b_bl(PA_MIX_SITE, org + syms["pa_mix"], False)
+    vprint(f"pad bus, class A: {org:#x}; CC {PAD_CC} on a pad's channel")
 
 
 # --- pad names on 6 characters a line (cc29: 7, cc30: 6) ---------------------------------
@@ -3176,7 +3416,8 @@ def main():
                  "Theme, and your own          TOOLS > Theme",
                  "Wave folder, ch 1            CC 69-77",
                  "Pulse filter, ch 1           CC 33-39",
-                 "Pad names, 6 characters a line"):
+                 "Pad names, 6 characters a line",
+                 "Pad bus, class A pads        CC 94 (shapers: CC 68)"):
         print(f"     ok   {what}")
 
     write_string(d, ATTRIB_VA, VER_VA, ATTRIB_STOCK, ATTRIB_NEW)

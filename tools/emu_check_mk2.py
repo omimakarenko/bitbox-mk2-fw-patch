@@ -415,3 +415,55 @@ for settings,name in ((((69,127),(70,100),(71,100)),"bass keep max, deep fold"),
                       (((33,100),(35,64)),"HP 100"),(((35,127),(37,100)),"HP 100, soft pulse"),(((33,64),(35,64)),"open, no pulse"),((),"... later")):
     for n,v in settings: cc(n,v)
     print(f"13. {name:30} {h.mu.mem_read(0x24070b44+33,7).hex()}: ", bus_run())
+
+# ---- 14. cc32: the pad bus -- CC 94 on a class A voice, the send-path test, the split, the return
+PAD_DESC=0x24070c80; PAD_TAB=0x24070ca0
+h.allow(0x24070c80,0x24070da0); h.mu.mem_map(0x60000000,0x10000); h.allow(0x60000000,0x60010000)
+h.ret0={0x08043b4c:0x60000000}                      # the SDRAM bump allocator
+V=0x24049000; W=0x24049800
+entryA=bne_target(0x080b336e)
+h.terminal={0x80b2168}|set(v for v in CASES.values() if isinstance(v,int))
+for voice,val in ((V,100),(W,0)):
+    h.mu.mem_write(voice,b"\0"*0x800); h.mu.mem_write(voice+0x575,b"\1"); h.mu.mem_write(sp+0x40,struct.pack("<I",val<<7))
+    regs={r:0x1000+i for i,r in enumerate(REGS)}; regs[UC_ARM_REG_R3]=94; regs[UC_ARM_REG_R4]=voice; regs[UC_ARM_REG_R9]=0x24049800
+    end=h.run(entryA,regs,sp=sp,lr=0x0800fff1,count=50000)
+    print(f"14a. CC 94 = {val} on voice {voice:#x}: end {hex(end) if isinstance(end,int) else end}, badw {h.badw[:2]}")
+h.terminal=set(); del h.ret0
+tab=struct.unpack("<16I",h.mu.mem_read(PAD_TAB,64)); print("     table:",[hex(x) for x in tab[:6]], "ready", hex(struct.unpack("<I",h.mu.mem_read(PAD_DESC+0x14,4))[0]))
+# a master block sets the bus's size
+L=buf+0x100; R=L+FR*4; h.mu.mem_write(buf,struct.pack("<IIII",FR,0,L,R)+bytes([0,1,0,0]))
+h.mu.mem_write(L,struct.pack(f"<{FR}f",*([0.25]*FR))); h.mu.mem_write(R,struct.pack(f"<{FR}f",*([0.25]*FR)))
+regs={r:0x1000+i for i,r in enumerate(REGS)}; regs[UC_ARM_REG_R0]=buf
+h.run(bl_target(CHR_SITE),regs,sp=sp,lr=0x0809817f)
+print("14b. bus after a master block: cap/frames/silent", struct.unpack("<II",h.mu.mem_read(PAD_DESC,8)), h.mu.mem_read(PAD_DESC+0x10,2).hex())
+NEED=0x080b245e; MIX=0x080b2508
+for voice in (V,W):
+    h.terminal={0x080b35a2,0x080b2462}
+    regs={r:0x1000+i for i,r in enumerate(REGS)}; regs[UC_ARM_REG_R4]=voice; regs[UC_ARM_REG_R11]=0x24047000
+    h.mu.mem_write(sp+0x10,b"\0"*4)
+    end=h.run(bw_target(NEED),regs,sp=sp,lr=0x0800fff1,count=50000)
+    print(f"14c. pa_need, voice {voice:#x}: -> {hex(end) if isinstance(end,int) else end} [sp+0x10]={h.mu.mem_read(sp+0x10,4)[::-1].hex()} regs kept {all(h.mu.reg_read(r)==regs[r] for r in CS)}")
+gains=[]
+def gcap(mu,a,s,u):
+    gains.append((hex(mu.reg_read(UC_ARM_REG_R0)),hex(mu.reg_read(UC_ARM_REG_R1)),round(struct.unpack('<f',struct.pack('<I',mu.reg_read(UC_ARM_REG_S0)))[0],3)))
+hk=h.mu.hook_add(UC_HOOK_CODE,gcap,begin=0x080a4794,end=0x080a4794)
+for voice,r5 in ((V,1),(W,1),(V,0)):
+    gains.clear(); h.terminal={0x080b3654,0x080b250e}
+    regs={r:0x1000+i for i,r in enumerate(REGS)}; regs[UC_ARM_REG_R4]=voice; regs[UC_ARM_REG_R5]=r5; regs[UC_ARM_REG_R11]=0x24047000
+    h.mu.mem_write(sp+0x10,struct.pack("<I",0x24047100))
+    end=h.run(bw_target(MIX),regs,sp=sp,lr=0x0800fff1,count=50000)
+    gains=[(c[1][0],c[1][1],g[2]) for c,g in zip([c for c in h.calls if c[0]=="0x80a4794"],gains)]
+    print(f"14d. pa_mix voice {voice:#x} r5={r5}: -> {hex(end) if isinstance(end,int) else end}, mixes (dst, src, gain) {gains}, regs kept {all(h.mu.reg_read(r)==regs[r] for r in CS)}")
+h.mu.hook_del(hk); h.terminal=set()
+# the bus back into the master: fill it as the mixes would, then a master block (shapers on the master, then on the bus)
+for target in (0,127):
+    cc(68,target); cc(70,127); cc(71,100)
+    BL=0x60000000; h.mu.mem_write(BL,struct.pack(f"<{FR}f",*([0.5]*FR))); h.mu.mem_write(BL+1024,struct.pack(f"<{FR}f",*([0.5]*FR)))
+    h.mu.mem_write(PAD_DESC+4,struct.pack("<I",FR)); h.mu.mem_write(PAD_DESC+0x10,b"\0\1")
+    h.mu.mem_write(buf,struct.pack("<IIII",FR,0,L,R)+bytes([0,1,0,0]))
+    h.mu.mem_write(L,struct.pack(f"<{FR}f",*([0.0]*FR))); h.mu.mem_write(R,struct.pack(f"<{FR}f",*([0.0]*FR)))
+    regs={r:0x1000+i for i,r in enumerate(REGS)}; regs[UC_ARM_REG_R0]=buf
+    end=h.run(bl_target(CHR_SITE),regs,sp=sp,lr=0x0809817f)
+    out=struct.unpack(f"<{FR}f",h.mu.mem_read(L,FR*4))
+    print(f"14e. CC 68 = {target}: master out {out[0]:.3f}..{out[-1]:.3f} (silent master + bus 0.5), bus silent after: {h.mu.mem_read(PAD_DESC+0x10,1).hex()}, badw {h.badw[:2]}")
+cc(70,0); cc(68,0)
