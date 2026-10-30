@@ -82,7 +82,7 @@ import patch_micro as pm                # noqa: E402  the hook generators
 BASE = 0x08040000
 STOCK_SHA = "35ab7995ad0eca8484f3b28bc76389f10b2037dbb21a4a394e950d9329073e86"
 STOCK_SIZE = 674896
-VERSION = "2.3.4-cc29"                  # 10 characters: see pm.VER_DISPLAY_MAX
+VERSION = "2.3.4-cc30"                  # 10 characters: see pm.VER_DISPLAY_MAX
 
 # CCs left out of this build. 2026-10-27, cc1 on hardware: CC 89 (Loop
 # Crossfade) on a Sample pad gave sudden full-scale distorted output at any
@@ -758,98 +758,97 @@ FROZEN_MK2 = {
         "00000000440b072400bf00bf00bf00bf"
         , {'fblock': 0, 'fblock_next': 2, 'fcode': 112, 'fm_out': 86, 'fmidi': 58, 'fmidi_next': 96}),
     'mk2_foldc': (
-        "f0b503af2de9000f81b02ded108b86b040f6443544f65301c2f20745c3f2504155f8042c8a425cd000220023ee18ea50"
-        "4033802bc6e90122c6e90322c6e90522c6e90722c6e90922c6e90b227263b263f263ebd144f200030022c4f27f0385f8"
-        "4520a5f8462005f59a76ab6447f67f73a5f84c30402385f821304ff480436b844023c4f27f036b6205f1800343f8042b"
-        "b3420bd243f8042bb3423cbf43f8042bb34203d243f8042bb342efd343f233334ff07e52c3f69373c5f8d020c5e92623"
-        "002345f8041cc4f2c823c5f8a430c5e92022c5e923224ff08043c5e93f23c5e94222017cf9b94268002a08bf0268a2f2"
-        "011111f5807f16d390f811c00221bcf1000f08bf01210191d0e902100028059018bf0120002904911ebfbcfa8cf14909"
-        "50ea010006d106b0bdec108b01b0bde8000ff0bd40f644399fed6f1ac2f20749dfed6e2adfed6e4a029299f84c00dfed"
-        "6d3adfed6d1a99f8464000ee100ab0ee614a99f8475099f8483099f8496099f84a80b8ee400a99f84be020ee010abdee"
-        "c01ab8eec12a11ee101a30ee423ab0ee620ab0ee632a012903ee240a03ee002ab7ee000a03ee024ab0ee402a03ee042a"
-        "0adb11f00302ddf804a008d032ee022a012a06d14a1e0de0ddf804a019e00a4608e032ee022a022a01d18a1e02e032ee"
-        "022aca1e04290cd3511e32ee021a043911f1020f31ee011a31ee011a31ee012af3d39fed428a002c9fed419a99ed251a"
-        "40f0b8809fed3f3ab4ee431af1ee10fa40f1b0800020c9f894004ff07e51ddf80880c9e93200c9e93410c9e93a00c9e9"
-        "3800c9e93600c9e93000c9e92e00c9f8f800c9e93c0099f823109fed2f2a99f82120002001ee101a422a88bf0120b8ee"
-        "411a40003e2a38bf012031ee021a9fed272a21ee021abfee002ab4ee412af1ee10fa32fe017a022800f04e83012840f0"
-        "778300ee102a9fed1e1ab8ee400a20ee010abdeec02ab8eec21a12ee101a30ee413ab7ee000a012943ee242ab0ee401a"
-        "43ee223a43ee231a03ee211ac0f2528411f0030200f02c8431ee011a012a40f02b844a1e00f037bc0768803d4458633d"
-        "3c951d3cf0fd753e1872313f0402013c0000803c6f12033a000080c22108823c7fb9133e000020429a99193ed00d5d3d"
-        "1f4289380000803d8888083e3333933fcdcc4c3d6f12833a000000003333733fabaaaa3e87c3613d00003e4300007042"
-        "0000003cf304b53f1f42093977cc2b320000804252b87e3fa1c4a2bde15d253fda0fc93f1fed193a0f2c22ee032a03ee"
-        "104a1fed1baac5f17f0107ee101a5fed1d1ab8ee434a1fed1e3a22ee035a1fed1f2ab8eec77a5fed202a24ee023a1fed"
-        "212a88bfb0ee403ab4ee425a5fed244af1ee10fa27ee087af0ee406a32fe056a1fed282ab4ee452a99ed275af1ee10fa"
-        "64ee083a99f8451032fe066a5fed2ebaf0ee6bca36ee456a06ee0a5a06ee105ab8ee466a89ed275a65ee050a26ee086a"
-        "40eea12a5fed371a26ee036a67ee211a23ee866ad9ed203a47ee214a1fed3c7a00eea27a5fed3d1ab1eec66af0ee402a"
-        "44ee212a1fed404a5fed401a46ee041a04ee106ab1eee46a40ee876af5ee000ab8ee444a1fed587a80ee066af4ee640a"
-        "34ee074ab0ee007a72eee30a5fed4c2af1ee10fa64ee222a99ed214a40ee8a3a00ee908a77fe067a34eec46ad9ed224a"
-        "32eee47af8ee600ac9ed203a06ee0a4a06ee10ea47ee0a4a20ee887af8ee460a99ed236a65ee266a1fed5e5a77ee462a"
-        "07ee101a60ee890a89ed214ac9ed224af8ee475a99ed287a02ee8a6af0ee472a55ee882ad9ed245a70eee50a33ee418a"
-        "99ed263a77eec37a89ed236a40ee8a5af0ee400a08ee0a1a02ee8a7a76ee852a99ed295a71eec51ac9ed245a07ee8a3a"
-        "89ed251a46eea20a89ed287a01ee8a5ab4ee427a1fed7c2af1ee10fa89ed263a89ed295a1cddf0ee6bcad9ed3d1a5fed"
-        "812af4ee621af1ee10fa11ddd9ed3e2ac2eea11a70ee611af1eee12af5ee401af1ee10fa5fed941a27ee227a77fe21ca"
-        "80ee04caf9ee00da80ee20dab0ee6bba21ee06eab0ee6b9a25ee02faf0ee6b9a64ee038ab0ee6b8a4ff000080df1100e"
-        "5fed99aa1fed997a2ce0b0ee602af0ee46eab0ee624ab0ee6f5a02f1a80602f1b00502f1b80402f1c00186ed005a02f1"
-        "d40685ed004a02f1dc0584ed00aa02f1e404c1ed001a02f1ec0108f10108c6ed007ad04585ed002a84ed001ac1ed00ea"
-        "00f01e8109eb8802029e002ed2ed2afad2ed2c2a92ed2eaad2ed301ad2ed357ad2ed370a92ed391a92ed3b6abdd05ef8"
-        "28502be0b0ee6baaf0ee6b1af0ee6b7ab0ee6b2ab0ee6b1af0ee6beab0ee6b4ab0ee6b5af0ee6b2af0ee43fa03ee03ba"
-        "55eea2faf0ee442a40eea09af0ee420a06ee068ab0ee6e6a013e0eee2f3af0ee45fa03ee039aa5ec013a96d095ed003a"
-        "b0ee642a03ee832a2cee022ab4ee6a2af1ee10fa04ddb0ee6a2a3f2b0ad954e01fedf34ab4ee424af1ee10fa34fe022a"
-        "402b35d232ee002ab5ee004abfee005a5fede3ea22ee042abdeec24ab8eec44a34ee055ab4ee424af1ee10fa35fe044a"
-        "1fedea5a32ee442abeee004a32ee042ab1ee424ab5ee402af1ee10fa48bfb0ee442ab0ee404a02ee2d4a24ee042a02ee"
-        "2e5a5fedf5ea42ee45ea24ee2e2a3be0b5ee402af1ee10fa0fdab1ee424ab5ee402ab0ee425af1ee10fa48bfb0ee445a"
-        "35ee004a82ee042a26e032ee002ab5ee004abfee005a22ee042abdeec24ab8eec44a34ee055ab4ee424af1ee10fa35fe"
-        "044a32ee442abeee004a32ee044ab1ee442ab5ee404af1ee10fa48bfb0ee424ab0ee402a04ee2d2a33ee674a7e2828ee"
-        "825a4fee047a35ee6f4a02ee874a37eee02af0ee442a4fee020a4ceea02a13d832eee12af0ee4a2a46ee822a2dee222a"
-        "f0ee612a46ee822a32ee022a32ee4aaa72eea2ea7eeee11a34ee412af4ee622af1ee10fa0fee021a31ee462a0fee026a"
-        "bff510afb4ee4aaaf1ee10fa7cbff4ee611af1ee10fabff505afb0ee602af0ee46eab4ee466af1ee10fafff50daff9e6"
-        "bcf1000fdfedc54a18bf4ff0010cddf8088099ed3d6a08fa0cf0b0ee463a01ee100a99ed322ad9ed3e0a99ed335af0ee"
-        "601a9fedbb4ab8ee411a80ee011a11ee293a21ee0b7a61ee092a51ee081ab4ee427af1ee10fa03ee246ab6ee003af4ee"
-        "452a37ee427a33fe041af1ee10fa72eec52a89ed3d6a73fe043a41eea40a07ee012a99ed341a02eea35ac9ed3e0a89ed"
-        "322a89ed335a99f84d0040285cd230ee412ab0ee416a9fed9f3a9fed9f8a02ee036a9fed9e9adfed9e1adfed9e2adfed"
-        "9e3adfed9e4a85e0a2f143019fed951a00ee101ab8eec00a20ee010abdeec02ab8eec21a12ee101a30ee413ab7ee000a"
-        "012943ee242ab0ee401a43ee223a43ee231a03ee211ac0f24b8111f0030200f0e18031ee011a012a40f0e4804a1e30e1"
-        "4339c9b2fb29c0f0c48099ed440a9fed841ab4ee410af1ee10fa40f1b8800020c9e94400c9f83001c9e94a00c9e94800"
-        "c9e94600fff7afbb9fed7a6ab4ee462ab0ee416af1ee10fa9fed6f8a9fed6f9adfed6f1adfed6f2adfed6f3adfed6f4a"
-        "28dd9fed716ab4ee465ab0ee416af1ee10fa1fdd82ee052ab0ee045a9fed6b6ab1eec22ab4ee452af1ee10fab4ee426a"
-        "35fe025af1ee10fa36fe052ab0ee416ab4ee421af1ee10fa32ee412a33fe043a02ee036a03ee108a36ee412a08f4fe71"
-        "08f0030049420022b8ee433a89ed346a82ee032a03e0013252453ff4f4abb8f1000ff8d0b8f1040f5ef8223004d20026"
-        "b0ee413a70bbeee7b0ee413aa3f11005002632ee034a95ed045a23ee053a95ed065a95ed056a85ed043a32ee047a05f1"
-        "100424ee064a95ed076a85ed054a043e72ee070ab14227ee053a85ed063a32ee203a20ee864a85ed074a2546d9d17642"
-        "0028c0d003eb8603012893ed004a23ee044a83ed004ab6d032ee033a93ed014a022823ee044a83ed014aacd032ee033a"
-        "93ed024a23ee043a83ed023aa3e79fed280ab6ee001a99ed3f2ab3ee043ab4ee412a9fed241af1ee10fa31fe031a6be0"
-        "0a4610e00a4654e031ee011a022a07d18a1e08e031ee011a022a47d18a1e48e031ee011aca1e04290cd3511e31ee011a"
-        "043911f1020f31ee011a31ee011a31ee011af3d39fed102a44e000bfcdcc4c3d8fc2f53c9a99193e0402013c0000803c"
-        "1872313f4458633df0fd753e3c951d3c6f12033a95bfd6335f708930cdcc4c3e0000000000a08c46000020421f428938"
-        "9a99993f8888083ed00d5d3dabaaaa3e3333f3bf000080c2ec5178bf31ee011aca1e04290cd3511e31ee011a043911f1"
-        "020f31ee011a31ee011a31ee011af3d3b3ee042a21ee021a1fed142a99f8221021ee021a1fed162a1fed1f3a05ee101a"
-        "1fed184a99f82410b4ee421af0ee002af1ee10fab4ee413a99f8262032fe012af5ee006af1ee10fab8ee455a33fe021a"
-        "1fed233a022825ee085a21ee012a02ee034a1fed263a02ee043ab7ee004af0ee440a42ee030a03ee101a1fed2b2a99f8"
-        "251025ee022ab8ee433a45ee022a1fed2f2a33ee026a02ee101a05ee102a99ed3f3a99f82710f0ee433a51ee203ad9ed"
-        "420a01ee101ab8ee455af0ee604ab8ee422ab8ee411a55ee084a99ed435af0ee455a62ee081a51ee095a99ed401a72ee"
-        "c12a99ed412a77ee427ab0ee437a03eea67a5fed473a02eea61ad9ed442a30ee620a07eea62a44eea60a04ee908a05ee"
-        "a65adfedf75a40ee262a89ed3f7a61eea33a89ed401a37ee430a89ed412af8ee644ac9ed420a89ed435ac9ed442a0ad0"
-        "58b9f6ee006a0020b4ee667af1ee10fa48bf012002e0012000e00020b0ee447a80ee240a01eea37a4feac87126ee256a"
-        "0ff2803960eea20a0ff2803a08f4ff7b0026009109f104050af10401dfedd71a27e0f0ee612af0ee613af0ee614af0ee"
-        "615af0ee616ab0ee678a15ee268a40ee887ac4ed007a0cf58a720cf58e760cf592740cf59673c2ed005a019ac6ed004a"
-        "039e0136c4ed002a9642c3ed003a3ff49aa940f64432b8f1000fc2f20742039602eb860cdced455adced474adced492a"
-        "dced4b3ad7d004aab8f1010f52f826206fd1f0ee436a4ff0000e009b002bddf80880c8d071ee267a02eb8e04b0ee448a"
-        "b0ee65aa00284e4606eea78ad4ed007a37eee49a524606ee89aa84ee088a28ee0a9ab0ee648a06ee898af0ee676a41ee"
-        "496a76eec86a48fe266ab1ee66aaf5ee406ab0ee66baf1ee10fa48bfb0ee4aba3bee62aab4ee62baf1ee10fac8bf2e46"
-        "96ed00ba4aee0b2ab0ee63ba26ee22aaf4ee4a6af1ee10fac8bf0a4692ed00aa12ee8aba47ee0b3a42ee236af4ee666a"
-        "f1ee10fabff565af39ee099a79ee655af4ee655af1ee10fabff55baf38ee088a78ee644af4ee644af1ee10fafff55baf"
-        "4fe7f0ee436a02f104084ff0000e1ae0f0ee612af0ee613af0ee614af0ee615ab0ee61aaf0ee497a70ee266a55ee0a7a"
-        "0ef1020ef34500eea79a88ed009a08f108083ff472af71ee267ab0ee448ab0ee65aa00284b4606eea78a58ed017a37ee"
-        "e49a06ee89aab0ee649a84ee088a28ee0aaab0ee678a06ee8a9a01ee4a8a38ee498a09fe088ab1ee48bab5ee408ab0ee"
-        "48caf1ee10fa48bfb0ee4bca3cee62bab4ee62caf1ee10fac8bf2b4693ed00ca53464bee0c2ab0ee63ca26ee22bab4ee"
-        "4b8af1ee10fac8bf0b4693ed00ba12ee8bca47ee0c3a02ee238ab4ee488af1ee10fa11d63aee0aaa7aee655af4ee655a"
-        "f1ee10fa08d639ee099a79ee644af4ee644af1ee10fa09d7f0ee612af0ee613af0ee614af0ee615ab0ee618a70ee266a"
-        "b0ee44aab0ee65ca00284b4631ee269a06ee89aa98ed009a39ee64ba06ee8bcab0ee64ba84ee0aaa2aee0ccab0ee49aa"
-        "06ee8cba01ee4caa3aee4baa0bfe0aaab1ee4adab5ee40aab0ee4aeaf1ee10fa48bfb0ee4dea3eee62dab4ee62eaf1ee"
-        "10fac8bf2b4693ed00ea53464dee0e2ab0ee63ea26ee22dab4ee4daaf1ee10fac8bf0b4693ed00da12ee8deab0ee67da"
-        "15ee08da47ee0e3a40ee8d7a48ed017a02ee23aab4ee4aaaf1ee10fabff520af7cee0c7a77eee55af4ee655af1ee10fa"
-        "bff516af7bee0b7a77eee44af4ee644af1ee10fafff516af0ae700bf00000000cdcc4c3ca69bc43a0ad7a33c8104b5bf"
-        "8104b53f"
+        "f0b503af2de9000f81b02ded108b84b040f6443b44f65301c2f2074bc3f250515bf8042c8a4262d0002200230beb0306"
+        "4bf803204033802bc6e90122c6e90322c6e90522c6e90722c6e90922c6e90b227263b263f263e9d144f200030022c4f2"
+        "7f038bf84520abf846200bf59a76cbf8483047f67f73abf84c3040238bf821304ff48043abf8223042f64003c7f67f73"
+        "cbf824300bf1800343f8042bb3420bd243f8042bb3423cbf43f8042bb34203d243f8042bb342efd343f233334ff07e52"
+        "c3f69373cbf8d020cbe9262300234bf8041cc4f2c823cbf8a430cbe92022cbe923224ff08043cbe93f23cbe94222017c"
+        "11bbd0f80490b9f1000f08bfd0f80090a9f2011111f5807f16d390f811c00221bcf1000f08bf01210191d0e902100028"
+        "039018bf0120002902911ebfbcfa8cf1490950ea010006d104b0bdec108b01b0bde8000ff0bd9bf84c009fede51adfed"
+        "e52a9bf8466000ee100adfede34adfede33a9bf84750dfede21a9bf84830b8ee400ab0ee614a9bf849409bf84a809bf8"
+        "4ba020ee010abdeec01ab8eec12a11ee102a30ee423ab0ee620ab0ee632a012a03ee240a03ee002ab7ee000a03ee024a"
+        "b0ee402a03ee042a0adb12f00301ddf804e008d032ee022a012906d1511e0de0ddf804e019e0114608e032ee022a0229"
+        "01d1911e02e032ee022ad11e042a0cd3013932ee021a043911f1020f31ee011a31ee011a31ee012af3d39fedba9a9bed"
+        "251ab6bb9fedb83ab4ee431af1ee10fa2fd50020cbf894004ff07e51cbe93200cbe93410cbe93a00cbe93800cbe93600"
+        "cbe93000cbe92e00cbf8f800cbe93c009bf8211000209bf82320422988bf012040003e2938bf0120452ac0f03083443a"
+        "9feda22a01ee102ab8eec11a21ee021a33e39fed9f3a0f2e22ee032a03ee106a9fed9caac5f17f0107ee101adfed9a1a"
+        "b8ee434a9fed993a22ee035a9fed982ab8eec77adfed972a24ee023a9fed962a88bfb0ee403ab4ee425adfed944af1ee"
+        "10fa64ee093af0ee405a32fe056a9fed902ab4ee452a9bed275af1ee10fa27ee097a9bf8451032fe066adfed8aaaf0ee"
+        "6aba36ee456a06ee0a5a06ee105ab8ee466a8bed275a26ee096a65ee050a26ee036a40eea12adfed801a67ee211a23ee"
+        "866af0ee643af0ee404a47ee213a9fed7b7ab1eec66adfed7a1a00eea27af0ee002a44ee214a9fed774adfed771a46ee"
+        "041a04ee104ab1eee36ab8ee444a40ee875a9fed727af5ee000a80ee066a34ee074a07ee10aaf4ee630adfed6d0ab8ee"
+        "477a64ee200a9fed6b4af1ee10fa67ee046a9bed214a33eec47a03ee908a72fe867adbed202a34eee26af8ee633a07ee"
+        "0a4a46ee0a2a9bed236a23ee897adbed223a70eee30a65ee255a9fed5b5a77ee464a07ee101a40ee8a3acbed202a8bed"
+        "214ab8ee478a9bed287a04ee8a6af0ee470adbed244acbed223a58ee090a76eee46a33ee418a9bed263a77eec37a8bed"
+        "236a46ee8a4a75ee856a9bed295a71eec51a00ee8a7af0ee400a08ee0a1acbed244a07ee8a3a45eea60a01ee8a5a8bed"
+        "287a8bed251ab4ee427a9fed3c2af1ee10fa8bed263a8bed295a1cddf0ee6abadbed3d1adfed366af4ee661af1ee10fa"
+        "11dddbed3e6ac6eea11a70ee611af1eee16af5ee401af1ee10fadfed221a27ee267a77fe21ba80ee04baf9ee00ca80ee"
+        "20cab0ee6aaa21ee06dab0ee6a8a25ee02eaf0ee6a8a24ee03faf0ee6a7a4ff0000a0df10808dfed1f9a9fed1f6a76e0"
+        "0768803d4458633d3c951d3cf0fd753e1872313f0402013c6f12033af3d88a3c000020429a99193ed00d5d3d1f428938"
+        "0000803d8888083e3333933fcdcc4c3d6f12833a000000003333733fabaaaa3e87c3613d00003e4300007042000080c2"
+        "0000003c0000803cf304b53f1f42093977cc2b320000804252b87e3fa1c4a2bde15d253fda0fc93f8fc2f53c8988883c"
+        "6f12033af0ee47faf0ee45dab0ee613ab0ee6e4a05f1a80105f1b00405f1b80605f1c00281ed004a05f1d40184ed003a"
+        "05f1dc0486ed009a05f1e406c2ed000a05f1ec020af1010ac1ed006af245c4ed00fa86ed001ac2ed00da00f01f810beb"
+        "8a05b9f1000fd5ed2aead5ed2c1a95ed2e9ad5ed300ad5ed356a95ed377a95ed391a95ed3b5abdd058f82a604c462be0"
+        "b0ee6a9af0ee6a0af0ee6a6af0ee6afab0ee6a1af0ee6adab0ee6a3ab0ee6a4af0ee6a1af0ee42ea02ee02aa54eea1ea"
+        "f0ee431a47ee078ab0ee6f7a45ee057ab0ee6d5a013c0dee2e2af0ee44ea02ee028aa6ec012a95d096ed002ab0ee633a"
+        "02ee823a2bee033ab4ee693af1ee10fa04ddb0ee693a3f2b0ad954e01fed514ab4ee434af1ee10fa34fe033a402b35d2"
+        "33ee003ab5ee004affee00da5fed51fa23ee043abdeec34ab8eec44a74ee2ddab4ee434af1ee10fa3dfe844a5fed58da"
+        "33ee443abeee004a33ee043ab1ee434ab5ee403af1ee10fa48bfb0ee443ab0ee404a03ee2c4a24ee043a43ee2fda5fed"
+        "63fa43ee6dfa24ee2f3a3be0b5ee403af1ee10fa0fdab1ee434ab5ee403af0ee43daf1ee10fa48bff0ee44da3dee804a"
+        "83ee043a26e033ee003ab5ee004affee00da23ee043abdeec34ab8eec44a74ee2ddab4ee434af1ee10fa3dfe844a33ee"
+        "443abeee004a33ee044ab1ee443ab5ee404af1ee10fa48bfb0ee434ab0ee403a04ee2c3a32ee664a7e284eee046a2fee"
+        "034a34ee6e3a01ee863a76eec7da0eee2d7af0ee431a4bee871a13d871eee01af0ee49da45eea1daf0ee601a6cee2dda"
+        "45eead1a7deeadda3deec99a71eea1ea7eeee00a73ee41daf4ee611af1ee10fa0eee2d1a71ee45da0eee2d5abff510af"
+        "b4ee499af1ee10fa7cbff4ee600af1ee10fabff505aff0ee47faf0ee45dab4ee455af1ee10fafff50daff9e6bcf1000f"
+        "5fedbe4a18bf4ff0010c09fa0cf09bed3d6a01ee100ab0ee463a9bed322adbed3e0af0ee601a9bed335ab8ee411a1fed"
+        "b64a80ee011a11ee283a21ee0a7a61ee082a51ee271ab4ee427af1ee10fa03ee246ab6ee003af4ee452a37ee427a33fe"
+        "041af1ee10fa72eec52a8bed3d6a73fe043a41eea40a07ee012a9bed341a02eea35acbed3e0a8bed322a8bed335a9bf8"
+        "4d00402880f0898030ee412ab0ee416a1fedec3a1fedf19a02ee036a5fedf41a5fedf82a5fedf73adfedc34ab1e03c3a"
+        "1fedda2a01ee102ab8eec11a21ee022a1fedf01a38bfb0ee421ab5ee401ab0ee413ab1ee412a1fedf57af1ee10fa48bf"
+        "b0ee423a61ee030aa1f14302b0ee476ad3b2f5ee400af1ee10fa18bfb0ee406afb2b38bfb0ee406ab5ee406af1ee10fa"
+        "15d19bed441a1fedf22ab4ee421af1ee10fa0cd50020cbe94400cbf83001cbe94a00cbe94800cbe94600fff7edbb0028"
+        "00f0d480022840f0e08001ee102a9fed942ab8eec11a21ee021abdeec12ab8eec23a12ee101a31ee433ab0ee401a0129"
+        "43ee242a43ee223a43ee231a03ee211ac0f20a8111f0030200f0e48031ee011a012a40f0e3804a1eefe09fed826ab4ee"
+        "462ab0ee416af1ee10fa9fed7f9adfed7f1adfed7f2adfed7f3adfed7f4a28dd9fed7e6ab4ee465ab0ee416af1ee10fa"
+        "1fdd82ee052ab0ee045a9fed796ab1eec22ab4ee452af1ee10fab4ee426a35fe025af1ee10fa36fe052ab0ee416ab4ee"
+        "421af1ee10fa32ee412a33fe043a02ee036a03ee109a36ee412a09f4fe7109f0030049420022b8ee433a8bed346a82ee"
+        "032a03e0013272453ff4faabb9f1000ff8d0b9f1040f58f8223004d20026b0ee413a70bbeee7b0ee413aa3f110050026"
+        "32ee034a95ed045a23ee053a95ed065a95ed056a85ed043a32ee047a05f1100424ee064a95ed076a85ed054a043e72ee"
+        "070ab14227ee053a85ed063a32ee203a20ee864a85ed074a2546d9d176420028c0d003eb8603012893ed004a23ee044a"
+        "83ed004ab6d032ee033a93ed014a022823ee044a83ed014aacd032ee033a93ed024a23ee043a83ed023aa3e7b6ee001a"
+        "9bed3f2ab3ee043ab4ee412a9fed311af1ee10fa31fe031a88e001ee101a9fed2e2ab8ee411a21ee021abdeec12ab8ee"
+        "c23a12ee101a31ee433ab0ee401a012943ee242a43ee223a43ee231a03ee211a68db11f0030207d031ee011a012a0bd1"
+        "4a1e50e00a4610e00a464ce031ee011a022a07d18a1e08e031ee011a022a3fd18a1e40e031ee011aca1e04290cd3511e"
+        "31ee011a043911f1020f31ee011a31ee011a31ee011af3d3b3ee042a3ce000bf9a99193e95bfd6330402013c1872313f"
+        "4458633df0fd753e3c951d3c5f708930cdcc4c3e00a08c467fb9133e000020421f4289389a99993f6f12033a8888083e"
+        "abaaaa3e0ad7233dd00d5d3d000080c231ee011aca1e04290cd3511e31ee011a043911f1020f31ee011a31ee011a31ee"
+        "011af3d31fed132a21ee021a1fed142a9bf8221021ee021a1fed162a1fed163a9bf826201fed174ab5ee008ab4ee421a"
+        "1fed195af1ee10fab4ee413a5fed1b4a32fe012af1ee10fa33fe021a1fed1e3a022821ee012a02ee034a03ee101a9bf8"
+        "2410b8ee433a02ee045ab0ee404a03ee494ab0ee403a02ee053a05ee101a34ee042a9bf82510b8ee455a44ee024a1fed"
+        "2d2a75ee021a02ee101a9bf82710b8ee424a02ee102a02ee901ab8ee425a9bed3f2af0ee426af8ee625a51ee036adbed"
+        "422af0ee627a9bed433a9bed401a55ee097ab0ee435a74eec14a15ee895af0ee425a64ee093a9bed414a04ee881adbed"
+        "444a70eec40a46ee885adfedf06a36ee646a00ee884adfedee0a47ee882a8bed401a05ee083acbed3f5a46ee084a06ee"
+        "109a63eea00a8bed414a35eec25acbed422ab8ee466a8bed433acbed444a0ad058b9f6ee007a0020f4ee675af1ee10fa"
+        "48bf012002e0012000e0002085ee065ab0ee406a03eea06a0ff2583e61eea60a09f4ff7362eea41a4ff000080ef10406"
+        "4feac971009127e0f0ee472af0ee473af0ee474af0ee475af0ee476ab0ee678a13ee268a41ee887ac1ed007a02f58a71"
+        "02f58e7502f5927402f59672c1ed005a08f101080199c5ed004a8845c4ed002ac2ed003a3ff498a90beb8802b9f1000f"
+        "d2ed455ad2ed474ad2ed492ad2ed4b3adcd002a9b9f1010f51f828a069d1f0ee426a0021009d002dd0d071ee267a0aeb"
+        "8101b0ee408ab0ee65aa0028754606eea78ad1ed007a37eee49a06ee89aa80ee088a28ee0a9ab0ee648a06ee898af0ee"
+        "676a41ee496a76eec86a48fe266ab1ee66aaf5ee406ab0ee66baf1ee10fa48bfb0ee4aba3bee62aab4ee62baf1ee10fa"
+        "c8bf354695ed00ba4aee0b2a20eea2aaf4ee4a6ab1ee62aaf1ee10fa32fe8aaa3aee63aa46ee0a3a44ee236af4ee666a"
+        "f1ee10fabff570af39ee099a79ee655af4ee655af1ee10fabff566af38ee088a78ee644af4ee644af1ee10fafff566af"
+        "5ae7f0ee426a0af1040c002119e0f0ee472af0ee473af0ee474af0ee475ab0ee47aaf0ee497a75ee266a53ee0a7a0231"
+        "8b4201eea79a8ced009a0cf1080c3ff479af71ee267ab0ee408ab0ee65aa0028744606eea78a5ced017a37eee49a06ee"
+        "89aab0ee649a80ee088a28ee0aaab0ee678a06ee8a9a01ee4a8a38ee498a09fe088ab1ee48bab5ee408ab0ee48caf1ee"
+        "10fa48bfb0ee4bca3cee62bab4ee62caf1ee10fac8bf344694ed00ca4bee0c2a20eea2bab4ee4b8ab1ee62baf1ee10fa"
+        "32fe8bba3bee63ba46ee0b3a04ee238ab4ee488af1ee10fa11d63aee0aaa7aee655af4ee655af1ee10fa08d639ee099a"
+        "79ee644af4ee644af1ee10fa09d7f0ee472af0ee473af0ee474af0ee475ab0ee478a75ee266ab0ee40aab0ee65ca0028"
+        "744631ee269a06ee89aa9ced009a39ee64ba06ee8bcab0ee64ba80ee0aaa2aee0ccab0ee49aa06ee8cba01ee4caa3aee"
+        "4baa0bfe0aaab1ee4adab5ee40aab0ee4aeaf1ee10fa48bfb0ee4dea3eee62dab4ee62eaf1ee10fac8bf344694ed00ea"
+        "4dee0e2a20eea2dab4ee4daab1ee62daf1ee10fa32fe8dda3dee63da46ee0d3ab0ee67da13ee08da04ee23aa41ee8d7a"
+        "4ced017ab4ee4aaaf1ee10fabff527af7cee0c7a77eee55af4ee655af1ee10fabff51daf7bee0b7a77eee44af4ee644a"
+        "f1ee10fafff51daf11e700bfcdcc4c3cec5178bfa69bc43a0ad7a33c"
         , {'shape_block': 0}),
     'mk2_font': (
         "45a2002110f8013b2bb152f82330c3f307431944f6e7084670472de9f04f8ab0029203930022049220e02de9f04f8ab0"
@@ -1181,7 +1180,7 @@ FROZEN_MK2 = {
         "0000bf00444941470000bf00435553544f4d0000"
         , {'_sT': 0, 'tchr': 564, 'tchr_call': 588, 'tclabel0': 736, 'tclabel1': 760, 'tclabel2': 780, 'tclabel3': 800, 'tclabel4': 820, 'tclabel5': 840, 'tclabel6': 860, 'tclabel7': 880, 'tcxml0': 748, 'tcxml1': 772, 'tcxml2': 792, 'tcxml3': 808, 'tcxml4': 828, 'tcxml5': 848, 'tcxml6': 868, 'tcxml7': 888, 'tedit': 446, 'tedit_next': 454, 'tground': 900, 'tlabel': 2436, 'tload': 620, 'tload_call': 640, 'tload_next': 662, 'tm_copy': 520, 'tm_custom': 540, 'tm_go': 542, 'tmine': 458, 'tpal': 948, 'tpost': 424, 'tpost_call': 542, 'tpost_next': 442, 'treg': 0, 'treg_c0': 60, 'treg_c1': 92, 'treg_c2': 124, 'treg_c3': 156, 'treg_c4': 188, 'treg_c5': 220, 'treg_c6': 252, 'treg_c7': 284, 'treg_call': 28, 'treg_next': 294, 'tsave': 666, 'tsave_call': 686, 'tsave_next': 708, 'tstore': 298, 'tstore_c0': 322, 'tstore_c1': 334, 'tstore_c2': 348, 'tstore_c3': 360, 'tstore_c4': 372, 'tstore_c5': 384, 'tstore_c6': 398, 'tstore_c7': 412, 'tstore_call': 308, 'tstore_next': 420, 'tv0': 2452, 'tv1': 2460, 'tv10': 2548, 'tv11': 2556, 'tv2': 2468, 'tv3': 2476, 'tv4': 2488, 'tv5': 2500, 'tv6': 2512, 'tv7': 2520, 'tv8': 2528, 'tv9': 2536, 'tvalues': 2388, 'txml': 2444}),
     'mk2_names': (
-        "072218a910a8dff828c0e04700238df84730072d09dd072218a9073108a8dff810c0e04700238df82730000000000000"
+        "062218a910a8dff828c0e04700238df84630062d09dd062218a9063108a8dff810c0e04700238df82630000000000000"
         "eddf0b08"
         , {'nsplit': 0}),
     'mk2_osdsync': (
@@ -2380,7 +2379,7 @@ FOLD_C = r"""/* The master bus shapers (cc29): the wave folder (ch 1 CC 69-77) a
 typedef unsigned int u32;
 typedef unsigned char u8;
 #define SHAPE_RAM 0x24070b40u
-#define MAGIC 0x34504853u           /* "SHP4" */
+#define MAGIC 0x35504853u           /* "SHP5" */
 #define FS 48000.0f
 typedef struct {
     u32 magic;
@@ -2430,7 +2429,7 @@ static void init(shape_t *s)
     u8 *c = s->cc;
     for (int i = 0; i < 128; i++) c[i] = 0;
     c[69] = 0; c[70] = 0; c[71] = 0; c[72] = 0; c[73] = 64; c[74] = 127; c[75] = 64; c[76] = 127; c[77] = 127;
-    c[33] = 64; c[34] = 0; c[35] = 64; c[36] = 64; c[37] = 0; c[38] = 127; c[39] = 64;
+    c[33] = 64; c[34] = 0; c[35] = 64; c[36] = 64; c[37] = 40; c[38] = 127; c[39] = 127;
     float *f = &s->g;
     for (float *e = (float *)(s + 1); f < e; f++) *f = 0.0f;
     s->g = 1.0f; s->t = 1.0f; s->mix = 1.0f; s->out = 1.0f; s->mk = 1.0f; s->lp = 1.15f; s->ag = 1.0f;
@@ -2535,8 +2534,10 @@ static void folder(shape_t *s, float **ch, int chans, u32 n)
 
 /* ---- the pulse filter: 33 cutoff, a DJ filter (0-63 low-pass closing,
    64 open, 65-127 high-pass opening upward), 34 resonance, 35 the pulse
-   (64 none, up adds it, down subtracts it), 36 the comparator's threshold
-   (64 at zero), 37 the pulse's softness, 38 mix, 39 level (64 unity).
+   (60-68 none, up adds it, down subtracts it, on a square-law taper so
+   the first steps are delicate), 36 the comparator's threshold (64 at
+   zero), 37 the pulse's softness (40), 38 mix, 39 level (127 unity, cc30:
+   it only ever turns down).
    The pulse is a comparator on the filtered signal, at the filtered
    signal's own envelope, so it follows the cutoff, the resonance and the
    music, and is silent in silence. */
@@ -2545,9 +2546,10 @@ static void pulse(shape_t *s, float **ch, int chans, u32 n)
     const u8 *c = s->cc;
     int cut = c[33];
     int mode = cut < 62 ? 1 : cut > 66 ? 2 : 0;          /* 1 LP, 2 HP, 0 open */
-    float amt = ((float)c[35] - 64.0f) * (1.0f / 63.0f);
-    if (amt < -1.0f) amt = -1.0f;
-    float eng = (mode || (c[35] < 62 || c[35] > 66)) ? 1.0f : 0.0f;
+    int pc = c[35];
+    float amt = pc > 68 ? (float)(pc - 68) * (1.0f / 59.0f) : pc < 60 ? (float)(pc - 60) * (1.0f / 60.0f) : 0.0f;
+    amt = amt * fabs_(amt);                               /* square law: delicate near the middle */
+    float eng = (mode || amt != 0.0f) ? 1.0f : 0.0f;
     if (eng == 0.0f && s->feng < 0.0005f) {
         s->feng = 0.0f;
         for (int i = 0; i < 2; i++) s->fi1[i] = s->fi2[i] = s->fenv[i] = s->fpul[i] = 0.0f;
@@ -2559,12 +2561,12 @@ static void pulse(shape_t *s, float **ch, int chans, u32 n)
     else fc = mode == 0 && s->fg > 0.5f ? 18000.0f : 20.0f;   /* open: glide to wherever it is open */
     float g1 = pre(fc);
     float res = (float)c[34] * (1.0f / 127.0f);
-    float k1 = 2.0f - 1.9f * res * res;                   /* 1/Q: 0.5 ... 10 */
+    float k1 = 2.0f * (1.0f - res) * (1.0f - res) + 0.04f;   /* 1/Q: Q 0.5 ... 25, the cutoff rings */
     float th = ((float)c[36] - 64.0f) * (0.8f / 64.0f);   /* relative to the envelope */
     float soft = (float)c[37] * (1.0f / 127.0f);
     float slew = 1.0f - 0.97f * soft * soft;              /* the pulse's one-pole */
     float mix = (float)c[38] * (1.0f / 127.0f);
-    float out = (float)c[39] * (1.0f / 64.0f);
+    float out = (float)c[39] * (1.0f / 127.0f);
     const float a = 0.25f;
     float g0 = s->fg;
     s->fg += a * (g1 - s->fg); s->fk += a * (k1 - s->fk);
@@ -2586,7 +2588,7 @@ static void pulse(shape_t *s, float **ch, int chans, u32 n)
             float f = hp ? x - K * v1 - v2 : v2;
             float af = fabs_(f);
             env += (af > env ? 0.02f : 0.0015f) * (af - env);
-            float sq = f > th * env ? env * 1.4142f : -env * 1.4142f;
+            float sq = f > th * env ? env : -env;
             pul += slew * (sq - pul);
             float y = f + P * pul;
             if (!(y == y) || !(i1 == i1) || !(i2 == i2)) { y = 0.0f; i1 = i2 = env = pul = 0.0f; }
@@ -2730,7 +2732,7 @@ def apply_fold(d):
     vprint(f"F wave folder at {org:#x}, {len(code) + len(ccode)} bytes, ram {FOLD_RAM:#x}")
 
 
-# --- pad names on 7 characters a line (cc29) ---------------------------------
+# --- pad names on 6 characters a line (cc29: 7, cc30: 6) ---------------------------------
 # A pad's name is split for its cell by 0x0805d8cc (set-name: strip the
 # extension, then two lines): the last space or underscore within the first
 # 4 characters splits it, else the first one past them, else 4 + 4; each line
@@ -2738,16 +2740,16 @@ def apply_fold(d):
 # path. The no-separator path (0x0805d9b6) copies from sp+0x64, which a 16-bit
 # add cannot reach at +7, so it branches to NAME_SRC instead. The one-line
 # labels (0x0805da98, 0x0805db66: the mixer's) get 7 too.
-NAME_CHARS = 7
+NAME_CHARS = 6
 NAME_PATCH = (                       # (va, stock hex, new hex)
-    (0x0805d988, "032c", "062c"),               # cmp r4, #3 -> #6: a space
-    (0x0805d9aa, "032c", "062c"),               # ... an underscore
-    (0x0805d9e0, "042ca8bf0427", "072ca8bf0727"),   # line 1: min(split, 7)
-    (0x0805d9fe, "042da8bf0425", "072da8bf0725"),   # line 2: min(rest, 7)
-    (0x0805daa8, "0422", "0722"),               # one-line label: 7
-    (0x0805dab0, "8df82440", "8df82740"),       # ... its terminator
-    (0x0805db74, "0422", "0722"),
-    (0x0805db7c, "8df80450", "8df80750"),
+    (0x0805d988, "032c", "052c"),               # cmp r4, #3 -> #5: a space
+    (0x0805d9aa, "032c", "052c"),               # ... an underscore
+    (0x0805d9e0, "042ca8bf0427", "062ca8bf0627"),   # line 1: min(split, 6)
+    (0x0805d9fe, "042da8bf0425", "062da8bf0625"),   # line 2: min(rest, 6)
+    (0x0805daa8, "0422", "0622"),               # one-line label: 6
+    (0x0805dab0, "8df82440", "8df82640"),       # ... its terminator
+    (0x0805db74, "0422", "0622"),
+    (0x0805db7c, "8df80450", "8df80650"),
 )
 NAME_SITE, NAME_RET = 0x0805d9b6, 0x0805da1a
 NAME_SRC = """
@@ -2756,24 +2758,24 @@ NAME_SRC = """
 .text
 .global nsplit
 .thumb_func
-nsplit:                             /* no separator: 7 + 7, in the caller's frame */
-    movs    r2, #7
+nsplit:                             /* no separator: 6 + 6, in the caller's frame */
+    movs    r2, #6
     add     r1, sp, #0x60
     add     r0, sp, #0x40
     ldr     r12, =0x080bdfed        /* strncpy */
     blx     r12
     movs    r3, #0
-    strb.w  r3, [sp, #0x47]
-    cmp     r5, #7
+    strb.w  r3, [sp, #0x46]
+    cmp     r5, #6
     ble     1f
-    movs    r2, #7
+    movs    r2, #6
     add     r1, sp, #0x60
-    adds    r1, #7
+    adds    r1, #6
     add     r0, sp, #0x20
     ldr     r12, =0x080bdfed
     blx     r12
     movs    r3, #0
-    strb.w  r3, [sp, #0x27]
+    strb.w  r3, [sp, #0x26]
 1:
     .short  0, 0                    /* b.w 0x0805da1a */
 .ltorg
@@ -3173,7 +3175,7 @@ def main():
                  "Theme, and your own          TOOLS > Theme",
                  "Wave folder, ch 1            CC 69-77",
                  "Pulse filter, ch 1           CC 33-39",
-                 "Pad names, 7 characters a line"):
+                 "Pad names, 6 characters a line"):
         print(f"     ok   {what}")
 
     write_string(d, ATTRIB_VA, VER_VA, ATTRIB_STOCK, ATTRIB_NEW)
