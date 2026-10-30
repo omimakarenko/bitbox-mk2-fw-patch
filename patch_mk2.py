@@ -82,7 +82,7 @@ import patch_micro as pm                # noqa: E402  the hook generators
 BASE = 0x08040000
 STOCK_SHA = "35ab7995ad0eca8484f3b28bc76389f10b2037dbb21a4a394e950d9329073e86"
 STOCK_SIZE = 674896
-VERSION = "2.3.4-cc26"                  # 10 characters: see pm.VER_DISPLAY_MAX
+VERSION = "2.3.4-cc27"                  # 10 characters: see pm.VER_DISPLAY_MAX
 
 # CCs left out of this build. 2026-10-27, cc1 on hardware: CC 89 (Loop
 # Crossfade) on a Sample pad gave sudden full-scale distorted output at any
@@ -754,31 +754,45 @@ STAGE3_GLOBALS = (
 FROZEN_MK2 = {
     'mk2_fold': (
         "01b5000000002de90f50eff30080f1ee101a03b42ded100a18980ff2540c4cf0010ce047bdec100a03bc80f30088e1ee"
-        "101abde80f5001b000bd2de90f50eff3008003b41a9838b91b994639052903d81c9ad209044b5a5403bc80f30088bde8"
+        "101abde80f5001b000bd2de90f50eff3008003b41a9838b91b994639062903d81c9ad209044b5a5403bc80f30088bde8"
         "0f50000000000000440b072400bf00bf"
         , {'fblock': 0, 'fblock_next': 2, 'fcode': 112, 'fm_out': 88, 'fmidi': 58, 'fmidi_next': 98}),
     'mk2_foldc': (
-        "f0b503af4df8048d2ded108b40f6603844f64671c2f20748c4f24c4158f8202c8a421ad047f600720023c4f2000248f8"
-        "1c2c44f27f0228f8182c4ff07e5248f8042c48e9052248e90332c8e90032c8e90433c8e9023348f8201c017ce9b9d0f8"
-        "04c0bcf1000f08bfd0f800c0acf2011111f5807f11d318f81c2c437c18f81a1c98ed007a72b99fedc60ab4ee407af1ee"
-        "10fa07d50020c8f80000bdec108b5df8048bf0bd18f81b6c01ee102a9fedbf4a18f8175c00ee106a18f8196cb8ee413a"
-        "9fedb81a18f8184cdfedba1ab8ee400adfedb93a23ee016a02ee904a0f2a4fea511220ee042a9fedb20af8ee622a00f1"
-        "080e4ff000014ff0010022ee001a00ee105a9fedb39a9fedb3aab8ee405a00ee106a42ee011a9feda41a18ed032af8ee"
-        "400ab7ee000a70ee810af0ee404a43ee234a9feda33af0ee423af1eee15a50ee833a58ed020af0ee606a18ed013a52ee"
-        "846ab5ee004adfed9b2af0ee437a55ee227ac0ee252af0ee005a88bfb0ee406ab4ee614a18ed048af1ee10fa71eec81a"
-        "18ed055a75fea22adfed8c5a03eea52ad8ed013a01eea58a76ee471a72eee32a74eec54a08ed032a46eea50af6ee006a"
-        "01eea57a08ed048a42eea53affee002a04eea55af9ee004a07eea53a48ed020a80ee086a88ed007ac8ed013adfed7a1a"
-        "20ee877adfed7c5a68ee230afeee003adfed7a7a08ed055a9fed748a08ed013a0ee085ed00ca86ed00ba1946002b18bf"
-        "012101424ff001014ff000003ff43daf5ef82140002cf0d008eb810101f1080501f1100691ed02ca91ed04ba614638e0"
-        "3eee00ea2eee04eabdeecefab8eecffa7fee228ab4ee4efaf1ee10fa38fe8ffa3eee4fea3eee23fab1ee4feab5ee40fa"
-        "f1ee10fa48bfb0ee4efab0ee40ea0fee24ea20ee8eea3eee4cca0bee25cab4ee4ccaf1ee10fa17fe8cbab0ee4dca13ee"
-        "0bca07ee0cda17fe8eca0139a4ec01daa7d094ed00dab0ee42ea05ee0dea26ee0efab0ee61eab4ee61faf1ee10fa08dc"
-        "b0ee4feab4ee41faf1ee10fa01d5b0ee41ea022a46d03eee00ea012a16d0002aa8d02eee26eabdeecefab8eecffa7fee"
-        "228ab4ee4efaf1ee10fa38fe8ffa3eee4fea3eee0eea3eee22eab2e72eee04eaf0ee4a9abdeecefab8eecffa7fee228a"
-        "b4ee4efaf1ee10fa38fe8ffaf0ee498a3eee4fea3eee23eab1ee4efab5ee40eaf1ee10fa48bfb0ee4feab0ee40fa0eee"
-        "24fa2fee0fea4eee088a4eee689a2fee29ea86e7b5ee40eaf1ee10fabff660afb1ee4efab5ee40eaf0ee4e8af1ee10fa"
-        "48bff0ee4f8a38ee80fa8eee0fea70e76f12033a0000803d000080c20402013c3333733fcdcc4c3d87c3613d9a99193e"
-        "0000003c0000803c00008042a1c4a2bde15d253fda0fc93f52b87e3f00000000"
+        "f0b503af2de9000f81b02ded108b84b040f6603144f64642c2f20741c3f2442251f8203c934225d04ff0804341f81c3c"
+        "44f27f0321f8183c7f2301f1040c01f8163c4ff07e5343f23335002641e9053341e9036341f8043cc3f693750e608ce8"
+        "6800c1e90466c1e90666c1e908668e6241f8202c027c002a40f0f980d0f804c0bcf1000f08bfd0f800c0acf2011212f5"
+        "807fc0f0ec8011f8169cb7ee000a90f811e011f81c5c11f81b3c11f81a2c11f8196c11f8188c11f817acb9f1000f11d0"
+        "0393a9f101030124b9f1310f04eb131303f0030b09d200239fede71abbf1000f6dd1afe09fede51ab1e0b0ee002acdf8"
+        "088023f003049fede01a4ff020089fede03a4b46cde9006a04ee103ab0ee405aa3f1100aa3f12006b0ee406a07ee106a"
+        "b8eec44aa8f110064e45a3f13006b8eec77af0ee400a04ee035a04ee10aaa3f1400347ee030ab0ee407ab8eec44a04ee"
+        "036ab0ee424a88bfb0ee454a21ee041ab0ee424a05ee106ac84588bfb0ee464a21ee041a08f11006b0ee424ab8eec55a"
+        "4e4508f1200688bfb0ee604a21ee041ab0ee424a05ee037a4e4588bfb0ee474a21ee041a043c08f14008add1a8f12003"
+        "ddf80880dde9006abbf1000f42d0a9eb03049fedaf3a02ee104ab0ee404a03f11004a145b8eec22a02ee034ab0ee002a"
+        "b0ee425a38bfb0ee445a21ee051abbf1010f27d0a9eb0404b0ee405a04ee104a03f12004a145b8eec44a04ee035ab0ee"
+        "424a38bfb0ee454a21ee041abbf1020f10d0a9eb0404b0ee405a04ee104a30334b45b8eec44a04ee035a88bfb0ee452a"
+        "21ee021a9fedf32a039b21ee021ad1ed001a9db99fedf02af4ee421af1ee10fa0cd500200860c1e90700c1e9090004b0"
+        "bdec108b01b0bde8000ff0bd02ee105a9feded3a0f2ddfedee3a9fedef4ac3f17f03b8ee422a9fede25adfedec4a06ee"
+        "106adfede15af0ee007a22ee037a9fede33a88bfb0ee407ab4ee431ad1ed022af1ee10fab8ee466adfedd46a33fe011a"
+        "11ed048a91ed01aab0ee409a01249fede2ba31ee621a41ee232a9fedd61ac1ed022a22eea23a03ee014a01ee103aa1f1"
+        "0c03b8eec11a61ee050a9fedc61a43ee044a20ee814a9fedc51a36ee016a40ee845ab0ee404a02ee264af0ee400a02ee"
+        "108a43ee240a9fedbe3a06ee90aa26ee036a00f10808f8ee424ab5ee002ab1eee53a0020f8ee666ab4ee652a80ee033a"
+        "f1ee10fa64ee854a9fedb25a77fe837a11ed053a66ee856a34ee435a22eea04a75eec85a05ee233a9fedb15a74ee050a"
+        "11ed035a05eea38a51ed025a36ee456a74eee54a01ed053a77eeca7a06ee235a11ed016a44eea35a01ed048a76eec64a"
+        "77ee616a04ee209a07eea3aadfeda27a46eea31af9ee006a04eea36affee004ac0ee080adfed9b3a83ec035a80ee097a"
+        "c1ed001a68ee0a2a81ed01aa65eea11afeee005a9fed958a9fed959a9fed95aa1fe0f0ee689af0ee4faa05f10c0005f1"
+        "140305f11c06c0ed009a05f12400c3ed00aa86ed00ca80ed00da7046bef1000f18bf012020424ff001004ff000043ff4"
+        "0eaf58f82060002eefd001eb8005bcf1000fd5ed038a95ed05fa95ed07ca95ed09daced060461de000002042a7922b3b"
+        "0000803df0ee4b9af0ee4baab0ee4bcab0ee4bdab0ee4bfaf0ee4e8a013856ee0f8ab0ee6afa01eea8eaf0ee698aa6ec"
+        "01eab2d096ed00eaf0ee459a43ee0e9a60eea99af4ee639af1ee10fa04ddf0ee639a3f2a08d94ae0b4ee691af1ee10fa"
+        "71fe299a402a2dd279ee809af0ee49ca69ee829afdeee9aaf8eeeaaa7aeea4baf4ee69aaf1ee10fa7bfeaaaaf0ee48ba"
+        "79eeea9a79eea59af1ee69aaf5ee409af1ee10fa48bff0ee6a9af0ee40aa49eea6aa6aeeaa9a49eea7ba49eeebca6aee"
+        "ac9a35e0f5ee409af1ee10fa0fdaf1ee69aaf5ee409af0ee69baf1ee10fa48bff0ee6aba7bee80aac9eeaa9a20e079ee"
+        "809a69ee829afdeee9aaf8eeeaaa7aeea4baf4ee69aaf1ee10fa7bfeaaaa79eeea9a79eea5aaf1ee6a9af5ee40aaf1ee"
+        "10fa48bff0ee69aaf0ee409a4aeea69a62eea99ab9f17e0f79eee8aa4fee0aaa14d83aeecdfaf0ee4c8a44ee0f8ab0ee"
+        "4dfa67ee288a04ee28fa78eea88a38eeccca7fee0fba3beecdda01e0b0ee6afab4ee4ffaf1ee10fa7cbfb4ee4ccaf1ee"
+        "10fabff53fafb4ee4ddaf1ee10fafff543af37e71f4289386f12033a87c3613d0402013c3333733fcdcc4c3d000080c2"
+        "0000003c0000803c0000803d3333933f9a99193ed00d5d3d8888083eabaaaa3ef304b53f00008042a1c4a2bde15d253f"
+        "da0fc93f52b87e3f00000000"
         , {'fold_block': 0}),
     'mk2_font': (
         "45a2002110f8013b2bb152f82330c3f307431944f6e7084670472de9f04f8ab0029203930022049220e02de9f04f8ab0"
@@ -2288,22 +2302,24 @@ def version_labels(d):
 # fold_block is C (FOLD_C), compiled to one relocation-free .text and frozen;
 # it sits right after the asm, which reaches it with adr. Its state lives at
 # FOLD_RAM, initialised by the C on its first block (magic "FOLD").
-#   CC 70 amount (0 = off)  71 fold point (127 = full scale)  72 character
-#   (0-31 triangle, 32-63 sine, 64-95 top only, 96-127 wrap)  73 bias
+#   CC 70 amount (0 = off)  71 fold point (0 = the bend at full scale, the
+#   softest; cc27)  72 character (0-63 soft sine fold, 64-127 top only; cc27)
+#   76 a low-pass on the folded side before the mix (127 = open; cc27)  73 bias
 #   (64 = none)  74 mix  75 the folded side's level (64 = unity). The amount
 #   also fades the folder in over 0-16, so turning it to 0 never clicks.
 FOLD_RAM = 0x24070b40
-assert THEME_PAL_RAM + 4 * PAL_WORDS <= FOLD_RAM and FOLD_RAM + 0x40 <= POOL_FLOOR
-FOLD_C = r"""/* Wave folder on the master bus, ch 1 CC 70-75. State at a fixed RAM address. */
+assert THEME_PAL_RAM + 4 * PAL_WORDS <= FOLD_RAM and FOLD_RAM + 0x80 <= POOL_FLOOR
+FOLD_C = r"""/* Wave folder on the master bus, ch 1 CC 70-76. State at a fixed RAM address. */
 typedef unsigned int u32;
 typedef unsigned char u8;
 #define FOLD_RAM 0x24070b40u
-#define MAGIC 0x444c4f46u           /* "FOLD" */
+#define MAGIC 0x32444c46u           /* "FLD2" */
 typedef struct {
     u32 magic;
-    u8 cc[8];                       /* 70 amount, 71 fold point, 72 character, 73 bias, 74 mix, 75 output */
-    float g, t, bias, mix, out, eng, mk;   /* smoothed */
+    u8 cc[8];                       /* 70 amount, 71 fold point, 72 character, 73 bias, 74 mix, 75 level, 76 low-pass */
+    float g, t, bias, mix, out, eng, mk, lp;   /* smoothed */
     float dcx[2], dcy[2];
+    float s1[2], s2[2];             /* the low-pass's two integrators, per channel */
 } fold_t;
 
 static inline float ffloor(float v) { int i = (int)v; float f = (float)i; return f > v ? f - 1.0f : f; }
@@ -2317,23 +2333,25 @@ static inline float sine1(float x) {          /* sin(pi/2 x), x in [-1,1] */
     float x2 = x * x;
     return x * (1.5707963f - x2 * (0.6459637f - x2 * 0.0794766f));
 }
-static inline float shape(float u, int type) {
-    if (u > 64.0f) u = 64.0f; else if (u < -64.0f) u = -64.0f;   /* also catches NaN-free overflow */
-    switch (type) {
-    case 0:  return tri(u);                                 /* triangle fold */
-    case 1:  return sine1(tri(u));                          /* sine fold, smooth */
-    case 2:  return u >= 0.0f ? tri(u) : u / (1.0f + fabs_(u));   /* folds the top, rounds the bottom */
-    default: { float v = (u + 1.0f) * 0.5f; v -= ffloor(v); return 2.0f * v - 1.0f; }   /* wrap */
-    }
+static inline float shape(float u, int top_only) {
+    if (u > 64.0f) u = 64.0f; else if (u < -64.0f) u = -64.0f;
+    if (!top_only) return sine1(tri(u));                       /* soft: sine fold */
+    return u >= 0.0f ? tri(u) : u / (1.0f + fabs_(u));         /* folds the top, rounds the bottom */
+}
+static inline float tan_(float x) {           /* tan for 0 < x < 1.2 */
+    float x2 = x * x;
+    return x * (1.0f + x2 * (0.33333333f + x2 * (0.13333333f + x2 * 0.05396825f)));
 }
 
 void fold_block(int *bus)
 {
     fold_t *s = (fold_t *)FOLD_RAM;
     if (s->magic != MAGIC) {
-        s->cc[0] = 0; s->cc[1] = 127; s->cc[2] = 0; s->cc[3] = 64; s->cc[4] = 127; s->cc[5] = 64;
+        s->cc[0] = 0; s->cc[1] = 0; s->cc[2] = 0; s->cc[3] = 64; s->cc[4] = 127; s->cc[5] = 64; s->cc[6] = 127;
         s->g = 1.0f; s->t = 1.0f; s->bias = 0.0f; s->mix = 1.0f; s->out = 1.0f; s->eng = 0.0f; s->mk = 1.0f;
+        s->lp = 1.15f;
         s->dcx[0] = s->dcx[1] = s->dcy[0] = s->dcy[1] = 0.0f;
+        s->s1[0] = s->s1[1] = s->s2[0] = s->s2[1] = 0.0f;
         s->magic = MAGIC;
     }
     /* the bus as chr_block reads it: frames at +4 (or +0 when that is 0),
@@ -2346,39 +2364,55 @@ void fold_block(int *bus)
     if (n == 0 || n > 256) return;
     int chans = b8[0x11] ? 2 : 1;
     float g = 1.0f + (float)s->cc[0] * (7.0f / 127.0f);
-    float k = (float)s->cc[1] * (1.0f / 127.0f);
+    float k = (float)(127 - s->cc[1]) * (1.0f / 127.0f);   /* 0 = the bend at full scale, softest */
     float t = 0.05f + 0.95f * k * k;
     float bias = ((float)s->cc[3] - 64.0f) * (0.5f / 64.0f);
     float mix = (float)s->cc[4] * (1.0f / 127.0f);
     float out = (float)s->cc[5] * (1.0f / 64.0f);
-    int type = s->cc[2] >> 5;
+    int top_only = s->cc[2] >= 64;
+    /* low-pass on the folded side: 127 open (bypassed), else 40 Hz - 9.5 kHz,
+       exponential; per block, the prewarped g = tan(pi fc / 48 kHz) */
+    int lpon = s->cc[6] < 127;
+    float fc = 40.0f;
+    for (int i = 0; i < s->cc[6]; i += 16) fc *= i + 16 <= s->cc[6] ? 2.0f : 1.0f + (float)(s->cc[6] - i) * (1.0f / 16.0f);
+    float lpg = fc * (3.14159265f / 48000.0f);
+    if (lpg > 1.15f) lpg = 1.15f;
     /* the amount also fades the folder in: 0 is dry, 16 and up fully folded */
     float eng = s->cc[0] >= 16 ? 1.0f : (float)s->cc[0] * (1.0f / 16.0f);
     if (s->cc[0] == 0 && s->eng < 0.0005f) {      /* off, and faded out */
         s->eng = 0.0f;
+        s->s1[0] = s->s1[1] = s->s2[0] = s->s2[1] = 0.0f;
         return;
     }
-    /* make-up for a low fold point: the folded wave peaks at T */
     float mk = t < 0.25f ? 2.0f : 1.0f / __builtin_sqrtf(t);
     const float a = 0.15f;                        /* per-block smoothing toward the targets */
     s->g += a * (g - s->g); s->t += a * (t - s->t); s->bias += a * (bias - s->bias);
     s->mix += a * (mix - s->mix); s->out += a * (out - s->out);
     s->eng += a * (eng - s->eng); s->mk += a * (mk - s->mk);
+    s->lp += a * (lpg - s->lp);
     float G = s->g, T = s->t, B = s->bias, M = s->mix * s->eng, O = s->out, K = s->mk;
     float inv = 1.0f / T;
+    float gg = tan_(s->lp), R2 = 1.41421356f;     /* Butterworth: 12 dB/oct, no peak */
+    float a1 = 1.0f / (1.0f + gg * (gg + R2));
     for (int c = 0; c < chans; c++) {
         float *p = (float *)bus[2 + c];
         if (!p) continue;
-        float x1 = s->dcx[c], y1 = s->dcy[c];
+        float x1 = s->dcx[c], y1 = s->dcy[c], i1 = s->s1[c], i2 = s->s2[c];
         for (u32 i = 0; i < n; i++) {
             float x = p[i];
-            float w = K * T * shape((x * G + B) * inv, type);
-            float y = w - x1 + 0.995f * y1;           /* DC blocker: the bias and the asymmetric types */
+            float w = K * T * shape((x * G + B) * inv, top_only);
+            float y = w - x1 + 0.995f * y1;           /* DC blocker: the bias and the top-only type */
             x1 = w; y1 = y;
-            if (!(y == y)) { y = 0.0f; x1 = 0.0f; y1 = 0.0f; }
-            p[i] = x + M * (y * O - x);              /* the output level is the wet side's */
+            if (lpon) {                               /* TPT state-variable low-pass */
+                float v1 = a1 * (i1 + gg * (y - i2));
+                float v2 = i2 + gg * v1;
+                i1 = 2.0f * v1 - i1; i2 = 2.0f * v2 - i2;
+                y = v2;
+            }
+            if (!(y == y) || !(i1 == i1) || !(i2 == i2)) { y = 0.0f; x1 = y1 = i1 = i2 = 0.0f; }
+            p[i] = x + M * (y * O - x);
         }
-        s->dcx[c] = x1; s->dcy[c] = y1;
+        s->dcx[c] = x1; s->dcy[c] = y1; s->s1[c] = i1; s->s2[c] = i2;
     }
 }
 """
@@ -2418,7 +2452,7 @@ fmidi:
     cbnz    r0, fm_out
     ldr     r1, [sp, #0x6c]         /* CC */
     subs    r1, #70
-    cmp     r1, #5
+    cmp     r1, #6
     bhi     fm_out
     ldr     r2, [sp, #0x70]         /* value << 7 */
     lsrs    r2, r2, #7
@@ -2875,7 +2909,7 @@ def main():
                  "Live Flip modes, per pad     CC 117",
                  "Hold buttons, per pad        CC 78, 102, 104, 105, 107, 118, 119",
                  "Theme, and your own          TOOLS > Theme",
-                 "Wave folder, ch 1            CC 70-75"):
+                 "Wave folder, ch 1            CC 70-76"):
         print(f"     ok   {what}")
 
     write_string(d, ATTRIB_VA, VER_VA, ATTRIB_STOCK, ATTRIB_NEW)

@@ -66,7 +66,7 @@ def bl_target(at):
     if S: off-=1<<25
     return at+4+off
 h=H(img,END,WIN)
-h.allow(0x24070b40,0x24070b80)     # cc25: the wave folder's state
+h.allow(0x24070b40,0x24070bc0)     # cc25: the wave folder's state
 # ---- 1. MIDI chain at the post call
 head=bl_target(POST_SITE); print("post call ->",hex(head))
 sp=0x2001f000
@@ -405,7 +405,7 @@ def bus_run(blocks=12):
 for n,v in ((70,0),(14,0),(15,0),(16,0),(17,0),(22,16),(23,16),(24,16),(25,16)): cc(n,v)   # Character: set 0 (no f64), off
 print("13. fold head",hex(FHEAD),"-> next",hex(FNEXT))
 print("13. folder off:                  ", bus_run())
-for settings,name in ((((70,127),(71,40),(72,0)),"triangle, amount max, point 40"),(((72,40),),"sine"),(((72,80),),"top only"),(((72,110),),"wrap"),
+for settings,name in ((((70,127),(71,87),(72,0)),"soft, amount max, point 87"),(((72,100),),"top only"),(((76,40),),"top only, low-pass 40"),(((76,127),(72,0),(71,0)),"soft, point 0, open"),
                       (((73,100),(74,64),(75,30)),"bias, half mix, quieter"),(((70,0),),"amount back to 0"),((),"... 12 blocks later"),((),"... and later")):
     for n,v in settings: cc(n,v)
     print(f"13. {name:30} state {h.mu.mem_read(0x24070b40,10).hex()}: ", bus_run())
