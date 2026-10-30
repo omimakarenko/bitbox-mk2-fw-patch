@@ -82,7 +82,7 @@ import patch_micro as pm                # noqa: E402  the hook generators
 BASE = 0x08040000
 STOCK_SHA = "35ab7995ad0eca8484f3b28bc76389f10b2037dbb21a4a394e950d9329073e86"
 STOCK_SIZE = 674896
-VERSION = "2.3.4-cc25"                  # 10 characters: see pm.VER_DISPLAY_MAX
+VERSION = "2.3.4-cc26"                  # 10 characters: see pm.VER_DISPLAY_MAX
 
 # CCs left out of this build. 2026-10-27, cc1 on hardware: CC 89 (Loop
 # Crossfade) on a Sample pad gave sudden full-scale distorted output at any
@@ -758,27 +758,27 @@ FROZEN_MK2 = {
         "0f50000000000000440b072400bf00bf"
         , {'fblock': 0, 'fblock_next': 2, 'fcode': 112, 'fm_out': 88, 'fmidi': 58, 'fmidi_next': 98}),
     'mk2_foldc': (
-        "f0b503af4df804bd2ded108b40f6603e44f64671c2f2074ec4f24c415ef8202c8a421ad047f600720023c4f200024ef8"
-        "1c2c44f27f022ef8182c4ff07e524ef8042c4ee905224ee90332cee90032cee90433cee902334ef8201cd0f800c0acf2"
-        "012111f5007f10d31ef81c2c1ef81a1c9eed007a72b99fedc30ab4ee407af1ee10fa07d50020cef80000bdec108b5df8"
-        "04bbf0bd1ef81b3c01ee102a9fedbc4a1ef8174c00ee103a1ef8193cb8ee413a9fedb51a1ef8185cdfedb71ab8ee400a"
-        "dfedb63a23ee016a02ee905a0f2a4ff0010220ee042a9fedaf0af8ee622a9fedb59a9fedb5aa22ee001a00ee104a4ff0"
-        "0004b8ee405a00ee103a42ee011a9feda31a1eed032a4fea5113f8ee400ab7ee000a70ee810af0ee404a43ee234a9fed"
-        "a13af0ee423af1eee15a50ee833a5eed020af0ee606a1eed013a52ee846ab5ee004adfed992af0ee437a55ee227ac0ee"
-        "252af0ee005a88bfb0ee406ab4ee614a1eed048af1ee10fa71eec81a1eed055a75fea22adfed8a5a03eea52adeed013a"
-        "01eea58a76ee471a72eee32a74eec54a0eed032a46eea50af6ee006a01eea57a0eed048a42eea53affee002a04eea55a"
-        "f9ee004a07eea53a4eed020a80ee086a8eed007aceed013adfed781a20ee877adfed7a5a68ee230afeee003adfed787a"
-        "0eed055a9fed728a0eed013a0ae084ed00ca85ed00bad1074ff001044ff000023ff443af00eb840189680029f3d00eeb"
-        "8405664605f1080495ed02ca95ed04ba103538e03eee00ea2eee04eabdeecefab8eecffa7fee228ab4ee4efaf1ee10fa"
-        "38fe8ffa3eee4fea3eee23fab1ee4feab5ee40faf1ee10fa48bfb0ee4efab0ee40ea0fee24ea20ee8eea3eee4cca0bee"
-        "25cab4ee4ccaf1ee10fa17fe8cbab0ee4dca13ee0bca07ee0cda17fe8eca013ea1ec01daabd091ed00dab0ee42ea05ee"
-        "0dea26ee0efab0ee61eab4ee61faf1ee10fa08dcb0ee4feab4ee41faf1ee10fa01d5b0ee41ea022b46d03eee00ea012b"
-        "16d0002ba8d02eee26eabdeecefab8eecffa7fee228ab4ee4efaf1ee10fa38fe8ffa3eee4fea3eee0eea3eee22eab2e7"
-        "2eee04eaf0ee4a9abdeecefab8eecffa7fee228ab4ee4efaf1ee10fa38fe8ffaf0ee498a3eee4fea3eee23eab1ee4efa"
-        "b5ee40eaf1ee10fa48bfb0ee4feab0ee40fa0eee24fa2fee0fea4eee088a4eee689a2fee29ea86e7b5ee40eaf1ee10fa"
-        "bff660afb1ee4efab5ee40eaf0ee4e8af1ee10fa48bff0ee4f8a38ee80fa8eee0fea70e76f12033a0000803d000080c2"
-        "0402013c3333733fcdcc4c3d87c3613d9a99193e0000003c0000803c00008042a1c4a2bde15d253fda0fc93f52b87e3f"
-        "00000000"
+        "f0b503af4df8048d2ded108b40f6603844f64671c2f20748c4f24c4158f8202c8a421ad047f600720023c4f2000248f8"
+        "1c2c44f27f0228f8182c4ff07e5248f8042c48e9052248e90332c8e90032c8e90433c8e9023348f8201c017ce9b9d0f8"
+        "04c0bcf1000f08bfd0f800c0acf2011111f5807f11d318f81c2c437c18f81a1c98ed007a72b99fedc60ab4ee407af1ee"
+        "10fa07d50020c8f80000bdec108b5df8048bf0bd18f81b6c01ee102a9fedbf4a18f8175c00ee106a18f8196cb8ee413a"
+        "9fedb81a18f8184cdfedba1ab8ee400adfedb93a23ee016a02ee904a0f2a4fea511220ee042a9fedb20af8ee622a00f1"
+        "080e4ff000014ff0010022ee001a00ee105a9fedb39a9fedb3aab8ee405a00ee106a42ee011a9feda41a18ed032af8ee"
+        "400ab7ee000a70ee810af0ee404a43ee234a9feda33af0ee423af1eee15a50ee833a58ed020af0ee606a18ed013a52ee"
+        "846ab5ee004adfed9b2af0ee437a55ee227ac0ee252af0ee005a88bfb0ee406ab4ee614a18ed048af1ee10fa71eec81a"
+        "18ed055a75fea22adfed8c5a03eea52ad8ed013a01eea58a76ee471a72eee32a74eec54a08ed032a46eea50af6ee006a"
+        "01eea57a08ed048a42eea53affee002a04eea55af9ee004a07eea53a48ed020a80ee086a88ed007ac8ed013adfed7a1a"
+        "20ee877adfed7c5a68ee230afeee003adfed7a7a08ed055a9fed748a08ed013a0ee085ed00ca86ed00ba1946002b18bf"
+        "012101424ff001014ff000003ff43daf5ef82140002cf0d008eb810101f1080501f1100691ed02ca91ed04ba614638e0"
+        "3eee00ea2eee04eabdeecefab8eecffa7fee228ab4ee4efaf1ee10fa38fe8ffa3eee4fea3eee23fab1ee4feab5ee40fa"
+        "f1ee10fa48bfb0ee4efab0ee40ea0fee24ea20ee8eea3eee4cca0bee25cab4ee4ccaf1ee10fa17fe8cbab0ee4dca13ee"
+        "0bca07ee0cda17fe8eca0139a4ec01daa7d094ed00dab0ee42ea05ee0dea26ee0efab0ee61eab4ee61faf1ee10fa08dc"
+        "b0ee4feab4ee41faf1ee10fa01d5b0ee41ea022a46d03eee00ea012a16d0002aa8d02eee26eabdeecefab8eecffa7fee"
+        "228ab4ee4efaf1ee10fa38fe8ffa3eee4fea3eee0eea3eee22eab2e72eee04eaf0ee4a9abdeecefab8eecffa7fee228a"
+        "b4ee4efaf1ee10fa38fe8ffaf0ee498a3eee4fea3eee23eab1ee4efab5ee40eaf1ee10fa48bfb0ee4feab0ee40fa0eee"
+        "24fa2fee0fea4eee088a4eee689a2fee29ea86e7b5ee40eaf1ee10fabff660afb1ee4efab5ee40eaf0ee4e8af1ee10fa"
+        "48bff0ee4f8a38ee80fa8eee0fea70e76f12033a0000803d000080c20402013c3333733fcdcc4c3d87c3613d9a99193e"
+        "0000003c0000803c00008042a1c4a2bde15d253fda0fc93f52b87e3f00000000"
         , {'fold_block': 0}),
     'mk2_font': (
         "45a2002110f8013b2bb152f82330c3f307431944f6e7084670472de9f04f8ab0029203930022049220e02de9f04f8ab0"
@@ -1054,7 +1054,7 @@ FROZEN_MK2 = {
         "20353a00636d7076616c73350000bf00"
         , {'_sS': 0, 'schr': 402, 'schr_call': 426, 'sclabel0': 476, 'sclabel1': 500, 'sclabel2': 520, 'sclabel3': 540, 'sclabel4': 560, 'sclabel5': 580, 'sclabel6': 600, 'sclabel7': 620, 'scxml0': 488, 'scxml1': 512, 'scxml2': 532, 'scxml3': 548, 'scxml4': 568, 'scxml5': 588, 'scxml6': 608, 'scxml7': 628, 'spost': 388, 'spost_next': 398, 'sreg': 0, 'sreg_c0': 34, 'sreg_c1': 66, 'sreg_c2': 98, 'sreg_c3': 130, 'sreg_c4': 162, 'sreg_c5': 194, 'sreg_c6': 226, 'sreg_c7': 258, 'sreg_next': 268, 'sstore': 272, 'sstore_c0': 286, 'sstore_c1': 298, 'sstore_c2': 312, 'sstore_c3': 324, 'sstore_c4': 336, 'sstore_c5': 348, 'sstore_c6': 362, 'sstore_c7': 376, 'sstore_next': 384}),
     'mk2_hookT': (
-        "2de91f5083b040f283110ff628120ff6f4030c2400940ff62414019400000000039840f28d1101220ff2b42300240094"
+        "2de91f5083b040f283110ff678120ff644130c2400940ff67414019400000000039840f28d1101220ff2b42300240094"
         "6ff0704401940ff2b424029400000000039840f28e1101220ff2ac23002400946ff0704401940ff2ac24029400000000"
         "039840f28f1101220ff2a023002400946ff0704401940ff2a024029400000000039840f2911101220ff2942300240094"
         "6ff0704401940ff29024029400000000039840f2921101220ff28823002400946ff0704401940ff28424029400000000"
@@ -1064,7 +1064,7 @@ FROZEN_MK2 = {
         "0000009840f28f114ff0000200000000009840f29111594a00000000009840f29211574a00000000009840f29311554a"
         "00000000009840f295114ff0400200000000009840f296114ff07f0200000000bde80f500000000040f2831c62450cd0"
         "a2f28d1cbcf1120f3cd90000000040f2831c624501d0000000002de90f50eff30081f1ee102a06b42ded100a18460c28"
-        "28bf00200ff29c1151f820103a4a1160a8b10b2812d0411e882201fb02f10ff2b4121144354a222351f804cb42f804cb"
+        "28bf00200ff29c1151f820103a4a1160a8b10b2812d0411e902201fb02f10ff2b4121144354a242351f804cb42f804cb"
         "013bf9d1bff34f8f012000e0062000000000bdec100a06bc81f30088e1ee102abde80f902de90f50eff30081f1ee10ca"
         "2de902102ded100a10461946000000001690bdec100a06bc81f30088e1ee102abde80f50bcf1000fa7d070472de90f50"
         "eff30082f1ee103a0cb42ded100a002100000000bdec100a0cbc82f30088e1ee103abde80f50000000002de90f50eff3"
@@ -1076,37 +1076,39 @@ FROZEN_MK2 = {
         "0000000000000000000000000000000000000000aa000000aa00000000ff000000000000000000003b4c5aff0c1216ff"
         "e0f3ffff1c40a8ff00b0ffff1f3bffff00b0ffff0c1216ff475b6bff00b0ffff2bc79cff1c32b8ff0c1216ff000000ff"
         "ecf8ffff2e3b46ff506677ff2bc79cff1c32b8ff66e0ffff1c32b8ff8ca5b8ff7ad2ffff3d8affff1a242cff00527aff"
-        "00b0ffff1e6a7aff00b0ffffecf8ffff00b0ffff1c40a8ffecf8ffff000000001e2256ff05060effc4cff0ff1a23c8ff"
-        "3d9affff142affff3d9affff05060eff242a6aff3d9affff3fa9d9ff1a24b0ff05060eff000000ffcfdaf8ff191c46ff"
-        "2a3076ff3fa9d9ff1a24b0ff5ac1ffff1a24b0ff6c7ad2ff5c7affff7a4ad0ff0d0f24ff18209aff3d9affff204c6bff"
-        "3d9affffcfdaf8ff3d9affff1a23c8ffcfdaf8ff000000003a3a3aff0e0e0effffffffffd65f1fff00b0ffff007affff"
-        "00b0ffff0e0e0eff707070ff00b0ffffff9b3dff0056b8ff0e0e0eff000000ffffffffff303030ff7e7e7effff9b3dff"
-        "0056b8ff4de1ffff0056b8ffc4c4c4ffffd09affd8b0ffff2a2a2aff00567aff00b0ffff256c7aff00b0ffffffffffff"
-        "00b0ffffd65f1fffffffffff00000000304827ff0a1107ffe2ffd8ff367a1cff3dc4ffff3a4affff3dc4ffff0a1107ff"
-        "39552eff3dc4ffff50ff9aff2e3ab3ff0a1107ff000000ffeeffe8ff25381eff416135ff50ff9aff2e3ab3ff5afff5ff"
-        "2e3ab3ff82a872ffc8ff7aff3affc2ff182413ff125a7aff3dc4ffff1e7a6eff3dc4ffffeeffe8ff3dc4ffff367a1cff"
-        "eeffe8ff0000000061394dff190d13fffff0ffff6f16b8ffffe62eff3b3bffffffe62eff190d13ff6f4359ffffe62eff"
-        "b0ff3dff3a2ab8ff190d13ff000000fffff6ffff4f2d3dff7b4c64ffb0ff3dff3a2ab8ff5ce4ffff3a2ab8ffc298aaff"
-        "ff85aeffe08affff351d29ff7a6e0effffe62eff2a6a7affffe62efffff6ffffffe62eff6f16b8fffff6ffff00000000"
-        "aa0000ff000000ffffffffff550000ffaaaa00ff000000ffaaaa00ff000000ff55ffffffaaaa00ffaaaa00ff0000aaff"
-        "000000ff000000ffffffffffffff55ffffff55ffaaaa00ff0000aaff55ffffff0000aaffaaaaaaffffff55ff55ffffff"
-        "aa0000ff555500ffaaaa00ff0055aaffaaaa00ffffffffffaaaa00ff55ffffffffffffff00000000aa0000ff000000ff"
-        "ffffffffaaaa00ff55ffffff000000ff55ffffff000000ffffffffff55ffffffaaaa00ff0000aaff000000ff000000ff"
+        "00b0ffff1e6a7aff00b0ffffecf8ffff00b0ffff1c40a8ffecf8ffff3b4c5affe0f3ffff000000001e2256ff05060eff"
+        "c4cff0ff1a23c8ff3d9affff142affff3d9affff05060eff242a6aff3d9affff3fa9d9ff1a24b0ff05060eff000000ff"
+        "cfdaf8ff191c46ff2a3076ff3fa9d9ff1a24b0ff5ac1ffff1a24b0ff6c7ad2ff5c7affff7a4ad0ff0d0f24ff18209aff"
+        "3d9affff204c6bff3d9affffcfdaf8ff3d9affff1a23c8ffcfdaf8ff1e2256ffc4cff0ff000000003a3a3aff0e0e0eff"
+        "ffffffffd65f1fff00b0ffff007affff00b0ffff0e0e0eff707070ff00b0ffffff9b3dff0056b8ff0e0e0eff000000ff"
+        "ffffffff303030ff7e7e7effff9b3dff0056b8ff4de1ffff0056b8ffc4c4c4ffffd09affd8b0ffff2a2a2aff00567aff"
+        "00b0ffff256c7aff00b0ffffffffffff00b0ffffd65f1fffffffffff3a3a3affffffffff00000000304827ff0a1107ff"
+        "e2ffd8ff367a1cff3dc4ffff3a4affff3dc4ffff0a1107ff39552eff3dc4ffff50ff9aff2e3ab3ff0a1107ff000000ff"
+        "eeffe8ff25381eff416135ff50ff9aff2e3ab3ff5afff5ff2e3ab3ff82a872ffc8ff7aff3affc2ff182413ff125a7aff"
+        "3dc4ffff1e7a6eff3dc4ffffeeffe8ff3dc4ffff367a1cffeeffe8ff304827ffe2ffd8ff0000000061394dff190d13ff"
+        "fff0ffff6f16b8ffffe62eff3b3bffffffe62eff190d13ff6f4359ffffe62effb0ff3dff3a2ab8ff190d13ff000000ff"
+        "fff6ffff4f2d3dff7b4c64ffb0ff3dff3a2ab8ff5ce4ffff3a2ab8ffc298aaffff85aeffe08affff351d29ff7a6e0eff"
+        "ffe62eff2a6a7affffe62efffff6ffffffe62eff6f16b8fffff6ffff61394dfffff0ffff00000000aa0000ff000000ff"
+        "ffffffff550000ffaaaa00ff000000ffaaaa00ff000000ff55ffffffaaaa00ffaaaa00ff0000aaff000000ff000000ff"
         "ffffffffffff55ffffff55ffaaaa00ff0000aaff55ffffff0000aaffaaaaaaffffff55ff55ffffffaa0000ff555500ff"
-        "55ffffff0055aaff55ffffffffffffff55ffffffaa0000ffffffffff00000000550000ff000000ffffffffffaa0000ff"
-        "aaaa00ff000000ffaaaa00ff000000ff55ffffff55ffffffaa0000ff0000aaff000000ff000000ffffffffffaa0000ff"
-        "ffff55ffaaaa00ff0000aaff55ffffff0000aaffaaaaaaffffff55ff55ffffff550000ff555500ffaaaa00ff0055aaff"
-        "aaaa00ffffffffffaaaa00ff55ffffffffffffff00000000550000ff000000ffffffffffaa0000ffaaaa00ff000000ff"
-        "aaaa00ff000000ff55ffffffaaaa00ffaa0000ff0000aaff000000ff000000ffffffffffaa0000ffffff55ffaaaa00ff"
-        "0000aaff55ffffff0000aaffaaaaaaffffff55ff55ffffff550000ff555500ffaaaa00ff0055aaffaaaa00ffffffffff"
-        "aaaa00ff55ffffffffffffff00000000550000ff0000ffffffffffffaa0000ffff80ffff000000ff0080ffff004080ff"
-        "ffff00ff00ffffffff8080ff0000aaffff00ffff000000ffffffffffaa0000ffffff55ffaaaa00ff0000aaff00ff00ff"
-        "0000aaffaaaaaaffffff55ff808080ff550000ff555500ffaaaa00ff0055aaffaaaa00ffffffffffaaaa00ffff80c0ff"
-        "ffffffff0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
-        "000000005468656d653a00007468656d650000bf53544f434b0000bf414d4245520000bf53544147450000bf434f4e54"
-        "524153540000bf0050484f5350484f520000bf0053594e5448574156450000bf4e4f52544f4e0000564f4c4b4f560000"
-        "5041434d414e00004d49444e494748540000bf00444941470000bf00435553544f4d0000"
-        , {'_sT': 0, 'tchr': 564, 'tchr_call': 588, 'tclabel0': 736, 'tclabel1': 760, 'tclabel2': 780, 'tclabel3': 800, 'tclabel4': 820, 'tclabel5': 840, 'tclabel6': 860, 'tclabel7': 880, 'tcxml0': 748, 'tcxml1': 772, 'tcxml2': 792, 'tcxml3': 808, 'tcxml4': 828, 'tcxml5': 848, 'tcxml6': 868, 'tcxml7': 888, 'tedit': 446, 'tedit_next': 454, 'tground': 900, 'tlabel': 2356, 'tload': 620, 'tload_call': 640, 'tload_next': 662, 'tm_copy': 520, 'tm_custom': 540, 'tm_go': 542, 'tmine': 458, 'tpal': 948, 'tpost': 424, 'tpost_call': 542, 'tpost_next': 442, 'treg': 0, 'treg_c0': 60, 'treg_c1': 92, 'treg_c2': 124, 'treg_c3': 156, 'treg_c4': 188, 'treg_c5': 220, 'treg_c6': 252, 'treg_c7': 284, 'treg_call': 28, 'treg_next': 294, 'tsave': 666, 'tsave_call': 686, 'tsave_next': 708, 'tstore': 298, 'tstore_c0': 322, 'tstore_c1': 334, 'tstore_c2': 348, 'tstore_c3': 360, 'tstore_c4': 372, 'tstore_c5': 384, 'tstore_c6': 398, 'tstore_c7': 412, 'tstore_call': 308, 'tstore_next': 420, 'tv0': 2372, 'tv1': 2380, 'tv10': 2468, 'tv11': 2476, 'tv2': 2388, 'tv3': 2396, 'tv4': 2408, 'tv5': 2420, 'tv6': 2432, 'tv7': 2440, 'tv8': 2448, 'tv9': 2456, 'tvalues': 2308, 'txml': 2364}),
+        "aaaa00ff0055aaffaaaa00ffffffffffaaaa00ff55ffffffffffffff55ffffff000000ff00000000aa0000ff000000ff"
+        "ffff55ffaaaa00ff55ffffff000000ff55ffffff000000ffffffffff55ffffffaaaa00ff0000aaff000000ff000000ff"
+        "ffffffffffff55ffffff55ffaaaa00ff0000aaff55ffffff0000aaffaaaaaaffffff55ff55ffffffaa0000ff555500ff"
+        "55ffffff0055aaff55ffffffffffffff55ffffffaaaa00ffffffffffaaaa00ff55ffffff00000000550000ff000000ff"
+        "ffffffffaa0000ffaaaa00ff000000ffaaaa00ff000000ff55ffffff55ffffffaa0000ff0000aaff000000ff000000ff"
+        "ffffffffaa0000ffffff55ffaaaa00ff0000aaff55ffffff0000aaffaaaaaaffffff55ff55ffffff550000ff555500ff"
+        "aaaa00ff0055aaffaaaa00ffffffffffaaaa00ff55ffffffffffffff000000ff55ffffff00000000550000ff000000ff"
+        "ffffffffaa0000ffaaaa00ff000000ffaaaa00ff000000ff55ffffffaaaa00ffaa0000ff0000aaff000000ff000000ff"
+        "ffffffffaa0000ffffff55ffaaaa00ff0000aaff55ffffff0000aaffaaaaaaffffff55ff55ffffff550000ff555500ff"
+        "aaaa00ff0055aaffaaaa00ffffffffffaaaa00ff55ffffffffffffffaaaa00ff000000ff00000000550000ff0000ffff"
+        "ffffffffaa0000ffff80ffff000000ff0080ffff004080ffffff00ff00ffffffff8080ff0000aaffff00ffff000000ff"
+        "ffffffffaa0000ffffff55ffaaaa00ff0000aaff00ff00ff0000aaffaaaaaaffffff55ff808080ff550000ff555500ff"
+        "aaaa00ff0055aaffaaaa00ffffffffffaaaa00ffff80c0ffffffffff000000ff55ffffff000000000000000000000000"
+        "0000000000000000000000000000000000000000000000000000000000000000000000005468656d653a00007468656d"
+        "650000bf53544f434b0000bf414d4245520000bf53544147450000bf434f4e54524153540000bf0050484f5350484f52"
+        "0000bf0053594e5448574156450000bf4e4f52544f4e0000564f4c4b4f5600005041434d414e00004d49444e49474854"
+        "0000bf00444941470000bf00435553544f4d0000"
+        , {'_sT': 0, 'tchr': 564, 'tchr_call': 588, 'tclabel0': 736, 'tclabel1': 760, 'tclabel2': 780, 'tclabel3': 800, 'tclabel4': 820, 'tclabel5': 840, 'tclabel6': 860, 'tclabel7': 880, 'tcxml0': 748, 'tcxml1': 772, 'tcxml2': 792, 'tcxml3': 808, 'tcxml4': 828, 'tcxml5': 848, 'tcxml6': 868, 'tcxml7': 888, 'tedit': 446, 'tedit_next': 454, 'tground': 900, 'tlabel': 2436, 'tload': 620, 'tload_call': 640, 'tload_next': 662, 'tm_copy': 520, 'tm_custom': 540, 'tm_go': 542, 'tmine': 458, 'tpal': 948, 'tpost': 424, 'tpost_call': 542, 'tpost_next': 442, 'treg': 0, 'treg_c0': 60, 'treg_c1': 92, 'treg_c2': 124, 'treg_c3': 156, 'treg_c4': 188, 'treg_c5': 220, 'treg_c6': 252, 'treg_c7': 284, 'treg_call': 28, 'treg_next': 294, 'tsave': 666, 'tsave_call': 686, 'tsave_next': 708, 'tstore': 298, 'tstore_c0': 322, 'tstore_c1': 334, 'tstore_c2': 348, 'tstore_c3': 360, 'tstore_c4': 372, 'tstore_c5': 384, 'tstore_c6': 398, 'tstore_c7': 412, 'tstore_call': 308, 'tstore_next': 420, 'tv0': 2452, 'tv1': 2460, 'tv10': 2548, 'tv11': 2556, 'tv2': 2468, 'tv3': 2476, 'tv4': 2488, 'tv5': 2500, 'tv6': 2512, 'tv7': 2520, 'tv8': 2528, 'tv9': 2536, 'tvalues': 2388, 'txml': 2444}),
     'mk2_osdsync': (
         "2de9f04f8a4607465ff00008dff8a8b03c6800f00af87c6800f007f8b8f1000f01d0bff34f8fbde8f08f00b5dff88cc0"
         "002505f1ce064ff4207006fb00f6264405f1020000f01f015fea50195fea8909c646002248f64203b2f10b00b0f5957f"
@@ -1818,11 +1820,16 @@ THEME_SPLIT = {2: "FF0000", 5: "FF80FF", 12: "AA0000",          # red, pink, dar
 # waveform and a modulation slot in use; 11 the mixer's unmuted pads (and,
 # until cc23, the CPU bar -- moved to 18 so the two can differ).
 LOOP_FRAME, LOOP_TEXT, MOD_USED, MIXER_PAD = 32, 9, 10, 11
-BUILTIN_THEMES = (("NORTON", _NORTON, {LOOP_FRAME: "FFFF55"}),
-                  ("VOLKOV", _VOLKOV, {LOOP_FRAME: "0000AA", LOOP_TEXT: "FFFFFF"}),
-                  ("PACMAN", _PACMAN, {LOOP_FRAME: "FFFF55", MOD_USED: "FFFF55", MIXER_PAD: "0000AA"}),
-                  ("MIDNIGHT", _MIDNIGHT, {LOOP_FRAME: "FFFF55", MIXER_PAD: "0000AA"}),
-                  ("DIAG", _DIAG, THEME_SPLIT))
+# cc26: entries 34 and 35 are the pop-up's box and text (see POPUP_BOX).
+TEXT = 3
+BUILTIN_THEMES = (("NORTON", _NORTON, {LOOP_FRAME: "FFFF55", 34: "FFFF55", 35: "000000"}),
+                  ("VOLKOV", _VOLKOV, {LOOP_FRAME: "00AAAA", LOOP_TEXT: "FFFFFF", TEXT: "55FFFF",
+                                       34: "00AAAA", 35: "FFFF55"}),
+                  ("PACMAN", _PACMAN, {LOOP_FRAME: "FFFF55", MOD_USED: "FFFF55", MIXER_PAD: "0000AA",
+                                       34: "000000", 35: "FFFF55"}),
+                  ("MIDNIGHT", _MIDNIGHT, {LOOP_FRAME: "FFFF55", MIXER_PAD: "0000AA",
+                                           34: "00AAAA", 35: "000000"}),
+                  ("DIAG", _DIAG, {**THEME_SPLIT, 34: "000000", 35: "FFFF55"}))
 THM_TAB_HEAD = "000000003b4c5aff0c1216ff"      # Amber's first three entries, as 2.3.10 has them
 # cc17b: the new themes come IN ADDITION to 2.3.10's five. The C knows seven
 # values (Stock, five table rows, Custom = 6) in a dozen compares; rather than
@@ -1833,16 +1840,22 @@ THM_TAB_HEAD = "000000003b4c5aff0c1216ff"      # Amber's first three entries, as
 # THEME_PAL_RAM, so row 0 is always the theme just chosen -- including when
 # Custom starts its theme.tml from "the theme on screen".
 THEME_PAL_RAM = 0x24070a80           # above patch RAM, below the uncached pool (POOL_FLOOR)
-assert THEME_PAL_RAM + 136 <= POOL_FLOOR
+# cc26: a palette here is 36 words. The CLUT takes 33 (0x080433c6) and the C's
+# palette pass 1-33, so 34 and 35 never reach the screen: they are the pop-up's
+# box and text, read by chr_osd_tick through tho_entry (and, in Custom, the
+# two thm_fam bytes appended for them: the cells' and the text's colours).
+PAL_WORDS = 36
+POPUP_BOX, POPUP_TEXT = 34, 35
+assert THEME_PAL_RAM + 4 * PAL_WORDS <= POOL_FLOOR
 
 
 def theme_palette(fam, colours, entry_set):
     words = []
-    for i in range(34):
+    for i in range(PAL_WORDS):
         if i == 0:
             words.append(0)                  # entry 0 stays clear: the screen's own ground
             continue
-        h = entry_set.get(i) or colours[THEME_ROLES[fam[i]]]
+        h = entry_set.get(i) or colours[THEME_ROLES[(fam + bytes((4, 8)))[i]]]
         r, g, b = (int(h[j:j + 2], 16) for j in (0, 2, 4))
         words.append(0xff000000 | r << 16 | g << 8 | b)
     return words
@@ -1855,14 +1868,18 @@ def _theme_palettes():
     fam = bytes.fromhex(by[".rodata.thm_fam"][2])
     if len(tab) != 5 * 34 * 4 or tab[:12].hex() != THM_TAB_HEAD or len(fam) != 34:
         raise SystemExit("internal error: chr10's theme table is not what cc17 was built on")
-    words = list(struct.unpack("<170I", tab))           # Amber, Stage, Contrast, Phosphor, Synthwave
+    old = struct.unpack("<170I", tab)                    # Amber, Stage, Contrast, Phosphor, Synthwave
+    words = []
+    for r in range(5):                                   # each + its cells' and text's colours for the pop-up
+        row = old[34 * r:34 * r + 34]
+        words += list(row) + [row[1], row[3]]
     for _, c, e in BUILTIN_THEMES:
         words += theme_palette(fam, c, e)
     return words
 
 
-THEME_PALETTES = _theme_palettes()                       # 10 x 34 words
-THEME_COUNT = 1 + len(THEME_PALETTES) // 34 + 1          # Stock, the tables, Custom
+THEME_PALETTES = _theme_palettes()                       # 10 x PAL_WORDS words
+THEME_COUNT = 1 + len(THEME_PALETTES) // PAL_WORDS + 1   # Stock, the tables, Custom
 # cc24: the gaps between cells are no palette entry at all: nothing is drawn
 # there and entry 0 is clear, so the LTDC's background colour shows (BCCR,
 # 0x5000102c, RGB888; stock initialises it black at 0x08042dc4). Hook T sets
@@ -1885,12 +1902,12 @@ THEME_MAP_MK2 = f"""    mov     r0, r3                  /* cc17: the row's value
     cmp     r0, #{THEME_COUNT - 1}
     beq     tm_custom
     subs    r1, r0, #1              /* a table: copy its palette to THEME_PAL_RAM */
-    movs    r2, #136
+    movs    r2, #{4 * PAL_WORDS}
     mul     r1, r1, r2
     adr.w   r2, tpal
     add     r1, r1, r2
     ldr     r2, =0x{THEME_PAL_RAM:08x}
-    movs    r3, #34
+    movs    r3, #{PAL_WORDS}
 tm_copy:
     ldr     r12, [r1], #4
     str     r12, [r2], #4
@@ -1948,11 +1965,21 @@ def theme_table_to_ram(by_name):
     if code[754:756] != b"\x02\x2f":
         pm.refuse("The pop-up's own colour check is not what cc22 expects.")
     code[754:756] = b"\x00\x2f"
+    # cc26: tho_entry may name 34 and 35 (the pop-up's own colours): the
+    # entry's range check, sub.w r2, sl, #0x22; cmn.w r2, #0x21 (1-33), widened
+    # to #0x24 / #0x23 (1-35).
+    if code[768:776] != bytes.fromhex("aaf1220212f1210f"):
+        pm.refuse("The pop-up colours' entry check is not what cc26 expects.")
+    code[770], code[774] = 0x24, 0x23
     tick[2] = code.hex()
     ent = by_name[".rodata.tho_entry"]
     if ent[2] != "02030b14060f0211050b0e0f06":
         pm.refuse("The pop-up colours' palette entries are not what cc21 expects.")
-    ent[2] = "010312140c0f0211050b0e0f06"         # cc23: the bar from 18, not 11 (the mixer's pads)
+    ent[2] = "222312140c0f0211050b0e0f06"         # cc23: the bar from 18, not 11; cc26: box 34, text 35
+    fam = by_name[".rodata.thm_fam"]
+    if len(fam[2]) != 68:
+        pm.refuse("The themes' family table is not 34 entries.")
+    fam[2] += "0408"                                      # 34: cell, 35: text, for Custom
 
 
 def prepare_stage3():
@@ -2266,7 +2293,7 @@ def version_labels(d):
 #   (64 = none)  74 mix  75 the folded side's level (64 = unity). The amount
 #   also fades the folder in over 0-16, so turning it to 0 never clicks.
 FOLD_RAM = 0x24070b40
-assert THEME_PAL_RAM + 136 <= FOLD_RAM and FOLD_RAM + 0x40 <= POOL_FLOOR
+assert THEME_PAL_RAM + 4 * PAL_WORDS <= FOLD_RAM and FOLD_RAM + 0x40 <= POOL_FLOOR
 FOLD_C = r"""/* Wave folder on the master bus, ch 1 CC 70-75. State at a fixed RAM address. */
 typedef unsigned int u32;
 typedef unsigned char u8;
@@ -2309,8 +2336,15 @@ void fold_block(int *bus)
         s->dcx[0] = s->dcx[1] = s->dcy[0] = s->dcy[1] = 0.0f;
         s->magic = MAGIC;
     }
-    u32 n = (u32)bus[0];
-    if (n == 0 || n > 512) return;
+    /* the bus as chr_block reads it: frames at +4 (or +0 when that is 0),
+       L at +8, R at +0xc only when the stereo byte +0x11 is set; +0x10 set
+       means the block is not to be touched */
+    const u8 *b8 = (const u8 *)bus;
+    if (b8[0x10]) return;
+    u32 n = (u32)bus[1];
+    if (n == 0) n = (u32)bus[0];
+    if (n == 0 || n > 256) return;
+    int chans = b8[0x11] ? 2 : 1;
     float g = 1.0f + (float)s->cc[0] * (7.0f / 127.0f);
     float k = (float)s->cc[1] * (1.0f / 127.0f);
     float t = 0.05f + 0.95f * k * k;
@@ -2332,7 +2366,7 @@ void fold_block(int *bus)
     s->eng += a * (eng - s->eng); s->mk += a * (mk - s->mk);
     float G = s->g, T = s->t, B = s->bias, M = s->mix * s->eng, O = s->out, K = s->mk;
     float inv = 1.0f / T;
-    for (int c = 0; c < 2; c++) {
+    for (int c = 0; c < chans; c++) {
         float *p = (float *)bus[2 + c];
         if (!p) continue;
         float x1 = s->dcx[c], y1 = s->dcy[c];
