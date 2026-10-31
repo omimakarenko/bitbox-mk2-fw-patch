@@ -467,3 +467,13 @@ for target in (0,127):
     out=struct.unpack(f"<{FR}f",h.mu.mem_read(L,FR*4))
     print(f"14e. CC 68 = {target}: master out {out[0]:.3f}..{out[-1]:.3f} (silent master + bus 0.5), bus silent after: {h.mu.mem_read(PAD_DESC+0x10,1).hex()}, badw {h.badw[:2]}")
 cc(70,0); cc(68,0)
+# ---- 14f. cc33: a preset load empties the pad table
+h.ret0={0x08043b4c:0x60000000}; h.terminal={0x80b2168}|set(v for v in CASES.values() if isinstance(v,int))
+h.mu.mem_write(sp+0x40,struct.pack("<I",90<<7))
+regs={r:0x1000+i for i,r in enumerate(REGS)}; regs[UC_ARM_REG_R3]=94; regs[UC_ARM_REG_R4]=V; regs[UC_ARM_REG_R9]=0x24049800
+h.run(entryA,regs,sp=sp,lr=0x0800fff1,count=50000); h.terminal=set(); del h.ret0
+before=struct.unpack("<2I",h.mu.mem_read(PAD_TAB,8))
+for site in (0x0807e2f4,0x080822ac):
+    regs={r:0x1000+i for i,r in enumerate(REGS)}; regs[UC_ARM_REG_R0]=0x24011110
+    end=h.run(bl_target(site),regs,sp=sp,lr=(site+4)|1)
+    print(f"14f. load finish {site:#x}: end {hex(end) if isinstance(end,int) else end}, table before {[hex(x) for x in before]} after {h.mu.mem_read(PAD_TAB,8).hex()}, stock {[c[0] for c in h.calls]}, regs kept {all(h.mu.reg_read(r)==regs[r] for r in CS)}")
