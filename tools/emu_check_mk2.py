@@ -477,3 +477,29 @@ for site in (0x0807e2f4,0x080822ac):
     regs={r:0x1000+i for i,r in enumerate(REGS)}; regs[UC_ARM_REG_R0]=0x24011110
     end=h.run(bl_target(site),regs,sp=sp,lr=(site+4)|1)
     print(f"14f. load finish {site:#x}: end {hex(end) if isinstance(end,int) else end}, table before {[hex(x) for x in before]} after {h.mu.mem_read(PAD_TAB,8).hex()}, stock {[c[0] for c in h.calls]}, regs kept {all(h.mu.reg_read(r)==regs[r] for r in CS)}")
+# ---- 15. cc34: the pad bus on class B (Clip, Slicer)
+h.ret0={0x08043b4c:0x60000000}
+entryB=bne_target(0x080b8dfe)
+h.terminal={0x080b867c,0x80b8916,0x80a1868,0x80b7e10}|set(v for v in CASES.values() if isinstance(v,int))
+for voice,val in ((V,0),(W,127)):
+    h.mu.mem_write(voice,b"\0"*0x1000); h.mu.mem_write(voice+0x254,b"\1"); h.mu.mem_write(sp+0x38,struct.pack("<I",val<<7))
+    regs={r:0x1000+i for i,r in enumerate(REGS)}; regs[UC_ARM_REG_R3]=94; regs[UC_ARM_REG_R4]=voice; regs[UC_ARM_REG_R9]=clkp
+    end=h.run(entryB,regs,sp=sp,lr=0x0800fff1,count=200000)
+    print(f"15a. class B CC 94 = {val} on {voice:#x}: end {hex(end) if isinstance(end,int) else end}, badw {h.badw[:2]}")
+h.terminal=set(); del h.ret0
+print("     table:",[hex(x) for x in struct.unpack("<4I",h.mu.mem_read(PAD_TAB,16))])
+for voice in (W,V):
+    h.terminal={0x080b90a6,0x080b8ee2}
+    regs={r:0x1000+i for i,r in enumerate(REGS)}; regs[UC_ARM_REG_R4]=voice
+    h.mu.mem_write(sp+0x14,struct.pack("<I",0x24047000))
+    end=h.run(bw_target(0x080b8ede),regs,sp=sp,lr=0x0800fff1,count=50000)
+    print(f"15b. pb_need {voice:#x}: -> {hex(end) if isinstance(end,int) else end}, sl {h.mu.reg_read(UC_ARM_REG_R10):#x}, regs {all(h.mu.reg_read(r)==regs[r] for r in CS if r!=UC_ARM_REG_R10)}")
+gains=[]; hk=h.mu.hook_add(UC_HOOK_CODE,gcap,begin=0x080a4794,end=0x080a4794)
+for voice in (W,V):
+    gains.clear(); h.terminal={0x080b916e,0x080b8f4c}
+    regs={r:0x1000+i for i,r in enumerate(REGS)}; regs[UC_ARM_REG_R4]=voice; regs[UC_ARM_REG_R10]=0x24047100
+    h.mu.mem_write(sp+0x14,struct.pack("<I",0x24047000))
+    end=h.run(bw_target(0x080b916a),regs,sp=sp,lr=0x0800fff1,count=50000)
+    g=[(c[1][0],c[1][1],x[2]) for c,x in zip([c for c in h.calls if c[0]=="0x80a4794"],gains)]
+    print(f"15c. pb_mix {voice:#x}: -> {hex(end) if isinstance(end,int) else end}, r0/r1 {h.mu.reg_read(UC_ARM_REG_R0):#x}/{h.mu.reg_read(UC_ARM_REG_R1):#x}, mixes {g}")
+h.mu.hook_del(hk); h.terminal=set()

@@ -82,7 +82,7 @@ import patch_micro as pm                # noqa: E402  the hook generators
 BASE = 0x08040000
 STOCK_SHA = "35ab7995ad0eca8484f3b28bc76389f10b2037dbb21a4a394e950d9329073e86"
 STOCK_SIZE = 674896
-VERSION = "2.3.4-cc33"                  # 10 characters: see pm.VER_DISPLAY_MAX
+VERSION = "2.3.4-cc34"                  # 10 characters: see pm.VER_DISPLAY_MAX
 
 # CCs left out of this build. 2026-10-27, cc1 on hardware: CC 89 (Loop
 # Crossfade) on a Sample pad gave sudden full-scale distorted output at any
@@ -1236,6 +1236,12 @@ FROZEN_MK2 = {
         "13d02de90f502ded100a204659461a9adff840c0e0478446bdec100abcf1000fbde80f5001d100000000000000002de9"
         "0f502ded100adff810c0e047bdec100abde80f500000000000000000000000000000000000000000"
         , {'pa_c_mix': 180, 'pa_c_on': 176, 'pa_c_reset': 168, 'pa_c_set': 172, 'pa_load': 142, 'pa_load_next': 164, 'pa_mix': 94, 'pa_mix_ret': 138, 'pa_mix_stock': 134, 'pa_need': 50, 'pa_need_ret': 86, 'pa_need_send': 90, 'pa_rec': 0, 'pa_rec_next': 46}),
+    'mk2_padbusb': (
+        "5e2b14d12de90f50eff3008003b42ded100a20462699c909dff874c0e047bdec100a03bc80f30088bde80f505e2b0000"
+        "00002de90f502ded100a2046dff854c0e0478446bdec100abcf1000fbde80f5003d1ddf814a000000000000000002de9"
+        "0f502ded100a20461b995246dff828c0e0478446bdec100abcf1000fbde80f5003d151460598000000000000000000bf"
+        "000000000000000000000000"
+        , {'pb_c_mix': 152, 'pb_c_on': 148, 'pb_c_set': 144, 'pb_mix': 94, 'pb_mix_done': 138, 'pb_mix_stock': 134, 'pb_need': 50, 'pb_need_ret': 86, 'pb_need_send': 90, 'pb_rec': 0, 'pb_rec_next': 46}),
 }
 # END FROZEN_MK2
 
@@ -2187,6 +2193,7 @@ def stage3(d, upto="full", hook_e=None):
             apply_fold(d)                          # cc25: the wave folder
             apply_pad_names(d)                     # cc29: 7 characters a line
             apply_pad_bus(d, *SHAPE_C)             # cc32: CC 94, the pads into the shapers
+            apply_pad_bus_b(d, *SHAPE_C)           # cc34: ... Clip and Slicer pads too
     finally:
         pm.assemble = saved
 
@@ -3006,6 +3013,116 @@ def apply_pad_bus(d, s_org, s_csyms):
     vprint(f"pad bus, class A: {org:#x}; CC {PAD_CC} on a pad's channel")
 
 
+# --- P2b: the pad bus in the class B voice (Clip, Slicer; cc34) ---------------
+# The class B process (around 0x080b8e92) has the same shape as A's: a send
+# makes it render into a temp (0x080b90a6: sl = bus 0's temp, r5 = r7, set),
+# else sl = its output [sp+0x14] (0x080b8ede). After the sends, r5 != 0 mixes
+# sl into the output at 0x080b916a (mov r1, sl; ldr r0, [sp, #0x14]; bl
+# 0x080a46d0; b 0x080b8f4c) -- both send paths reach it. CC 94 is noted at
+# hook B's site (0x080b8dfe, the chain's last bne.w), the value at sp+0x38.
+PB_REC_SITE, PB_NEED_SITE, PB_MIX_SITE = 0x080b8dfe, 0x080b8ede, 0x080b916a
+PB_GUARDS = ((0x080b8dfc, "012b", "cmp r3, #1: the chain's last compare"),
+             (0x080b8ede, "ddf814a0", "ldr.w sl, [sp, #0x14]: no send, the output itself"),
+             (0x080b8ee2, "0df12707", "add.w r7, sp, #0x27: the render follows"),
+             (0x080b90a6, "00214046", "the send path: bus 0's temp"),
+             (0x080b916a, "51460598ebf7affa", "the temp into the output, bl 0x080a46d0"))
+PB_SRC = """
+.syntax unified
+.thumb
+.text
+.global pb_rec, pb_need, pb_mix
+.thumb_func
+pb_rec:
+    cmp     r3, #94
+    bne     1f
+    push    {r0, r1, r2, r3, r12, lr}
+    mrs     r0, apsr
+    push    {r0, r1}
+    vpush   {s0-s15}
+    mov     r0, r4
+    ldr     r1, [sp, #0x38 + 96]
+    lsrs    r1, r1, #7
+    ldr     r12, pb_c_set
+    blx     r12
+    vpop    {s0-s15}
+    pop     {r0, r1}
+    msr     apsr_nzcvq, r0
+    pop     {r0, r1, r2, r3, r12, lr}
+    cmp     r3, #94
+1:
+pb_rec_next:
+    .short  0, 0
+
+.thumb_func
+pb_need:
+    push    {r0, r1, r2, r3, r12, lr}
+    vpush   {s0-s15}
+    mov     r0, r4
+    ldr     r12, pb_c_on
+    blx     r12
+    mov     r12, r0
+    vpop    {s0-s15}
+    cmp     r12, #0
+    pop     {r0, r1, r2, r3, r12, lr}
+    bne     2f
+    ldr.w   sl, [sp, #0x14]         /* as stock */
+pb_need_ret:
+    .short  0, 0                    /* b.w 0x080b8ee2 */
+2:
+pb_need_send:
+    .short  0, 0                    /* b.w 0x080b90a6 */
+
+.thumb_func
+pb_mix:
+    push    {r0, r1, r2, r3, r12, lr}
+    vpush   {s0-s15}
+    mov     r0, r4
+    ldr     r1, [sp, #0x14 + 88]    /* the output */
+    mov     r2, sl                  /* the temp */
+    ldr     r12, pb_c_mix
+    blx     r12
+    mov     r12, r0
+    vpop    {s0-s15}
+    cmp     r12, #0
+    pop     {r0, r1, r2, r3, r12, lr}
+    bne     3f
+    mov     r1, sl                  /* as stock */
+    ldr     r0, [sp, #0x14]
+pb_mix_stock:
+    .short  0, 0                    /* b.w 0x080b916e: bl 0x080a46d0; b 0x080b8f4c */
+3:
+pb_mix_done:
+    .short  0, 0                    /* b.w 0x080b8f4c */
+    .p2align 2
+pb_c_set: .word 0
+pb_c_on:  .word 0
+pb_c_mix: .word 0
+"""
+
+
+def apply_pad_bus_b(d, s_org, s_csyms):
+    for va, raw, what in PB_GUARDS:
+        guard_bytes(d, va, raw, what)
+    rec_next = pm.bne_target(d, PB_REC_SITE)
+    code, syms = mk2_assemble("padbusb", PB_SRC)
+    code = bytearray(code)
+    for lab, fn in (("pb_c_set", "padfx_set"), ("pb_c_on", "padfx_on"), ("pb_c_mix", "padfx_mix")):
+        struct.pack_into("<I", code, syms[lab], (s_org + s_csyms[fn]) | 1)
+    org = pm._append(d, code)
+    def b(lab, tgt):
+        va = org + syms[lab]
+        d[va - BASE:va - BASE + 4] = pm.enc_b_bl(va, tgt, False)
+    b("pb_rec_next", rec_next)
+    b("pb_need_ret", 0x080b8ee2)
+    b("pb_need_send", 0x080b90a6)
+    b("pb_mix_stock", 0x080b916e)
+    b("pb_mix_done", 0x080b8f4c)
+    d[PB_REC_SITE - BASE:PB_REC_SITE - BASE + 4] = pm.enc_bne_w(PB_REC_SITE, org + syms["pb_rec"])
+    d[PB_NEED_SITE - BASE:PB_NEED_SITE - BASE + 4] = pm.enc_b_bl(PB_NEED_SITE, org + syms["pb_need"], False)
+    d[PB_MIX_SITE - BASE:PB_MIX_SITE - BASE + 4] = pm.enc_b_bl(PB_MIX_SITE, org + syms["pb_mix"], False)
+    vprint(f"pad bus, class B: {org:#x}")
+
+
 # --- pad names on 6 characters a line (cc29: 7, cc30: 6) ---------------------------------
 # A pad's name is split for its cell by 0x0805d8cc (set-name: strip the
 # extension, then two lines): the last space or underscore within the first
@@ -3450,7 +3567,7 @@ def main():
                  "Wave folder, ch 1            CC 69-77",
                  "Pulse filter, ch 1           CC 33-39",
                  "Pad names, 6 characters a line",
-                 "Pad bus, class A pads        CC 94 (shapers: CC 68)"):
+                 "Pad bus, every pad type      CC 94 (shapers: CC 68)"):
         print(f"     ok   {what}")
 
     write_string(d, ATTRIB_VA, VER_VA, ATTRIB_STOCK, ATTRIB_NEW)
