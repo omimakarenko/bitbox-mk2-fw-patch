@@ -416,46 +416,73 @@ for settings,name in ((((69,127),(70,100),(71,100)),"bass keep max, deep fold"),
     for n,v in settings: cc(n,v)
     print(f"13. {name:30} {h.mu.mem_read(0x24070b44+33,7).hex()}: ", bus_run())
 
-# ---- 14. cc32: the pad bus -- CC 94 on a class A voice, the send-path test, the split, the return
-PAD_DESC=0x24070c80; PAD_TAB=0x24070ca0
+# ---- 14. cc35: FX Shape (pad parameter 0x1c9) and the pad bus
+PAD_DESC=0x24070c80; PS=0x1c9; APP_PADS=0x240169b0
 h.allow(0x24070c80,0x24070da0); h.mu.mem_map(0x60000000,0x10000); h.allow(0x60000000,0x60010000)
-h.ret0={0x08043b4c:0x60000000}                      # the SDRAM bump allocator
+# registration: the Interp call, then FX Shape
+REG=0x0806b73e
+regs={r:0x1000+i for i,r in enumerate(REGS)}; regs[UC_ARM_REG_R0]=0x24050000; regs[UC_ARM_REG_R1]=0xd2; regs[UC_ARM_REG_R2]=0x080c25e0; regs[UC_ARM_REG_R3]=0x080c58ac
+h.mu.mem_write(sp,struct.pack("<II",2,0x080c2600))
+end=h.run(bl_target(REG),regs,sp=sp,lr=(REG+4)|1)
+c=[(x[0],x[1]) for x in h.calls]
+print("14a. registration:",end==REG+4, c, "knob stack:", [hex(x) for x in struct.unpack("<3I",h.mu.mem_read(sp-12,12))] if False else "", "sp kept", h.mu.reg_read(UC_ARM_REG_SP)==sp, "regs", all(h.mu.reg_read(r)==regs[r] for r in CS))
+def kargs(mu,a,s_,u):
+    sp_=mu.reg_read(UC_ARM_REG_SP); st=struct.unpack("<3I",mu.mem_read(sp_,12))
+    lab=bytes(mu.mem_read(mu.reg_read(UC_ARM_REG_R3),12)).split(b"\0")[0]; xml=bytes(mu.mem_read(st[2],16)).split(b"\0")[0]
+    print("     register_knob(", hex(mu.reg_read(UC_ARM_REG_R0)), hex(mu.reg_read(UC_ARM_REG_R1)), mu.reg_read(UC_ARM_REG_R2), lab, st[0], st[1], xml, ")")
+def largs(mu,a,s_,u):
+    sp_=mu.reg_read(UC_ARM_REG_SP); print("     register_list( id", hex(mu.reg_read(UC_ARM_REG_R1)), "count/xml", [hex(x) for x in struct.unpack("<2I",mu.mem_read(sp_,8))], ")")
+k1=h.mu.hook_add(UC_HOOK_CODE,kargs,begin=0x0806a2d4,end=0x0806a2d4); k2=h.mu.hook_add(UC_HOOK_CODE,largs,begin=0x0806a27c,end=0x0806a27c)
+h.run(bl_target(REG),regs,sp=sp,lr=(REG+4)|1); h.mu.hook_del(k1); h.mu.hook_del(k2)
+# record init: add Filter, add FX Shape, the bus's memory
+h.ret0={0x08043b4c:0x60000000}
+for site in (0x080895b0,0x080897da):
+    regs={r:0x1000+i for i,r in enumerate(REGS)}; regs[UC_ARM_REG_R0]=0x24050100; regs[UC_ARM_REG_R1]=0xaa; regs[UC_ARM_REG_R2]=0
+    end=h.run(bl_target(site),regs,sp=sp,lr=(site+4)|1)
+    print(f"14b. record init {site:#x}: end ok {end==site+4}, calls {[(x[0],x[1][:3]) for x in h.calls]}, regs {all(h.mu.reg_read(r)==regs[r] for r in CS)}")
+del h.ret0
+print("     bus ready", hex(struct.unpack("<I",h.mu.mem_read(PAD_DESC+0x14,4))[0]), "L/R", [hex(x) for x in struct.unpack("<II",h.mu.mem_read(PAD_DESC+8,8))])
+# a fake app pad record (row 1, col 2) with FX Shape among its entries
+ENT=0x24051000; REC=APP_PADS+1*0xf0+2*0x30; h.allow(ENT,ENT+0x200); h.allow(REC,REC+0x30)
+h.mu.mem_write(ENT,b"".join(struct.pack("<HHi",i,0,0) for i in (0xaa,0x11,PS,0xbb)))
+h.mu.mem_write(REC,b"\0"*0x30); h.mu.mem_write(REC+4,struct.pack("<I",ENT)); h.mu.mem_write(REC+0xa,struct.pack("<H",4))
+def shape_val(): return struct.unpack("<i",h.mu.mem_read(ENT+8*2+4,4))[0]
 V=0x24049000; W=0x24049800
-entryA=bne_target(0x080b336e)
-h.terminal={0x80b2168}|set(v for v in CASES.values() if isinstance(v,int))
-for voice,val in ((V,100),(W,0)):
-    h.mu.mem_write(voice,b"\0"*0x800); h.mu.mem_write(voice+0x575,b"\1"); h.mu.mem_write(sp+0x40,struct.pack("<I",val<<7))
-    regs={r:0x1000+i for i,r in enumerate(REGS)}; regs[UC_ARM_REG_R3]=94; regs[UC_ARM_REG_R4]=voice; regs[UC_ARM_REG_R9]=0x24049800
-    end=h.run(entryA,regs,sp=sp,lr=0x0800fff1,count=50000)
-    print(f"14a. CC 94 = {val} on voice {voice:#x}: end {hex(end) if isinstance(end,int) else end}, badw {h.badw[:2]}")
-h.terminal=set(); del h.ret0
-tab=struct.unpack("<16I",h.mu.mem_read(PAD_TAB,64)); print("     table:",[hex(x) for x in tab[:6]], "ready", hex(struct.unpack("<I",h.mu.mem_read(PAD_DESC+0x14,4))[0]))
+for voice,rc in ((V,0x0102),(W,0x0303)):
+    h.mu.mem_write(voice,b"\0"*0x1000); h.mu.mem_write(voice+0x18,struct.pack("<I",rc)); h.mu.mem_write(voice+0x575,b"\1"); h.mu.mem_write(voice+0x254,b"\1")
+entryA=bne_target(0x080b336e); entryB=bne_target(0x080b8dfe)
+h.terminal={0x80b2168,0x080b867c,0x80b8916,0x80a1868,0x80b7e10}|set(v for v in CASES.values() if isinstance(v,int))
+for entry,slot,val,cls in ((entryA,0x40,100,"A"),(entryB,0x38,127,"B"),(entryA,0x40,64,"A")):
+    h.mu.mem_write(sp+slot,struct.pack("<I",val<<7))
+    regs={r:0x1000+i for i,r in enumerate(REGS)}; regs[UC_ARM_REG_R3]=94; regs[UC_ARM_REG_R4]=V; regs[UC_ARM_REG_R9]=0x24049800
+    end=h.run(entry,regs,sp=sp,lr=0x0800fff1,count=200000)
+    print(f"14c. class {cls} CC 94 = {val}: end {hex(end) if isinstance(end,int) else end}, FX Shape in the record {shape_val()}, badw {h.badw[:2]}")
+h.terminal=set()
 # a master block sets the bus's size
 L=buf+0x100; R=L+FR*4; h.mu.mem_write(buf,struct.pack("<IIII",FR,0,L,R)+bytes([0,1,0,0]))
-h.mu.mem_write(L,struct.pack(f"<{FR}f",*([0.25]*FR))); h.mu.mem_write(R,struct.pack(f"<{FR}f",*([0.25]*FR)))
 regs={r:0x1000+i for i,r in enumerate(REGS)}; regs[UC_ARM_REG_R0]=buf
 h.run(bl_target(CHR_SITE),regs,sp=sp,lr=0x0809817f)
-print("14b. bus after a master block: cap/frames/silent", struct.unpack("<II",h.mu.mem_read(PAD_DESC,8)), h.mu.mem_read(PAD_DESC+0x10,2).hex())
-NEED=0x080b245e; MIX=0x080b2508
+def gcap(mu,a,s_,u):
+    gains.append((0,0,round(struct.unpack('<f',struct.pack('<I',mu.reg_read(UC_ARM_REG_S0)))[0],3)))
+gains=[]; hk=h.mu.hook_add(UC_HOOK_CODE,gcap,begin=0x080a4794,end=0x080a4794)
 for voice in (V,W):
     h.terminal={0x080b35a2,0x080b2462}
     regs={r:0x1000+i for i,r in enumerate(REGS)}; regs[UC_ARM_REG_R4]=voice; regs[UC_ARM_REG_R11]=0x24047000
-    h.mu.mem_write(sp+0x10,b"\0"*4)
-    end=h.run(bw_target(NEED),regs,sp=sp,lr=0x0800fff1,count=50000)
-    print(f"14c. pa_need, voice {voice:#x}: -> {hex(end) if isinstance(end,int) else end} [sp+0x10]={h.mu.mem_read(sp+0x10,4)[::-1].hex()} regs kept {all(h.mu.reg_read(r)==regs[r] for r in CS)}")
-gains=[]
-def gcap(mu,a,s,u):
-    gains.append((hex(mu.reg_read(UC_ARM_REG_R0)),hex(mu.reg_read(UC_ARM_REG_R1)),round(struct.unpack('<f',struct.pack('<I',mu.reg_read(UC_ARM_REG_S0)))[0],3)))
-hk=h.mu.hook_add(UC_HOOK_CODE,gcap,begin=0x080a4794,end=0x080a4794)
-for voice,r5 in ((V,1),(W,1),(V,0)):
-    gains.clear(); h.terminal={0x080b3654,0x080b250e}
-    regs={r:0x1000+i for i,r in enumerate(REGS)}; regs[UC_ARM_REG_R4]=voice; regs[UC_ARM_REG_R5]=r5; regs[UC_ARM_REG_R11]=0x24047000
-    h.mu.mem_write(sp+0x10,struct.pack("<I",0x24047100))
-    end=h.run(bw_target(MIX),regs,sp=sp,lr=0x0800fff1,count=50000)
-    gains=[(c[1][0],c[1][1],g[2]) for c,g in zip([c for c in h.calls if c[0]=="0x80a4794"],gains)]
-    print(f"14d. pa_mix voice {voice:#x} r5={r5}: -> {hex(end) if isinstance(end,int) else end}, mixes (dst, src, gain) {gains}, regs kept {all(h.mu.reg_read(r)==regs[r] for r in CS)}")
+    end=h.run(bw_target(0x080b245e),regs,sp=sp,lr=0x0800fff1,count=50000)
+    print(f"14d. A need {voice:#x}: -> {hex(end) if isinstance(end,int) else end}")
+    h.terminal={0x080b90a6,0x080b8ee2}
+    regs={r:0x1000+i for i,r in enumerate(REGS)}; regs[UC_ARM_REG_R4]=voice; h.mu.mem_write(sp+0x14,struct.pack("<I",0x24047000))
+    end=h.run(bw_target(0x080b8ede),regs,sp=sp,lr=0x0800fff1,count=50000)
+    print(f"14d. B need {voice:#x}: -> {hex(end) if isinstance(end,int) else end}")
+    for site,ends,r5 in ((0x080b2508,{0x080b3654,0x080b250e},1),(0x080b916a,{0x080b916e,0x080b8f4c},None)):
+        gains.clear(); h.terminal=ends
+        regs={r:0x1000+i for i,r in enumerate(REGS)}; regs[UC_ARM_REG_R4]=voice; regs[UC_ARM_REG_R11]=0x24047000; regs[UC_ARM_REG_R10]=0x24047100
+        if r5: regs[UC_ARM_REG_R5]=r5
+        h.mu.mem_write(sp+0x10,struct.pack("<I",0x24047100)); h.mu.mem_write(sp+0x14,struct.pack("<I",0x24047000))
+        end=h.run(bw_target(site),regs,sp=sp,lr=0x0800fff1,count=50000)
+        g=[(c[1][0],c[1][1],x[2]) for c,x in zip([c for c in h.calls if c[0]=="0x80a4794"],gains)]
+        print(f"14e. mix {site:#x} {voice:#x}: -> {hex(end) if isinstance(end,int) else end}, mixes {g}")
 h.mu.hook_del(hk); h.terminal=set()
-# the bus back into the master: fill it as the mixes would, then a master block (shapers on the master, then on the bus)
 for target in (0,127):
     cc(68,target); cc(70,127); cc(71,100)
     BL=0x60000000; h.mu.mem_write(BL,struct.pack(f"<{FR}f",*([0.5]*FR))); h.mu.mem_write(BL+1024,struct.pack(f"<{FR}f",*([0.5]*FR)))
@@ -465,41 +492,8 @@ for target in (0,127):
     regs={r:0x1000+i for i,r in enumerate(REGS)}; regs[UC_ARM_REG_R0]=buf
     end=h.run(bl_target(CHR_SITE),regs,sp=sp,lr=0x0809817f)
     out=struct.unpack(f"<{FR}f",h.mu.mem_read(L,FR*4))
-    print(f"14e. CC 68 = {target}: master out {out[0]:.3f}..{out[-1]:.3f} (silent master + bus 0.5), bus silent after: {h.mu.mem_read(PAD_DESC+0x10,1).hex()}, badw {h.badw[:2]}")
+    print(f"14f. CC 68 = {target}: master out {out[0]:.3f}..{out[-1]:.3f} (silent master + bus 0.5), bus silent after: {h.mu.mem_read(PAD_DESC+0x10,1).hex()}, badw {h.badw[:2]}")
 cc(70,0); cc(68,0)
-# ---- 14f. cc33: a preset load empties the pad table
-h.ret0={0x08043b4c:0x60000000}; h.terminal={0x80b2168}|set(v for v in CASES.values() if isinstance(v,int))
-h.mu.mem_write(sp+0x40,struct.pack("<I",90<<7))
-regs={r:0x1000+i for i,r in enumerate(REGS)}; regs[UC_ARM_REG_R3]=94; regs[UC_ARM_REG_R4]=V; regs[UC_ARM_REG_R9]=0x24049800
-h.run(entryA,regs,sp=sp,lr=0x0800fff1,count=50000); h.terminal=set(); del h.ret0
-before=struct.unpack("<2I",h.mu.mem_read(PAD_TAB,8))
-for site in (0x0807e2f4,0x080822ac):
-    regs={r:0x1000+i for i,r in enumerate(REGS)}; regs[UC_ARM_REG_R0]=0x24011110
-    end=h.run(bl_target(site),regs,sp=sp,lr=(site+4)|1)
-    print(f"14f. load finish {site:#x}: end {hex(end) if isinstance(end,int) else end}, table before {[hex(x) for x in before]} after {h.mu.mem_read(PAD_TAB,8).hex()}, stock {[c[0] for c in h.calls]}, regs kept {all(h.mu.reg_read(r)==regs[r] for r in CS)}")
-# ---- 15. cc34: the pad bus on class B (Clip, Slicer)
-h.ret0={0x08043b4c:0x60000000}
-entryB=bne_target(0x080b8dfe)
-h.terminal={0x080b867c,0x80b8916,0x80a1868,0x80b7e10}|set(v for v in CASES.values() if isinstance(v,int))
-for voice,val in ((V,0),(W,127)):
-    h.mu.mem_write(voice,b"\0"*0x1000); h.mu.mem_write(voice+0x254,b"\1"); h.mu.mem_write(sp+0x38,struct.pack("<I",val<<7))
-    regs={r:0x1000+i for i,r in enumerate(REGS)}; regs[UC_ARM_REG_R3]=94; regs[UC_ARM_REG_R4]=voice; regs[UC_ARM_REG_R9]=clkp
-    end=h.run(entryB,regs,sp=sp,lr=0x0800fff1,count=200000)
-    print(f"15a. class B CC 94 = {val} on {voice:#x}: end {hex(end) if isinstance(end,int) else end}, badw {h.badw[:2]}")
-h.terminal=set(); del h.ret0
-print("     table:",[hex(x) for x in struct.unpack("<4I",h.mu.mem_read(PAD_TAB,16))])
-for voice in (W,V):
-    h.terminal={0x080b90a6,0x080b8ee2}
-    regs={r:0x1000+i for i,r in enumerate(REGS)}; regs[UC_ARM_REG_R4]=voice
-    h.mu.mem_write(sp+0x14,struct.pack("<I",0x24047000))
-    end=h.run(bw_target(0x080b8ede),regs,sp=sp,lr=0x0800fff1,count=50000)
-    print(f"15b. pb_need {voice:#x}: -> {hex(end) if isinstance(end,int) else end}, sl {h.mu.reg_read(UC_ARM_REG_R10):#x}, regs {all(h.mu.reg_read(r)==regs[r] for r in CS if r!=UC_ARM_REG_R10)}")
-gains=[]; hk=h.mu.hook_add(UC_HOOK_CODE,gcap,begin=0x080a4794,end=0x080a4794)
-for voice in (W,V):
-    gains.clear(); h.terminal={0x080b916e,0x080b8f4c}
-    regs={r:0x1000+i for i,r in enumerate(REGS)}; regs[UC_ARM_REG_R4]=voice; regs[UC_ARM_REG_R10]=0x24047100
-    h.mu.mem_write(sp+0x14,struct.pack("<I",0x24047000))
-    end=h.run(bw_target(0x080b916a),regs,sp=sp,lr=0x0800fff1,count=50000)
-    g=[(c[1][0],c[1][1],x[2]) for c,x in zip([c for c in h.calls if c[0]=="0x80a4794"],gains)]
-    print(f"15c. pb_mix {voice:#x}: -> {hex(end) if isinstance(end,int) else end}, r0/r1 {h.mu.reg_read(UC_ARM_REG_R0):#x}/{h.mu.reg_read(UC_ARM_REG_R1):#x}, mixes {g}")
-h.mu.hook_del(hk); h.terminal=set()
+# the page tables
+for t,pg in ((0x080C7BD4,1),(0x080C84F4,1),(0x080C87C4,4),(0x080C8A04,1)):
+    ids=struct.unpack_from("<36H",img,t-BASE+pg*72); print(f"14g. table {t:#x} page {pg}:", [hex(x) for x in ids[:ids.index(0)]])

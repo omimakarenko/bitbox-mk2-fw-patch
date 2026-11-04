@@ -56,7 +56,11 @@ script on the zip and copy the result to your card. The splash should then read
 The patcher and this guide are MIT-licensed. The firmware is 1010music's. No
 permission over it is granted. Bitbox Micro is a product of 1010music LLC, named
 only to say what hardware this runs on. The Character chain's effects are ports
-of Chris Johnson's Airwindows plugins, under their own MIT licence. If you paid
+of Chris Johnson's Airwindows plugins, under their own MIT licence. The MK2's
+pad-parameter recipe (registration, the app's pad records, the pad page tables)
+and the CV/bus notes follow bitbox-mk2-semi
+(github.com/semierendonmez-commits/bitbox-mk2-semi, MIT, portkit contributors).
+If you paid
 for this, somebody sold you something they did not write.
 
 Flash stock firmware back before you send a unit for service. See
