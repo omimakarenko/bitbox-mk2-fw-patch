@@ -82,7 +82,7 @@ import patch_micro as pm                # noqa: E402  the hook generators
 BASE = 0x08040000
 STOCK_SHA = "35ab7995ad0eca8484f3b28bc76389f10b2037dbb21a4a394e950d9329073e86"
 STOCK_SIZE = 674896
-VERSION = "2.3.4-cc36"                  # 10 characters: see pm.VER_DISPLAY_MAX
+VERSION = "2.3.4-cc37"                  # 10 characters: see pm.VER_DISPLAY_MAX
 
 # CCs left out of this build. 2026-10-27, cc1 on hardware: CC 89 (Loop
 # Crossfade) on a Sample pad gave sudden full-scale distorted output at any
@@ -1773,6 +1773,8 @@ def relocated_chr(obj, key="chr"):
         _reloc_pair(data, sec, lo, hi, old, new)
         by_name[sec][2] = data.hex()
     landscape_chr(by_name, mask, "osdsync" if key == "chr" else "osdsync10")
+    if key == "chr10":
+        purest_drive_range(by_name)
     wb = by_name[".rodata.chr_work_base"]
     data = bytearray.fromhex(wb[2])
     old, = struct.unpack_from("<I", data, 0)
@@ -1781,6 +1783,25 @@ def relocated_chr(obj, key="chr"):
     struct.pack_into("<I", data, 0, pm.CHR_WORK_DEFAULT)
     wb[2] = data.hex()
     return [tuple(s) for s in secs], exports
+
+
+# cc37: PurestDrive (Saturation, the first effect) drives its input by its
+# Tone: dB = (1 - 2t) * -6 below the centre, (2t - 1) * 12 above, then takes
+# the same gain back after the shaper. +12 dB at the top left it all but
+# silent on a pad at ordinary level (simulator: peaks -32%, nothing else).
+# The top now reaches +24 dB: the old top is at three quarters, and the upper
+# quarter is new ground. One VFP immediate: vmov.f32 s12, #12.0 -> #24.0.
+PURE_SITE = 0x692                    # in .text.chr_mode_run
+PURE_OLD, PURE_NEW = "b2ee086a", "b3ee086a"
+
+
+def purest_drive_range(by_name):
+    sec = by_name[".text.chr_mode_run"]
+    data = bytearray.fromhex(sec[2])
+    if data[PURE_SITE:PURE_SITE + 4].hex() != PURE_OLD:
+        pm.refuse("PurestDrive's drive range is not where the patcher expects it.")
+    data[PURE_SITE:PURE_SITE + 4] = bytes.fromhex(PURE_NEW)
+    sec[2] = data.hex()
 
 
 # The pop-up, landscape. chr_osd_tick ORs its two text lines into a 1-bit
