@@ -416,8 +416,8 @@ for settings,name in ((((69,127),(70,100),(71,100)),"bass keep max, deep fold"),
     for n,v in settings: cc(n,v)
     print(f"13. {name:30} {h.mu.mem_read(0x24070b44+33,7).hex()}: ", bus_run())
 
-# ---- 14. cc35: FX Shape (pad parameter 0x1c9) and the pad bus
-PAD_DESC=0x24070c80; PS=0x1c9; APP_PADS=0x240169b0
+# ---- 14. cc35/cc36: FX Fold (0x1c9) and FX Pulse (0x1ca), pad parameters, and their two buses
+PAD_DESC=0x24070c80; PUL_DESC=0x24070ca0; PS=0x1c9; PS2=0x1ca; APP_PADS=0x240169b0
 h.allow(0x24070c80,0x24070da0); h.mu.mem_map(0x60000000,0x10000); h.allow(0x60000000,0x60010000)
 # registration: the Interp call, then FX Shape
 REG=0x0806b73e
@@ -441,22 +441,24 @@ for site in (0x080895b0,0x080897da):
     end=h.run(bl_target(site),regs,sp=sp,lr=(site+4)|1)
     print(f"14b. record init {site:#x}: end ok {end==site+4}, calls {[(x[0],x[1][:3]) for x in h.calls]}, regs {all(h.mu.reg_read(r)==regs[r] for r in CS)}")
 del h.ret0
-print("     bus ready", hex(struct.unpack("<I",h.mu.mem_read(PAD_DESC+0x14,4))[0]), "L/R", [hex(x) for x in struct.unpack("<II",h.mu.mem_read(PAD_DESC+8,8))])
+for D in (PAD_DESC,PUL_DESC): print("     bus ready", hex(struct.unpack("<I",h.mu.mem_read(D+0x14,4))[0]), "L/R", [hex(x) for x in struct.unpack("<II",h.mu.mem_read(D+8,8))])
+h.mu.mem_write(PUL_DESC+8,struct.pack("<II",0x60002000,0x60002400))   # the stub allocator gave both the same memory
 # a fake app pad record (row 1, col 2) with FX Shape among its entries
 ENT=0x24051000; REC=APP_PADS+1*0xf0+2*0x30; h.allow(ENT,ENT+0x200); h.allow(REC,REC+0x30)
-h.mu.mem_write(ENT,b"".join(struct.pack("<HHi",i,0,0) for i in (0xaa,0x11,PS,0xbb)))
-h.mu.mem_write(REC,b"\0"*0x30); h.mu.mem_write(REC+4,struct.pack("<I",ENT)); h.mu.mem_write(REC+0xa,struct.pack("<H",4))
-def shape_val(): return struct.unpack("<i",h.mu.mem_read(ENT+8*2+4,4))[0]
+h.mu.mem_write(ENT,b"".join(struct.pack("<HHi",i,0,0) for i in (0xaa,0x11,PS,0xbb,PS2)))
+h.mu.mem_write(REC,b"\0"*0x30); h.mu.mem_write(REC+4,struct.pack("<I",ENT)); h.mu.mem_write(REC+0xa,struct.pack("<H",5))
+def shape_val(k=2): return struct.unpack("<i",h.mu.mem_read(ENT+8*k+4,4))[0]
 V=0x24049000; W=0x24049800
 for voice,rc in ((V,0x0102),(W,0x0303)):
     h.mu.mem_write(voice,b"\0"*0x1000); h.mu.mem_write(voice+0x18,struct.pack("<I",rc)); h.mu.mem_write(voice+0x575,b"\1"); h.mu.mem_write(voice+0x254,b"\1")
 entryA=bne_target(0x080b336e); entryB=bne_target(0x080b8dfe)
 h.terminal={0x80b2168,0x080b867c,0x80b8916,0x80a1868,0x80b7e10}|set(v for v in CASES.values() if isinstance(v,int))
-for entry,slot,val,cls in ((entryA,0x40,100,"A"),(entryB,0x38,127,"B"),(entryA,0x40,64,"A")):
+for entry,slot,val,cls,ccn in ((entryA,0x40,100,"A",94),(entryB,0x38,127,"B",95),(entryA,0x40,64,"A",94),(entryA,0x40,30,"A",95),(entryB,0x38,90,"B",94)):
     h.mu.mem_write(sp+slot,struct.pack("<I",val<<7))
-    regs={r:0x1000+i for i,r in enumerate(REGS)}; regs[UC_ARM_REG_R3]=94; regs[UC_ARM_REG_R4]=V; regs[UC_ARM_REG_R9]=0x24049800
+    regs={r:0x1000+i for i,r in enumerate(REGS)}; regs[UC_ARM_REG_R3]=ccn; regs[UC_ARM_REG_R4]=V; regs[UC_ARM_REG_R9]=0x24049800
     end=h.run(entry,regs,sp=sp,lr=0x0800fff1,count=200000)
-    print(f"14c. class {cls} CC 94 = {val}: end {hex(end) if isinstance(end,int) else end}, FX Shape in the record {shape_val()}, badw {h.badw[:2]}")
+    print(f"14c. class {cls} CC {ccn} = {val}: end {hex(end) if isinstance(end,int) else end}, record: FX Fold {shape_val(2)}, FX Pulse {shape_val(4)}, badw {h.badw[:2]}")
+h.mu.mem_write(ENT+8*2+4,struct.pack("<i",503)); h.mu.mem_write(ENT+8*4+4,struct.pack("<i",236))   # for 14e: fold 0.503, pulse 0.236, dry 0.261
 h.terminal=set()
 # a master block sets the bus's size
 L=buf+0x100; R=L+FR*4; h.mu.mem_write(buf,struct.pack("<IIII",FR,0,L,R)+bytes([0,1,0,0]))
@@ -483,17 +485,19 @@ for voice in (V,W):
         g=[(c[1][0],c[1][1],x[2]) for c,x in zip([c for c in h.calls if c[0]=="0x80a4794"],gains)]
         print(f"14e. mix {site:#x} {voice:#x}: -> {hex(end) if isinstance(end,int) else end}, mixes {g}")
 h.mu.hook_del(hk); h.terminal=set()
-for target in (0,127):
-    cc(68,target); cc(70,127); cc(71,100)
+for target,pul in ((0,0),(127,0),(127,1)):
+    cc(68,target); cc(70,127); cc(71,100); cc(33,20 if pul else 64)
     BL=0x60000000; h.mu.mem_write(BL,struct.pack(f"<{FR}f",*([0.5]*FR))); h.mu.mem_write(BL+1024,struct.pack(f"<{FR}f",*([0.5]*FR)))
     h.mu.mem_write(PAD_DESC+4,struct.pack("<I",FR)); h.mu.mem_write(PAD_DESC+0x10,b"\0\1")
+    h.mu.mem_write(0x60002000,struct.pack(f"<{FR}f",*([0.25]*FR))); h.mu.mem_write(0x60002400,struct.pack(f"<{FR}f",*([0.25]*FR)))
+    h.mu.mem_write(PUL_DESC+4,struct.pack("<I",FR)); h.mu.mem_write(PUL_DESC+0x10,bytes([0 if pul else 1,1]))
     h.mu.mem_write(buf,struct.pack("<IIII",FR,0,L,R)+bytes([0,1,0,0]))
     h.mu.mem_write(L,struct.pack(f"<{FR}f",*([0.0]*FR))); h.mu.mem_write(R,struct.pack(f"<{FR}f",*([0.0]*FR)))
     regs={r:0x1000+i for i,r in enumerate(REGS)}; regs[UC_ARM_REG_R0]=buf
     end=h.run(bl_target(CHR_SITE),regs,sp=sp,lr=0x0809817f)
     out=struct.unpack(f"<{FR}f",h.mu.mem_read(L,FR*4))
-    print(f"14f. CC 68 = {target}: master out {out[0]:.3f}..{out[-1]:.3f} (silent master + bus 0.5), bus silent after: {h.mu.mem_read(PAD_DESC+0x10,1).hex()}, badw {h.badw[:2]}")
-cc(70,0); cc(68,0)
+    print(f"14f. CC 68 = {target}, pulse bus {'0.25 (LP 20)' if pul else 'silent'}: master out {out[0]:.3f}..{out[-1]:.3f} (silent master + fold bus 0.5), buses silent after: {h.mu.mem_read(PAD_DESC+0x10,1).hex()}{h.mu.mem_read(PUL_DESC+0x10,1).hex()}, badw {h.badw[:2]}")
+cc(70,0); cc(68,0); cc(33,64)
 # the page tables
 for t,pg in ((0x080C7BD4,1),(0x080C84F4,1),(0x080C87C4,4),(0x080C8A04,1)):
     ids=struct.unpack_from("<36H",img,t-BASE+pg*72); print(f"14g. table {t:#x} page {pg}:", [hex(x) for x in ids[:ids.index(0)]])
