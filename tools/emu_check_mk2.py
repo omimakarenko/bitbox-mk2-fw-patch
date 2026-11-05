@@ -417,8 +417,8 @@ for settings,name in ((((69,127),(70,100),(71,100)),"bass keep max, deep fold"),
     print(f"13. {name:30} {h.mu.mem_read(0x24070b44+33,7).hex()}: ", bus_run())
 
 # ---- 14. cc35/cc36: FX Fold (0x1c9) and FX Pulse (0x1ca), pad parameters, and their two buses
-PAD_DESC=0x24070c80; PUL_DESC=0x24070ca0; PS=0x1c9; PS2=0x1ca; APP_PADS=0x240169b0
-h.allow(0x24070c80,0x24070da0); h.mu.mem_map(0x60000000,0x10000); h.allow(0x60000000,0x60010000)
+PAD_DESC=0x24070cc0; PUL_DESC=0x24070ce0; PS=0x1c9; PS2=0x1ca; APP_PADS=0x240169b0
+h.allow(0x24070b40,0x24070da0); h.mu.mem_map(0x60000000,0x10000); h.allow(0x60000000,0x60010000)
 # registration: the Interp call, then FX Shape
 REG=0x0806b73e
 regs={r:0x1000+i for i,r in enumerate(REGS)}; regs[UC_ARM_REG_R0]=0x24050000; regs[UC_ARM_REG_R1]=0xd2; regs[UC_ARM_REG_R2]=0x080c25e0; regs[UC_ARM_REG_R3]=0x080c58ac
@@ -501,3 +501,23 @@ cc(70,0); cc(68,0); cc(33,64)
 # the page tables
 for t,pg in ((0x080C7BD4,1),(0x080C84F4,1),(0x080C87C4,4),(0x080C8A04,1)):
     ids=struct.unpack_from("<36H",img,t-BASE+pg*72); print(f"14g. table {t:#x} page {pg}:", [hex(x) for x in ids[:ids.index(0)]])
+
+# ---- 16. cc38: the folder's and pulse filter's settings in the project (session record, ids 0x1cb-0x1cf)
+SESS=0x240173e8; ENT2=0x24052000; h.allow(SESS,SESS+0x18); h.allow(ENT2,ENT2+0x200)
+SITE=0x080899be
+regs={r:0x1000+i for i,r in enumerate(REGS)}; regs[UC_ARM_REG_R0]=0x24050200; regs[UC_ARM_REG_R1]=0x6c; regs[UC_ARM_REG_R2]=3
+end=h.run(bl_target(SITE),regs,sp=sp,lr=(SITE+4)|1)
+print("16a. session init:", end==SITE+4, [(x[0],x[1][:3]) for x in h.calls], "regs kept", all(h.mu.reg_read(r)==regs[r] for r in CS))
+ids=[0x66,0xa1,0xa3,0xa4,0xb9,0x6b,0x6c]+list(range(0x1cb,0x1d0))
+h.mu.mem_write(ENT2,b"".join(struct.pack("<HHi",i,0,0) for i in ids))
+h.mu.mem_write(SESS,struct.pack("<IIHHII",0x080c7bb8,ENT2,0x1f,len(ids),0x40,0))
+def sess(): return [struct.unpack("<i",h.mu.mem_read(ENT2+8*(7+k)+4,4))[0] for k in range(5)]
+def ccs(*n): return [h.mu.mem_read(0x24070b44+x,1)[0] for x in n]
+sig=[0.3*math.sin(i*0.2) for i in range(FR)]
+ok,_,_=one(FHEAD,sig); print("16b. first block, store all 0 (defaults):", ok, "store", sess(), "CC 33/37/70/74/77", ccs(33,37,70,74,77))
+cc(70,100); ok,_,_=one(FHEAD,sig); print("16c. CC 70 = 100 -> store", sess(), "(word 2 = 100 << 7 = 12800)", ok)
+cc(33,20); ok,_,_=one(FHEAD,sig); print("16d. CC 33 = 20 -> store", sess(), f"(word 0 = 20 ^ 64 = {20^64})", ok)
+h.mu.mem_write(ENT2+8*7+4,struct.pack("<i",(100^64)|((90^0)<<7))); h.mu.mem_write(ENT2+8*9+4,struct.pack("<i",0))
+ok,_,_=one(FHEAD,sig); print("16e. a project loads (33 = 100, 34 = 90, folder words 0): CC 33/34/70", ccs(33,34,70), "store", sess(), ok)
+for k in range(5): h.mu.mem_write(ENT2+8*(7+k)+4,struct.pack("<i",0))
+ok,_,_=one(FHEAD,sig); print("16f. a project from before cc38 (all 0): CC 33/34/68/70/74/77", ccs(33,34,68,70,74,77), ok, "badw", h.badw[:2])
